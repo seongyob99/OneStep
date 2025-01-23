@@ -1,0 +1,31 @@
+# 각 리액트 프로젝트 내부의 node_modules , 깃 목록에서 제외하기. 
+**/node_modules
+# 각 프로젝트에서 build, 폴더도 다 제외하기.  
+**/build
+
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
