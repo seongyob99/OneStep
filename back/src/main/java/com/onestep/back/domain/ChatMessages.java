@@ -25,4 +25,10 @@ public class ChatMessages extends BaseEntity {
 
     @Column(name = "content")
     private String content;
+
+    public void setChatInfo(Chats chat, String memberId, String content) {
+        this.chat = chat;
+        this.memberId = memberId;
+        this.content = content;
+    }
 }
