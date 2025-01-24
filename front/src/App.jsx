@@ -12,8 +12,9 @@ function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/test" element={<Test />} />
+        <Route path="/chat" element={<ChatPage />} />
       </Route>
-      <Route path="/chat" element={<ChatPage />} />
+
     </Routes>
   )
 }
