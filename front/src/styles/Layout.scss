@@ -1,0 +1,27 @@
+.layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: lightyellow;
+    z-index: 1000; // 맨 앞으로
+}
+
+.main {
+    flex-grow: 1;
+    padding-top: 100px; // header 높이
+    overflow-y: auto;
+}
+
+.footer {
+    height: 100px;
+    background: beige;
+    margin-top: auto;
+}

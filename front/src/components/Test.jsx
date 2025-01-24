@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { produce } from 'immer';
-import '@styles/TestStyle.scss';
 
 const Test = () => {
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
