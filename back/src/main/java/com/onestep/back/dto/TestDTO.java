@@ -19,7 +19,7 @@ public class TestDTO {
     private Long id;
     private String name;
     private boolean chkType;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birth;
     private String address;
     private String filePath;
