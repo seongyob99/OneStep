@@ -23,7 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TestRestController {
 
-    @Value("${com.busanit501.upload.path}")
+    @Value("${com.onestep.upload.path}")
     private String uploadPath;
 
     private final TestService testService;
