@@ -36,32 +36,36 @@ public class GoalRestController {
     }
 
    // 목표 등록
-    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Long registerGoal(@ModelAttribute GoalDTO goalDTO,
-                             @RequestPart(value = "file", required = false) MultipartFile file) {
-        log.info("목표 등록 요청: {}", goalDTO);
+   @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+   public Long registerGoal(@ModelAttribute GoalDTO goalDTO,
+                            @RequestParam("memberId") String memberId, // 클라이언트 요청에서 memberId를 전달받음
+                            @RequestParam("categoryId") Long categoryId, // 추가
+                            @RequestPart(value = "file", required = false) MultipartFile file) {
+       log.info("목표 등록 요청: {}", goalDTO);
+       goalDTO.setMemberId(memberId); // 전달받은 memberId를 GoalDTO에 설정
+       goalDTO.setCategoryId(categoryId); // 설정
 
-        // 파일 업로드 처리
-        if (file != null && !file.isEmpty()) {
-            try {
-                String uuid = UUID.randomUUID().toString();
-                String fileName = uuid + "_" + file.getOriginalFilename();
-                Path savePath = Paths.get(uploadPath, fileName);
+       // 파일 업로드 처리
+       if (file != null && !file.isEmpty()) {
+           try {
+               String uuid = UUID.randomUUID().toString();
+               String fileName = uuid + "_" + file.getOriginalFilename();
+               Path savePath = Paths.get(uploadPath, fileName);
 
-                if (Files.notExists(Paths.get(uploadPath))) {
-                    Files.createDirectories(Paths.get(uploadPath)); // 디렉토리 생성
-                }
+               if (Files.notExists(Paths.get(uploadPath))) {
+                   Files.createDirectories(Paths.get(uploadPath)); // 디렉토리 생성
+               }
 
-                file.transferTo(savePath); // 파일 저장
-                goalDTO.setThumbnail(fileName); // 저장된 파일명 설정
-            } catch (IOException e) {
-                log.error("파일 업로드 실패", e);
-                throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.");
-            }
-        }
+               file.transferTo(savePath); // 파일 저장
+               goalDTO.setThumbnail(fileName); // 저장된 파일명 설정
+           } catch (IOException e) {
+               log.error("파일 업로드 실패", e);
+               throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.");
+           }
+       }
 
-        return goalService.register(goalDTO);
-    }
+       return goalService.register(goalDTO);
+   }
 
     // 목표 참가
     @PostMapping("/{goalId}/join")

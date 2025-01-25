@@ -1,7 +1,11 @@
 package com.onestep.back.service.goal;
 
+import com.onestep.back.domain.Categories;
 import com.onestep.back.domain.Goals;
+import com.onestep.back.domain.Members;
 import com.onestep.back.dto.GoalDTO;
+import com.onestep.back.repository.MemberRepository;
+import com.onestep.back.repository.category.CategoriesRepository;
 import com.onestep.back.repository.goal.GoalRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,6 +22,8 @@ public class GoalServiceImpl implements GoalService {
 
     private final GoalRepository goalRepository;
     private final ModelMapper modelMapper;
+    private final MemberRepository memberRepository;
+    private final CategoriesRepository categoriesRepository;
 
     @Override
     public List<GoalDTO> getList(String categoryName, String title) {
@@ -29,10 +35,39 @@ public class GoalServiceImpl implements GoalService {
 
     @Override
     public Long register(GoalDTO goalDTO) {
-        Goals goal = modelMapper.map(goalDTO, Goals.class);
+        // 1. DTO에서 categoryId 가져오기
+        Long categoryId = goalDTO.getCategoryId();
+        if (categoryId == null) {
+            throw new IllegalArgumentException("Category ID is required.");
+        }
+
+        // 2. Categories 엔티티 조회
+        Categories category = categoriesRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + categoryId));
+
+        // 3. Members 엔티티 조회 (adminMember 처리)
+        String memberId = goalDTO.getMemberId();
+        Members adminMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID: " + memberId));
+
+        // 4. Goals 객체 생성
+        Goals goal = Goals.builder()
+                .title(goalDTO.getTitle())
+                .description(goalDTO.getDescription())
+                .rule(goalDTO.getRule())
+                .certCycle(goalDTO.getCertCycle())
+                .category(category) // Categories 매핑
+                .adminMember(adminMember) // Members 매핑
+                .startDate(goalDTO.getStartDate())
+                .endDate(goalDTO.getEndDate())
+                .participants(goalDTO.getParticipants())
+                .build();
+
+        // 5. 저장
         Goals savedGoal = goalRepository.save(goal);
         return savedGoal.getGoalId();
     }
+
 
     @Override
     public void join(Long goalId, Long memberId) {
