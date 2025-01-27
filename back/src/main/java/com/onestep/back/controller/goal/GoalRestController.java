@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,6 +47,15 @@ public class GoalRestController {
             @RequestParam("memberId") String memberId,
             @RequestParam("categoryId") Long categoryId,
             @RequestPart(value = "file", required = false) MultipartFile file) {
+
+//        // 로그인된 사용자 ID 가져오기 로그인 연동 후 사용
+//        String memberId = null;
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        if (principal instanceof UserDetails) {
+//            memberId = ((UserDetails) principal).getUsername(); // 로그인 사용자 ID
+//        }
+
+        log.info("현재 로그인된 사용자 ID: {}", memberId);
 
         log.info("목표 등록 요청: {}", goalDTO);
         log.info("memberId: {}", memberId);
