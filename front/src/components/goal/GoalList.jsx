@@ -24,6 +24,8 @@ const GoalList = () => {
         axios
             .post(`http://localhost:8080/goals/${goalId}/join`, {
                 memberId: 1, // 로그인된 사용자 ID (임시 하드코딩)
+                // memberId: memberId, // 로그인 연동 후
+
             })
             .then(() => {
                 alert("참가 완료!");

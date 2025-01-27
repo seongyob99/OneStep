@@ -16,6 +16,13 @@ const GoalRegister = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        // // 로그인 연동 후
+        // const memberId = localStorage.getItem("memberId"); // 로그인된 사용자 ID 가져오기
+        // if (!memberId) {
+        //     alert("로그인이 필요합니다.");
+        //     return;
+        // }
+
         if (!title || !description || !certCycle || !startDate || !endDate || !rule) {
             alert("모든 필드를 입력해주세요.");
             return;
@@ -34,6 +41,7 @@ const GoalRegister = () => {
         formData.append("endDate", endDate);
         formData.append("certCycle", certCycle);
         formData.append("memberId", 1); // 임의로 설정한 memberId
+        // formData.append("memberId", memberId); // 로그인 연동 후
         formData.append("categoryId", 1); // 임의로 설정한 categoryId
         formData.append("rule", rule);
 
