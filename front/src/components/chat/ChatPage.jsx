@@ -1,13 +1,20 @@
-import React from "react";
-import ChatBox from "./ChatBox"; // ChatBox 컴포넌트 임포트
+// src/pages/ChatPage.jsx
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import ChatList from './ChatList';
 
-function ChatPage() {
+const ChatPage = () => {
     return (
-        <div>
-            <h2>Chat Room</h2>
-            <ChatBox /> {/* ChatBox 컴포넌트로 채팅 기능을 포함 */}
+        <div style={{ display: 'flex' }}>
+            <div style={{ width: '300px', padding: '20px', backgroundColor: '#f0f0f0', borderRight: '1px solid #ccc' }}>
+                <h3>채팅방 리스트</h3>
+                <ChatList />
+            </div>
+            <div style={{ flexGrow: 1, padding: '20px' }}>
+                <Outlet /> {/* ChatRoom이 여기에 렌더링됩니다 */}
+            </div>
         </div>
     );
-}
+};
 
 export default ChatPage;
