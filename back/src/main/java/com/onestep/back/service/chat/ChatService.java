@@ -1,4 +1,4 @@
 package com.onestep.back.service.chat;
 
-public class ChatMessagesServiceImpl {
+public class ChatService {
 }
