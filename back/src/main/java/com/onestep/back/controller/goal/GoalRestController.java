@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -48,64 +49,74 @@ public class GoalRestController {
             @RequestParam("categoryId") Long categoryId,
             @RequestPart(value = "file", required = false) MultipartFile file) {
 
-//        // 로그인된 사용자 ID 가져오기 로그인 연동 후 사용
-//        String memberId = null;
-//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        if (principal instanceof UserDetails) {
-//            memberId = ((UserDetails) principal).getUsername(); // 로그인 사용자 ID
-//        }
+        // 로그인된 사용자 ID 가져오기 (로그인 연동 후 사용)
+    /*
+    String memberId = null;
+    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    if (principal instanceof UserDetails) {
+        memberId = ((UserDetails) principal).getUsername(); // 로그인 사용자 ID
+    }
+    */
 
-        log.info("현재 로그인된 사용자 ID: {}", memberId);
-
-        log.info("목표 등록 요청: {}", goalDTO);
-        log.info("memberId: {}", memberId);
-        log.info("categoryId: {}", categoryId);
+        log.info("✅ 현재 로그인된 사용자 ID: {}", memberId);
+        log.info("📌 목표 등록 요청: {}", goalDTO);
+        log.info("📌 memberId: {}", memberId);
+        log.info("📌 categoryId: {}", categoryId);
 
         // memberId와 categoryId 설정
         goalDTO.setMemberId(memberId);
         goalDTO.setCategoryId(categoryId);
 
         try {
-            // 파일 업로드 처리
+            // 🛠 파일 업로드 처리
             if (file != null && !file.isEmpty()) {
+                log.info("📂 파일 업로드 시작: {}", file.getOriginalFilename());
+
+                // 파일명 생성
                 String uuid = UUID.randomUUID().toString();
                 String fileName = uuid + "_" + file.getOriginalFilename();
                 Path savePath = Paths.get(uploadPath, fileName);
 
-                log.info("파일 저장 경로: {}", savePath);
+                log.info("📂 파일 저장 경로: {}", savePath);
 
-                if (Files.notExists(Paths.get(uploadPath))) {
-                    Files.createDirectories(Paths.get(uploadPath)); // 디렉토리 생성
-                    log.info("업로드 경로 생성 완료");
+                // 🛠 업로드 경로가 존재하지 않으면 생성
+                Path uploadDir = Paths.get(uploadPath);
+                if (Files.notExists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                    log.info("📂 업로드 경로 생성 완료: {}", uploadDir);
                 }
 
-                file.transferTo(savePath); // 파일 저장
-                log.info("파일 저장 완료");
+                // 파일 저장
+                file.transferTo(savePath);
+                log.info("✅ 파일 저장 완료: {}", savePath);
 
-                // 클라이언트가 접근 가능한 URL 생성
-                String thumbnailUrl = "/uploads/" + fileName; // 경로 수정
+                // 클라이언트에서 접근 가능한 URL 설정
+                String thumbnailUrl = "/uploads/" + fileName;
                 goalDTO.setThumbnail(fileName); // 저장된 파일명 설정
-                goalDTO.setThumbnailUrl(thumbnailUrl); // 클라이언트에서 접근 가능한 URL 설정
+                goalDTO.setThumbnailUrl(thumbnailUrl); // 접근 가능한 URL 설정
+            } else {
+                log.info("📂 파일이 제공되지 않음.");
             }
 
-            // 데이터베이스 저장 호출
+            // 🛠 목표 데이터베이스 저장
             Long goalId = goalService.register(goalDTO);
-            log.info("목표 등록 완료, ID: {}", goalId);
+            log.info("✅ 목표 등록 완료, ID: {}", goalId);
 
-            // 성공 응답에 썸네일 URL 포함
-            return ResponseEntity.ok(Map.of(
-                    "goalId", goalId,
-                    "thumbnailUrl", goalDTO.getThumbnailUrl()
-            ));
+            // 응답 데이터 생성
+            Map<String, Object> response = new HashMap<>();
+            response.put("goalId", goalId);
+            response.put("thumbnailUrl", goalDTO.getThumbnailUrl());
+
+            return ResponseEntity.ok(response);
 
         } catch (IOException e) {
-            log.error("파일 업로드 실패", e);
+            log.error("❌ 파일 업로드 실패", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("파일 업로드 중 오류가 발생했습니다.");
+                    .body(Map.of("error", "파일 업로드 중 오류가 발생했습니다."));
         } catch (Exception e) {
-            log.error("목표 등록 중 오류 발생", e);
+            log.error("❌ 목표 등록 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("목표 등록 중 오류가 발생했습니다.");
+                    .body(Map.of("error", "목표 등록 중 오류가 발생했습니다."));
         }
     }
 

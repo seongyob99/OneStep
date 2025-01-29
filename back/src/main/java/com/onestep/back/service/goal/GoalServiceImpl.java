@@ -27,46 +27,62 @@ public class GoalServiceImpl implements GoalService {
 
     @Override
     public List<GoalDTO> getList(String categoryName, String title) {
-        // 카테고리와 제목 필터링 조건에 따른 조회 로직
-        return goalRepository.findAll().stream() // 검색 조건 추가 가능
-                .map(entity -> modelMapper.map(entity, GoalDTO.class))
+        List<Goals> goals = (categoryName == null || categoryName.isEmpty()) && (title == null || title.isEmpty())
+                ? goalRepository.findAll()
+                : goalRepository.findByCategoryCateNameContainingAndTitleContaining(
+                categoryName == null ? "" : categoryName,
+                title == null ? "" : title
+        );
+
+        return goals.stream()
+                .map(goal -> modelMapper.map(goal, GoalDTO.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Long register(GoalDTO goalDTO) {
-        // 1. DTO에서 categoryId 가져오기
+        log.info("🚀 목표 등록 요청: {}", goalDTO);
+
+        // 🚨 categoryId가 null인지 체크
         Long categoryId = goalDTO.getCategoryId();
         if (categoryId == null) {
-            throw new IllegalArgumentException("Category ID is required.");
+            throw new IllegalArgumentException("❌ Category ID is required.");
         }
 
-        // 2. Categories 엔티티 조회
+        // 🚨 categoryId가 유효한지 체크
         Categories category = categoriesRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + categoryId));
+                .orElseThrow(() -> new IllegalArgumentException("❌ Invalid category ID: " + categoryId));
 
-        // 3. Members 엔티티 조회 (adminMember 처리)
+        // 🚨 memberId가 null인지 체크
         String memberId = goalDTO.getMemberId();
-        Members adminMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID: " + memberId));
+        if (memberId == null) {
+            throw new IllegalArgumentException("❌ Member ID is required.");
+        }
 
-        // 4. Goals 객체 생성
+        // 🚨 memberId가 유효한지 체크
+        Members adminMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ Invalid member ID: " + memberId));
+
+        // 🚀 Goal 객체 생성
         Goals goal = Goals.builder()
-                .title(goalDTO.getTitle())
-                .description(goalDTO.getDescription())
-                .rule(goalDTO.getRule())
+                .title(goalDTO.getTitle() != null ? goalDTO.getTitle() : "제목 없음")  // null 방지
+                .description(goalDTO.getDescription() != null ? goalDTO.getDescription() : "설명 없음")  // null 방지
+                .rule(goalDTO.getRule() != null ? goalDTO.getRule() : "기본 규칙")  // null 방지
                 .certCycle(goalDTO.getCertCycle())
-                .category(category) // Categories 매핑
-                .adminMember(adminMember) // Members 매핑
+                .category(category)
+                .adminMember(adminMember)
                 .startDate(goalDTO.getStartDate())
                 .endDate(goalDTO.getEndDate())
-                .participants(goalDTO.getParticipants())
+                .participants(goalDTO.getParticipants() > 0 ? goalDTO.getParticipants() : 1) // 최소 1명 설정
                 .build();
 
-        // 5. 저장
+        // 🚀 저장
         Goals savedGoal = goalRepository.save(goal);
+        log.info("✅ 목표 저장 완료: ID={}", savedGoal.getGoalId());
+
         return savedGoal.getGoalId();
     }
+
 
 
     @Override
