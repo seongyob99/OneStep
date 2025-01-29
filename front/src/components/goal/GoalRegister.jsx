@@ -10,26 +10,22 @@ const GoalRegister = () => {
     const [endDate, setEndDate] = useState("");
     const [thumbnail, setThumbnail] = useState(null);
     const [certCycle, setCertCycle] = useState("");
-    const [rule, setRule] = useState(""); // rule 필드 추가
+    const [rule, setRule] = useState("");
+    const [categoryId, setCategoryId] = useState(""); // 카테고리 선택 값 추가
     const navigate = useNavigate();
+
+    const categories = [
+        { id: 1, name: "운동" },
+        { id: 2, name: "공부" },
+        { id: 3, name: "습관" },
+        { id: 4, name: "기타" }
+    ];
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // // 로그인 연동 후
-        // const memberId = localStorage.getItem("memberId"); // 로그인된 사용자 ID 가져오기
-        // if (!memberId) {
-        //     alert("로그인이 필요합니다.");
-        //     return;
-        // }
-
-        if (!title || !description || !certCycle || !startDate || !endDate || !rule) {
-            alert("모든 필드를 입력해주세요.");
-            return;
-        }
-
-        if (new Date(startDate) > new Date(endDate)) {
-            alert("종료일은 시작일 이후여야 합니다.");
+        if (!title || !description || !certCycle || !startDate || !endDate || !rule || !categoryId) {
+            alert("🚨 모든 필드를 입력해주세요.");
             return;
         }
 
@@ -40,25 +36,28 @@ const GoalRegister = () => {
         formData.append("startDate", startDate);
         formData.append("endDate", endDate);
         formData.append("certCycle", certCycle);
-        formData.append("memberId", 1); // 임의로 설정한 memberId
-        // formData.append("memberId", memberId); // 로그인 연동 후
-        formData.append("categoryId", 1); // 임의로 설정한 categoryId
+        formData.append("memberId", 1);
+        formData.append("categoryId", Number(categoryId)); // 🚀 숫자로 변환
         formData.append("rule", rule);
 
         if (thumbnail) {
             formData.append("file", thumbnail);
         }
 
-        axios
-            .post("http://localhost:8080/goals/register", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            })
+        // 🛠️ formData 내용 확인용 로그
+        for (let pair of formData.entries()) {
+            console.log(`${pair[0]}: ${pair[1]}`);
+        }
+
+        axios.post("http://localhost:8080/goals/register", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        })
             .then(() => {
-                alert("목표 등록 완료!");
+                alert("✅ 목표 등록 완료!");
                 navigate("/");
             })
             .catch((error) => {
-                console.error("등록 실패:", error);
+                console.error("❌ 등록 실패:", error);
                 alert(`목표 등록 중 오류가 발생했습니다: ${error.message}`);
             });
     };
@@ -122,7 +121,7 @@ const GoalRegister = () => {
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="form-label">인증 규칙</label> {/* rule 입력 필드 추가 */}
+                    <label className="form-label">인증 규칙</label>
                     <input
                         type="text"
                         className="form-control"
@@ -131,6 +130,24 @@ const GoalRegister = () => {
                         placeholder="예: 하루 1회 인증 필수"
                     />
                 </div>
+
+                {/* 카테고리 선택 필드 */}
+                <div className="mb-4">
+                    <label className="form-label">카테고리</label>
+                    <select
+                        className="form-control"
+                        value={categoryId}
+                        onChange={(e) => setCategoryId(e.target.value)}
+                    >
+                        <option value="">카테고리를 선택하세요</option>
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                                {category.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
                 <div className="mb-4">
                     <label className="form-label">썸네일 사진</label>
                     <input
