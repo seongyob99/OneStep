@@ -4,6 +4,8 @@ import axios from "axios";
 import GoalCard from "./GoalCard";
 
 const GoalList = () => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
     const [goals, setGoals] = useState([]);
     const [joinedGoals, setJoinedGoals] = useState([]); // 참가한 목표 ID 목록
     const navigate = useNavigate(); // 페이지 이동을 위한 navigate 훅
@@ -37,6 +39,9 @@ const GoalList = () => {
             });
     };
 
+
+
+
     return (
         <div className="container mt-4">
             {/* 상단 제목과 목표 등록 버튼 */}
@@ -49,6 +54,19 @@ const GoalList = () => {
                     목표 등록
                 </button>
             </div>
+            <input
+                type="text"
+                placeholder="검색어 입력"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                <option value="">전체</option>
+                <option value="건강">건강</option>
+                <option value="공부">공부</option>
+                <option value="습관">습관</option>
+            </select>
 
             {/* 목표 카드 리스트 */}
             <div className="row">
