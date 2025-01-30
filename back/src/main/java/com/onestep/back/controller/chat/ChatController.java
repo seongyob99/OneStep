@@ -1,7 +1,7 @@
 package com.onestep.back.controller.chat;
 
-import com.onestep.back.domain.ChatMessages;
-import com.onestep.back.domain.Chats;
+import com.onestep.back.dto.chat.ChatMessagesDTO;
+import com.onestep.back.dto.chat.ChatsDTO;
 import com.onestep.back.service.chat.ChatMessagesService;
 import com.onestep.back.service.chat.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -28,15 +28,15 @@ public class ChatController {
     }
 
     @GetMapping("/{chatId}/messages")
-    public ResponseEntity<List<ChatMessages>> getMessages(@PathVariable Long chatId) {
-        List<ChatMessages> messages = chatMessagesService.getMessages(chatId);
+    public ResponseEntity<List<ChatMessagesDTO>> getMessages(@PathVariable Long chatId) {
+        List<ChatMessagesDTO> messages = chatMessagesService.getMessages(chatId);
         return ResponseEntity.ok(messages);
     }
 
     // 채팅방 리스트 가져오기
     @GetMapping("/list")
-    public ResponseEntity<List<Chats>> getChatList() {
-        List<Chats> chatList = chatService.getAllChats();
+    public ResponseEntity<List<ChatsDTO>> getChatList() {
+        List<ChatsDTO> chatList = chatService.getAllChats();
         log.info("chatList"+chatList);
         return ResponseEntity.ok(chatList);
     }

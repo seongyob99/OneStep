@@ -6,7 +6,7 @@ import lombok.*;
 @Entity
 @Table(name = "chat_messages")
 @Getter
-@ToString
+@ToString(exclude = {"chat"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

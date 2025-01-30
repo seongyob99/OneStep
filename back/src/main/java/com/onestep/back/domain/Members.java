@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 @Table(name = "members")
 @Getter
-@ToString
+@ToString(exclude = {"chats", "goals", "certifications"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

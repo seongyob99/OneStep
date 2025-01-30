@@ -1,17 +1,21 @@
-// src/pages/ChatPage.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import ChatList from './ChatList';
+import '../../styles/chat/ChatPage.scss';  // SCSS 파일 import
 
 const ChatPage = () => {
+    const [selectedChatId, setSelectedChatId] = useState(null);
+
     return (
-        <div style={{ display: 'flex' }}>
-            <div style={{ width: '300px', padding: '20px', backgroundColor: '#f0f0f0', borderRight: '1px solid #ccc' }}>
+        <div className="chat-page">
+            <div className="chat-list-container">
                 <h3>채팅방 리스트</h3>
-                <ChatList />
+                <div className="chat-list-scroll">
+                    <ChatList setSelectedChatId={setSelectedChatId} />
+                </div>
             </div>
-            <div style={{ flexGrow: 1, padding: '20px' }}>
-                <Outlet /> {/* ChatRoom이 여기에 렌더링됩니다 */}
+            <div className="chat-room-container">
+                <Outlet context={{ selectedChatId }} />
             </div>
         </div>
     );

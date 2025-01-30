@@ -14,7 +14,7 @@ function App() {
       <Route element={<Layout />}>
         <Route path="/test" element={<Test />} />
         <Route path="/chat" element={<ChatPage />}>
-            <Route path=":chatId" element={<ChatRoom />} /> {/* 중첩 라우팅 */}
+          <Route path=":chatId" element={<ChatRoom />} />
         </Route>
       </Route>
 

@@ -21,10 +21,7 @@ public class chatRepositoryTests {
     @Test
     @Transactional
     public void testChatsRepository() {
-
-
-        log.info(chatsRepository.findById(1L));
-
+        log.info(chatsRepository.findAll());
     }
 
     @Test
