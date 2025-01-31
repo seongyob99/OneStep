@@ -5,12 +5,13 @@ import Test from './components/Test';
 import Layout from './Layout';
 import GoalList from './components/goal/GoalList';
 import GoalRegister from './components/goal/GoalRegister';
+import GoalDtl from './components/goal/GoalDtl';
 
 function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        {/* 기존 Test 라우트 */}
+        <Route path="/:goalid" element={<GoalDtl />} />
         <Route path="/test" element={<Test />} />
 
         {/* 목표 관련 라우트 추가 */}

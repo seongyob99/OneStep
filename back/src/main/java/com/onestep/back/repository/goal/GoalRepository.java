@@ -5,6 +5,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Pageable;
 
-public interface GoalRepository extends JpaRepository<Goals, Long> {
+
+// public interface GoalRepository extends JpaRepository<Goals, Long> {
+//     Page<Goals> findByCategoryCateNameContainingAndTitleContaining(String categoryName, String title, Pageable pageable);
+
+// public interface GoalRepository extends JpaRepository<Goals, Long>, GoalCustomRepo {
+//     List<Goals> findByCategoryCateNameContainingAndTitleContaining(String categoryName, String title);
+// }
+
+public interface GoalRepository extends JpaRepository<Goals, Long>, GoalCustomRepo {
     Page<Goals> findByCategoryCateNameContainingAndTitleContaining(String categoryName, String title, Pageable pageable);
 }

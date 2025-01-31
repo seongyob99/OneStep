@@ -1,0 +1,35 @@
+h5 {
+    display: flex;
+    align-items: center;
+}
+
+.rank {
+    margin-right: 13px;
+}
+
+.image-container {
+    aspect-ratio: 4 / 3; // 4:3 비율 
+    margin-bottom: 30px;
+}
+
+.image-container img {
+    object-fit: cover; // 이미지가 container를 채우고 나머지는 잘리도록 처리
+    width: 100%;
+    height: 100%;
+}
+
+.gray-text {
+    color: gray;
+}
+
+.selected-member {
+    background-color: #d3d3d3;
+}
+
+.member-item {
+    cursor: pointer;
+
+    &:hover {
+        background-color: #f0f0f0;
+    }
+}
