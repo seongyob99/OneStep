@@ -1,12 +1,11 @@
 package com.onestep.back.service.goal;
 
 import com.onestep.back.dto.GoalDTO;
-
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface GoalService {
-    List<GoalDTO> getList(String categoryName, String title); // 목표 목록 조회
+    Page<GoalDTO> getPagedList(String categoryName, String title, Pageable pageable); // 목표 목록 조회 (페이징)
 
     Long register(GoalDTO goalDTO); // 목표 등록
 
