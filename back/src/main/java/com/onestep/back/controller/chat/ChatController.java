@@ -21,11 +21,13 @@ public class ChatController {
 
     @PostMapping("/{chatId}/messages")
     public ResponseEntity<String> saveMessage(@PathVariable Long chatId,
-                                              @RequestParam String memberId,
-                                              @RequestParam String content) {
-        chatMessagesService.saveMessage(chatId, memberId, content);
+                                              @RequestBody ChatMessagesDTO chatMessagesDTO) {
+        log.info("chatId: " + chatId + ", memberId: " + chatMessagesDTO.getMemberId() + ", content: " + chatMessagesDTO.getContent());
+        chatMessagesService.saveMessage(chatId, chatMessagesDTO.getMemberId(), chatMessagesDTO.getContent());
+
         return ResponseEntity.ok("Message saved successfully");
     }
+
 
     @GetMapping("/{chatId}/messages")
     public ResponseEntity<List<ChatMessagesDTO>> getMessages(@PathVariable Long chatId) {

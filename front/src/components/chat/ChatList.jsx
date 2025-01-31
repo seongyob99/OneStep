@@ -7,7 +7,6 @@ const ChatList = ({ setSelectedChatId }) => {
     const [chatList, setChatList] = useState([]);
     const [selectedChatId, setSelectedChatIdState] = useState(null);
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-    console.log("setSelectedChatId:", setSelectedChatId);
     useEffect(() => {
         axios.get(`${SERVER_URL}/chat/list`)
             .then(response => {
@@ -19,7 +18,6 @@ const ChatList = ({ setSelectedChatId }) => {
     }, []);
 
     const handleChatSelect = (chatId) => {
-        console.log(`선택된 채팅방 ID: ${chatId}`);
         setSelectedChatIdState(chatId);
         setSelectedChatId(chatId);
     };

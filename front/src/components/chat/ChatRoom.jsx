@@ -7,61 +7,72 @@ import '../../styles/chat/ChatRoom.scss';  // SCSS 파일 import
 const ChatRoom = () => {
     const { chatId } = useParams();
     const [messages, setMessages] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [hasMore, setHasMore] = useState(true);
     const [error, setError] = useState(null);
     const [newMessage, setNewMessage] = useState('');  // 새로운 메시지 상태 추가
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     const listRef = useRef(null);
     const memberId = '현재 사용자';  // 실제 사용자 ID로 변경 필요
 
+
+
+
     useEffect(() => {
-        console.log(`useEffect 감지: chatId=${chatId}`);
+        console.log(`챗 id : ${chatId}`);
         loadMessages();
     }, [chatId]);
 
     const loadMessages = (loadMore = false) => {
-        if (loading || !hasMore) return;
-
-        setLoading(true);
         const lastMessageId = loadMore && messages.length > 0 ? messages[0].messageId : null;
 
+        console.log(`chat ID : ${chatId}`);
         axios.get(`${SERVER_URL}/chat/${chatId}/messages`, {
             params: { loadMore, lastMessageId }
         })
             .then(response => {
                 const newMessages = response.data;
+                console.log(newMessages);
                 setMessages(prev => (loadMore ? [...newMessages, ...prev] : newMessages));
-                setHasMore(newMessages.length === 20);
-                setLoading(false);
             })
             .catch(error => {
                 console.error("채팅 메시지 불러오기 실패:", error);
                 setError("메시지를 불러오는 데 실패했습니다.");
-                setLoading(false);
             });
     };
 
-    const handleScroll = ({ scrollTop }) => {
-        if (scrollTop === 0 && !loading && hasMore) {
-            loadMessages(true);
-        }
-    };
+
+
+
 
     const rowRenderer = useCallback(
         ({ index, key, style }) => {
             const message = messages[index];
+            const isCurrentUser = message.memberId === memberId;  // 현재 사용자와 메시지의 memberId 비교
             return (
-                <div key={key} style={style} className={`message ${message.isMine ? 'mine' : ''}`}>
-                    <strong>{message.memberId}</strong>: {message.content}
-                    <span className="timestamp">
-                        &nbsp;&nbsp;{new Date(message.timestamp).toLocaleDateString()} {new Date(message.timestamp).toLocaleTimeString()}
-                    </span>
+                <div>
+                    <div key={key} style={style} className={`message ${isCurrentUser ? 'mine' : ''}`}>
+                        {isCurrentUser ? (
+                            <div className="message-content mine">
+                                <span className="timestamp">
+                                    {new Date(message.timestamp).toLocaleDateString()} {new Date(message.timestamp).toLocaleTimeString()}
+                                </span> &nbsp;&nbsp;
+                                <span className="message-text">{message.content}</span>
+                            </div>
+                        ) : (
+                            <div className="message-content">
+                                <strong>{message.memberId}</strong>: {message.content}
+                                <span className="timestamp">
+                                    &nbsp;&nbsp;{new Date(message.timestamp).toLocaleDateString()} {new Date(message.timestamp).toLocaleTimeString()}
+                                </span>
+                            </div>
+                        )}
+                    </div>
                 </div>
             );
         },
-        [messages]
+        [messages, memberId]
     );
+
+
 
     const handleMessageSend = () => {
         if (!newMessage.trim()) return;
@@ -80,6 +91,7 @@ const ChatRoom = () => {
         axios.post(`${SERVER_URL}/chat/${chatId}/messages`, {
             memberId,  // 실제 사용자 ID
             content: newMessage,
+            chatId: chatId
         })
             .then(response => {
                 console.log('메시지가 서버에 저장되었습니다:', response.data);
@@ -91,13 +103,20 @@ const ChatRoom = () => {
             });
     };
 
-    if (loading && !messages.length) {
-        return <div>로딩 중...</div>;
-    }
+    // if (loading && !messages.length) {
+    //     return <div>로딩 중...</div>;
+    // }
 
     if (error) {
         return <div>{error}</div>;
     }
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // 기본 Enter 키 동작(줄 바꿈)을 막기 위해
+            handleMessageSend(); // 메시지 전송 함수 호출
+        }
+    };
 
     return (
         <div className="chat-room">
@@ -112,14 +131,13 @@ const ChatRoom = () => {
                             rowCount={messages.length}
                             rowHeight={50}
                             rowRenderer={rowRenderer}
-                            onScroll={handleScroll}
                             overscanRowCount={5}
+                            style={{ overflow: 'hidden' }}
                         />
                     )}
                 </AutoSizer>
             </div>
 
-            {/* 메시지 입력창 및 보내기 버튼 */}
             <div className="message-input-container">
                 <input
                     type="text"
@@ -127,6 +145,7 @@ const ChatRoom = () => {
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="메시지를 입력하세요..."
                     className="message-input"
+                    onKeyDown={handleKeyDown}
                 />
                 <button onClick={handleMessageSend} className="send-button">보내기</button>
             </div>
@@ -134,4 +153,4 @@ const ChatRoom = () => {
     );
 };
 
-export default ChatRoom;
+export default React.memo(ChatRoom);
