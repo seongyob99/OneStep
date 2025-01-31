@@ -1,62 +1,126 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Button, ListGroup, Image } from 'react-bootstrap';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 import '@styles/goal/goalDtl.scss';
+import { Container, Row, Col, Button, ListGroup, Image, Spinner, Modal } from 'react-bootstrap';
 import { FaMedal, FaCalendarAlt, FaUser, FaUserCog } from 'react-icons/fa';
 import { GiDuration } from "react-icons/gi";
 import { RiTodoLine } from "react-icons/ri";
 
-const goalData = {
-    goalId: 1,
-    title: "매일 1시간씩 걷기",
-    description: `매일 1시간 걷기를 실천하여 건강을 증진하고 체력을 향상시킵니다. 심혈관 건강과 스트레스 해소에 효과적입니다.`,
-    categoryName: "운동",
-    rule: `1. 하루에 최소 1시간 걷기. 2. 걷기 후 인증 사진을 찍어 업로드.`,
-    certCycle: 1,
-    adminMember: "user01",
-    startDate: "2025-01-31",
-    endDate: "",
-    participants: 15,
-    members: [
-        { memberId: 1, name: '사용자1', certifications: 5 },
-        { memberId: 2, name: '사용자2', certifications: 3 },
-        { memberId: 3, name: '사용자3', certifications: 8 },
-        { memberId: 4, name: '사용자4', certifications: 2 },
-        { memberId: 5, name: '사용자5', certifications: 4 },
-        { memberId: 6, name: '사용자6', certifications: 6 },
-        { memberId: 7, name: '사용자7', certifications: 1 },
-        { memberId: 8, name: '사용자8', certifications: 7 },
-    ],
-};
-
-// 인증 횟수 기준으로 랭킹 정렬
-const sortedMembers = goalData.members.sort((a, b) => b.certifications - a.certifications);
-
-const imageData = [
-    { filePath: './src/assets/react.svg' },
-    { filePath: './src/assets/react.svg' },
-    { filePath: './src/assets/react.svg' },
-    { filePath: './src/assets/react.svg' },
-];
-
 const GoalDtl = () => {
-    const navigate = useNavigate();
-    const isStarted = new Date(goalData.startDate).setHours(0, 0, 0, 0) <= new Date().setHours(0, 0, 0, 0);
+    const [goalData, setGoalData] = useState(null);
+    const [imageData, setImageData] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedMember, setSelectedMember] = useState(null);
+    const [dataChanged, setDataChanged] = useState(false);
 
+    const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+    const navigate = useNavigate();
+    const goalid = useParams().goalid;
+    const isStarted = goalData && new Date(goalData?.startDate).getTime() <= Date.now();
+
+    // 정보 조회
+    const getGoalInfo = useCallback(async () => {
+        try {
+            const response = await axios.post(
+                `${SERVER_URL}/goals/dtl/${goalid}`,
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+            setGoalData(response.data);
+        } catch (err) {
+            alert("상세정보를 가져오지 못했습니다.");
+        }
+    }, []);
+
+    // 최근 인증 기록 조회
+    const getRecentCert = useCallback(async () => {
+        try {
+            const response = await axios.post(
+                `${SERVER_URL}/goals/dtl/getRecentCert/${goalid}`,
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+            setImageData(response.data);
+        } catch (err) {
+            alert("인증 기록을 가져오지 못했습니다.");
+        }
+    }, []);
+
+    useEffect(() => {
+        getGoalInfo();
+        getRecentCert();
+    }, [dataChanged]);
+
+    // 관리자 외 참가자 목록
+    const filteredMembers = useMemo(() => {
+        return goalData?.members.filter((member) => member.memberId !== goalData.adminMemberId);
+    }, [goalData]);
+
+    // 내보내기 및 그만두기
+    const removeMember = useCallback(async (memberId) => {
+        try {
+            await axios.post(
+                `${SERVER_URL}/goals/dtl/removeMember`,
+                { goalId: goalid, memberId: memberId },
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+            setDataChanged(prev => !prev);
+        } catch (err) {
+            alert("작업에 실패했습니다. 다시 시도해주세요.");
+        }
+    }, []);
+
+    // 그만두기
+    const onCancel = useCallback(() => {
+        const confirmCancel = confirm("정말 그만두시겠습니까?");
+        if (confirmCancel) {
+            removeMember('user03'); // 로그인 유저
+        }
+    }, []);
+
+    // 내보내기
+    const onExport = () => {
+        setSelectedMember(null);
+        setShowModal(true);
+    };
+
+    // 선택완료
+    const handleSelectComplete = useCallback(() => {
+        if (!selectedMember) {
+            alert("선택된 유저가 없습니다.");
+            return;
+        }
+        const confirmDelete = confirm(`${selectedMember?.name}(${selectedMember?.memberId}) 을(를) 내보내시겠습니까?`);
+        if (confirmDelete) {
+            removeMember(selectedMember.memberId);
+            setShowModal(false);
+        }
+    }, [selectedMember]);
+
+    // 인증하기
     const onCertification = () => {
         navigate("/cert");
     };
+
+    // 데이터 없는 경우 로딩창
+    if (!goalData) {
+        return (
+            <Container className="text-center my-5">
+                <Spinner animation="border" variant="primary" />
+                <p>Loading...</p>
+            </Container>
+        );
+    }
 
     return (
         <Container>
             <Row className="my-4 d-flex align-items-center">
                 <Col>
                     <h3 className="d-inline">{goalData.title}</h3>
-                    <p className="d-inline ms-2 mb-0">| {goalData.categoryName}</p>
+                    <p className="d-inline ms-2 mb-0 gray-text">| {goalData.categoryName}</p>
                 </Col>
                 <Col xs="auto">
-                    <Button variant="danger" className="ms-2">내보내기</Button>
-                    <Button variant="danger" className="ms-2">그만두기</Button>
+                    <Button variant="danger" className="ms-2" onClick={onExport}>내보내기</Button>
+                    <Button variant="danger" className="ms-2" onClick={onCancel}>그만두기</Button>
                 </Col>
             </Row>
             <Row className="mb-3">
@@ -69,7 +133,7 @@ const GoalDtl = () => {
                 <Col md={8}>
                     <div className="mb-4">
                         <h5><FaUserCog className="me-2" />방장</h5>
-                        <p>{goalData.adminMember}</p>
+                        <p>{goalData.adminMemberName} ({goalData.adminMemberId})</p>
                         <h5><FaUser className="me-2" />인원</h5>
                         <p>{goalData.members.length} / {goalData.participants}</p>
                         <h5><FaCalendarAlt className="me-2" />기간</h5>
@@ -85,32 +149,32 @@ const GoalDtl = () => {
                         <div>
                             <h4>인증 랭킹</h4>
                             <ListGroup>
-                                {sortedMembers.map((member, index) => {
+                                {goalData.members.map((member, index) => {
                                     if (index === 0) {
                                         return (
                                             <ListGroup.Item key={member.memberId}>
                                                 <FaMedal color="gold" size={24} className="rank" />
-                                                {member.name} (<span>{member.certifications}회)</span>
+                                                {member.name} <span className="gray-text">({member.certCnt}회)</span>
                                             </ListGroup.Item>
                                         );
                                     } else if (index === 1) {
                                         return (
                                             <ListGroup.Item key={member.memberId}>
                                                 <FaMedal color="silver" size={24} className="rank" />
-                                                {member.name} (<span>{member.certifications}회)</span>
+                                                {member.name} <span className="gray-text">({member.certCnt}회)</span>
                                             </ListGroup.Item>
                                         );
                                     } else if (index === 2) {
                                         return (
                                             <ListGroup.Item key={member.memberId}>
                                                 <FaMedal color="brown" size={24} className="rank" />
-                                                {member.name} (<span>{member.certifications}회)</span>
+                                                {member.name} <span className="gray-text">({member.certCnt}회)</span>
                                             </ListGroup.Item>
                                         );
                                     } else {
                                         return (
                                             <ListGroup.Item key={member.memberId}>
-                                                <strong className="rank">{index + 1}위</strong>{member.name} (<span>{member.certifications}회)</span>
+                                                <strong className="rank">{index + 1}위</strong>{member.name} <span className="gray-text">({member.certCnt}회)</span>
                                             </ListGroup.Item>
                                         );
                                     }
@@ -142,6 +206,31 @@ const GoalDtl = () => {
                     </Row>
                 </>
             }
+
+            {/* 모달 */}
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>유저 선택</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <ListGroup>
+                        {filteredMembers.map((member) => (
+                            <ListGroup.Item
+                                key={member.memberId}
+                                onClick={() => setSelectedMember(member)}
+                                className={`member-item ${selectedMember?.memberId === member.memberId ? 'selected-member' : ''}`}
+                            >
+                                {member.name} ({member.memberId})
+                            </ListGroup.Item>
+                        ))}
+                    </ListGroup>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={handleSelectComplete}>
+                        선택 완료
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };
