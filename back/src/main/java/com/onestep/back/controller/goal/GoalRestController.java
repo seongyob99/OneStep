@@ -5,6 +5,9 @@ import com.onestep.back.service.goal.GoalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,11 +38,18 @@ public class GoalRestController {
 
     // 목표 목록 조회
     @GetMapping("/list")
-    public List<GoalDTO> getGoalList(@RequestParam(required = false) String categoryName,
-                                     @RequestParam(required = false) String title) {
-        log.info("목표 목록 조회 요청: categoryName={}, title={}", categoryName, title);
-        return goalService.getList(categoryName, title);
+    public Page<GoalDTO> getPagedGoalList(
+            @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) String title,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        log.info("📌 목표 목록 조회 요청: categoryName={}, title={}, page={}, size={}", categoryName, title, page, size);
+
+        Pageable pageable = PageRequest.of(page, size);
+        return goalService.getPagedList(categoryName, title, pageable);
     }
+
 
     // 목표 등록
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
