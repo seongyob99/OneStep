@@ -39,10 +39,7 @@ public class Members extends BaseEntity {
     @Column(name = "social")
     private boolean social;
 
-    @ManyToMany
-    @JoinTable(name = "goals_members",
-            joinColumns = @JoinColumn(name = "member_id"),
-            inverseJoinColumns = @JoinColumn(name = "goal_id"))
+    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private List<Goals> goals;
 
     @ManyToMany

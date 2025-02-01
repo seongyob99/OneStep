@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @RestController
@@ -24,11 +25,18 @@ public class GoalDtlRestController {
         return goalDtlService.getGoalInfo(goalId);
     }
 
+    // 참가하기
+    @PostMapping("/joinGoal")
+    public Map<String, GoalDTO> joinGoal(@RequestBody GoalDTO goalDTO) {
+        goalDtlService.joinGoal(goalDTO);
+        return Map.of("goalDTO", goalDTO);
+    }
+
     // 내보내기, 그만두기
     @PostMapping("/removeMember")
-    public GoalDtlDTO getGoalInfo(@RequestBody GoalDTO goalId) {
-        // 로직 추가
-        return null;
+    public Map<String, GoalDTO> removeMember(@RequestBody GoalDTO goalDTO) {
+        goalDtlService.removeMember(goalDTO);
+        return Map.of("goalDTO", goalDTO);
     }
 
     // 최근 인증기록 조회

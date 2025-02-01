@@ -40,7 +40,8 @@ public class GoalCustomRepoImpl extends QuerydslRepositorySupport implements Goa
                         members.name,
                         goals.startDate,
                         goals.endDate,
-                        goals.participants
+                        goals.participants,
+                        goals.thumbnail
                 )
                 .fetchOne();
 
@@ -61,23 +62,24 @@ public class GoalCustomRepoImpl extends QuerydslRepositorySupport implements Goa
                 .startDate(goalResult.get(goals.startDate))
                 .endDate(goalResult.get(goals.endDate))
                 .participants(goalResult.get(goals.participants))
+                .thumbnail(goalResult.get(goals.thumbnail))
                 .members(new ArrayList<>())
                 .build();
 
         // 참여자 정보 조회
-        List<Tuple> memberResult = from(certifications)
-                .leftJoin(certifications.goal, goals)
-                .leftJoin(certifications.member, members)
-                .where(certifications.goal.goalId.eq(goalId))
+        List<Tuple> memberResult = from(members)
+                .leftJoin(members.certifications, certifications)
+                .leftJoin(members.goals, goals)
+                .where(goals.goalId.eq(goalId))
                 .groupBy(members.memberId, members.name)
                 .select(
                         goals.goalId,
                         members.memberId,
                         members.name,
-                        certifications.count().as("certCnt"),
+                        certifications.count().coalesce(0L).as("certCnt"),
                         certifications.certDate.max().as("latestCertDate")
                 )
-                .orderBy(certifications.count().desc(), certifications.certDate.max().desc(), certifications.regDate.asc())
+                .orderBy(certifications.count().coalesce(0L).desc(), certifications.certDate.max().desc(), certifications.regDate.asc())
                 .fetch();
 
         // CertDTO 추가
@@ -86,7 +88,7 @@ public class GoalCustomRepoImpl extends QuerydslRepositorySupport implements Goa
                     .goalId(tuple.get(goals.goalId))
                     .memberId(tuple.get(members.memberId))
                     .name(tuple.get(members.name))
-                    .certCnt(tuple.get(certifications.count().as("certCnt")))
+                    .certCnt(tuple.get(certifications.count().coalesce(0L).as("certCnt")))
                     .build());
         });
 
