@@ -56,4 +56,7 @@ public class Goals extends BaseEntity {
 
     @OneToOne(mappedBy = "goal", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Chats chat;
+
+    @Column(name = "thumbnail")  // 📌 썸네일 파일명 추가
+    private String thumbnail;
 }

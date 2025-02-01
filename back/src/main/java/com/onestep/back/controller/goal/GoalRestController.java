@@ -47,9 +47,19 @@ public class GoalRestController {
         log.info("📌 목표 목록 조회 요청: categoryName={}, title={}, page={}, size={}", categoryName, title, page, size);
 
         Pageable pageable = PageRequest.of(page, size);
-        return goalService.getPagedList(categoryName, title, pageable);
-    }
+        Page<GoalDTO> goals = goalService.getPagedList(categoryName, title, pageable);
 
+        // ✅ 각 GoalDTO에 thumbnailUrl 추가
+        goals.forEach(goal -> {
+            if (goal.getThumbnail() != null && !goal.getThumbnail().isEmpty()) {
+                goal.setThumbnailUrl("http://localhost:8080/uploads/" + goal.getThumbnail());
+            } else {
+                goal.setThumbnailUrl("http://localhost:8080/uploads/default.jpg"); // 기본 이미지 설정
+            }
+        });
+
+        return goals;
+    }
 
     // 목표 등록
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -59,7 +69,7 @@ public class GoalRestController {
             @RequestParam("categoryId") Long categoryId,
             @RequestPart(value = "file", required = false) MultipartFile file) {
 
-        // 로그인된 사용자 ID 가져오기 (로그인 연동 후 사용)
+        // 🛠 로그인된 사용자 ID 가져오기 (추후 로그인 연동 시 사용 가능)
     /*
     String memberId = null;
     Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -73,7 +83,7 @@ public class GoalRestController {
         log.info("📌 memberId: {}", memberId);
         log.info("📌 categoryId: {}", categoryId);
 
-        // memberId와 categoryId 설정
+        // 🔹 memberId 및 categoryId 설정 (추후 DB 저장을 위해 DTO에 값 할당)
         goalDTO.setMemberId(memberId);
         goalDTO.setCategoryId(categoryId);
 
@@ -82,40 +92,37 @@ public class GoalRestController {
             if (file != null && !file.isEmpty()) {
                 log.info("📂 파일 업로드 시작: {}", file.getOriginalFilename());
 
-                // 파일명 생성
+                // 🔹 파일명 생성 (UUID + 원본 파일명 조합)
                 String uuid = UUID.randomUUID().toString();
                 String fileName = uuid + "_" + file.getOriginalFilename();
                 Path savePath = Paths.get(uploadPath, fileName);
 
                 log.info("📂 파일 저장 경로: {}", savePath);
 
-                // 🛠 업로드 경로가 존재하지 않으면 생성
+                // 🔹 업로드 경로가 존재하지 않으면 생성
                 Path uploadDir = Paths.get(uploadPath);
                 if (Files.notExists(uploadDir)) {
                     Files.createDirectories(uploadDir);
                     log.info("📂 업로드 경로 생성 완료: {}", uploadDir);
                 }
 
-                // 파일 저장
+                // 🔹 파일 저장
                 file.transferTo(savePath);
                 log.info("✅ 파일 저장 완료: {}", savePath);
 
-                // 클라이언트에서 접근 가능한 URL 설정
-                String thumbnailUrl = "/uploads/" + fileName;
-                goalDTO.setThumbnail(fileName); // 저장된 파일명 설정
-                goalDTO.setThumbnailUrl(thumbnailUrl); // 접근 가능한 URL 설정
+                // ✅ DB에는 파일명만 저장 (URL은 조회 시 동적으로 생성)
+                goalDTO.setThumbnail(fileName);
             } else {
-                log.info("📂 파일이 제공되지 않음.");
+                log.info("📂 파일이 제공되지 않음. 기본값 유지");
             }
 
             // 🛠 목표 데이터베이스 저장
             Long goalId = goalService.register(goalDTO);
             log.info("✅ 목표 등록 완료, ID: {}", goalId);
 
-            // 응답 데이터 생성
+            // 🔹 응답 데이터 생성 (등록된 목표 ID 및 썸네일 URL 반환)
             Map<String, Object> response = new HashMap<>();
             response.put("goalId", goalId);
-            response.put("thumbnailUrl", goalDTO.getThumbnailUrl());
 
             return ResponseEntity.ok(response);
 
