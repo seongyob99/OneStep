@@ -48,7 +48,12 @@ public class Goals extends BaseEntity {
     @Column(name = "participants")
     private Long participants;
 
-    @ManyToMany(mappedBy = "goals", fetch = FetchType.LAZY)
+    @ManyToMany
+    @JoinTable(
+            name = "goals_members",
+            joinColumns = @JoinColumn(name = "goal_id"),
+            inverseJoinColumns = @JoinColumn(name = "member_id")
+    )
     private List<Members> members;
 
     @OneToMany(mappedBy = "goal", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)

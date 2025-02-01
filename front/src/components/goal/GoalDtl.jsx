@@ -18,6 +18,7 @@ const GoalDtl = () => {
     const navigate = useNavigate();
     const goalid = useParams().goalid;
     const isStarted = goalData && new Date(goalData?.startDate).getTime() <= Date.now();
+    const isEnded = goalData && new Date(goalData?.endDate).getTime() <= Date.now();
 
     // 정보 조회
     const getGoalInfo = useCallback(async () => {
@@ -54,6 +55,27 @@ const GoalDtl = () => {
     const filteredMembers = useMemo(() => {
         return goalData?.members.filter((member) => member.memberId !== goalData.adminMemberId);
     }, [goalData]);
+
+    // 참가하기
+    const onJoin = useCallback(async () => {
+        if (goalData?.members.length === goalData?.participants) {
+            alert("모집 완료된 목표입니다.");
+            return;
+        }
+        const confirmJoin = confirm("이 목표에 참가하시겠습니까?");
+        if (confirmJoin) {
+            try {
+                await axios.post(
+                    `${SERVER_URL}/goals/dtl/joinGoal`,
+                    { goalId: goalid, memberId: 'user03' }, // 로그인 유저
+                    { headers: { 'Content-Type': 'application/json' } }
+                );
+                setDataChanged(prev => !prev);
+            } catch (err) {
+                alert("작업에 실패했습니다. 다시 시도해주세요.");
+            }
+        }
+    }, []);
 
     // 내보내기 및 그만두기
     const removeMember = useCallback(async (memberId) => {
@@ -113,21 +135,31 @@ const GoalDtl = () => {
 
     return (
         <Container>
-            <Row className="my-4 d-flex align-items-center">
+            <Col className="d-flex align-items-center">
+                <Col xs="auto" className="mt-3">
+                    <Image src={`${SERVER_URL}/uploads/${goalData.thumbnail}`} alt="Goal Thumbnail" className="goal-thumbnail" />
+                </Col>
                 <Col>
-                    <h3 className="d-inline">{goalData.title}</h3>
-                    <p className="d-inline ms-2 mb-0 gray-text">| {goalData.categoryName}</p>
+                    <Row className="mt-4 d-flex align-items-center">
+                        <Col>
+                            <h3 className="d-inline">{goalData.title}</h3>
+                            <p className="d-inline ms-2 mb-0 gray-text">| {goalData.categoryName}</p>
+                            <p className="my-2">{goalData.description}</p>
+                        </Col>
+                        <Col xs="auto">
+                            {!isEnded &&
+                                <>
+                                    <Button variant="danger" className="ms-2" onClick={onExport}>내보내기</Button>
+                                    <Button variant="danger" className="ms-2" onClick={onCancel}>그만두기</Button>
+                                </>
+                            }
+                            {!isStarted &&
+                                <Button variant="primary" className="ms-2" onClick={onJoin}>참가하기</Button>
+                            }
+                        </Col>
+                    </Row>
                 </Col>
-                <Col xs="auto">
-                    <Button variant="danger" className="ms-2" onClick={onExport}>내보내기</Button>
-                    <Button variant="danger" className="ms-2" onClick={onCancel}>그만두기</Button>
-                </Col>
-            </Row>
-            <Row className="mb-3">
-                <Col>
-                    <p>{goalData.description}</p>
-                </Col>
-            </Row>
+            </Col>
             <hr />
             <Row className="mt-4">
                 <Col md={8}>
@@ -144,10 +176,14 @@ const GoalDtl = () => {
                         <p>{goalData.rule}</p>
                     </div>
                 </Col>
-                {isStarted &&
-                    <Col md={4}>
-                        <div>
-                            <h4>인증 랭킹</h4>
+                <Col md={4}>
+                    <div>
+                        <h4>인증 랭킹</h4>
+                        {!isStarted ? (
+                            <>
+                                <br /><p>랭킹은 목표 시작일부터 표시됩니다.</p>
+                            </>
+                        ) : (
                             <ListGroup>
                                 {goalData.members.map((member, index) => {
                                     if (index === 0) {
@@ -180,9 +216,9 @@ const GoalDtl = () => {
                                     }
                                 })}
                             </ListGroup>
-                        </div>
-                    </Col>
-                }
+                        )}
+                    </div>
+                </Col>
             </Row>
             {isStarted &&
                 <>
@@ -200,7 +236,7 @@ const GoalDtl = () => {
                     <Row>
                         {imageData.map((image, index) =>
                             <Col xs={3} key={index} className="image-container">
-                                <Image src={image.filePath} />
+                                <Image src={`${SERVER_URL}/uploads/${image.filePath}`} />
                             </Col>
                         )}
                     </Row>

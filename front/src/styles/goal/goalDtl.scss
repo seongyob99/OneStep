@@ -33,3 +33,8 @@ h5 {
         background-color: #f0f0f0;
     }
 }
+
+.goal-thumbnail {
+    height: 75px;
+    object-fit: cover; // 이미지 비율 유지하며 잘리지 않게 설정
+}

@@ -28,5 +28,6 @@ public class GoalDtlDTO {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
     private Long participants;
+    private String thumbnail;
     private List<CertDTO> members;
 }
