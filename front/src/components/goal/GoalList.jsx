@@ -7,7 +7,6 @@ const GoalList = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [goals, setGoals] = useState([]);
-    const [joinedGoals, setJoinedGoals] = useState([]);
     const [currentPage, setCurrentPage] = useState(0); // 현재 페이지
     const [isFetching, setIsFetching] = useState(false); // 데이터 가져오는 중인지 여부
     const [hasMore, setHasMore] = useState(true); // 더 불러올 데이터가 있는지 여부
@@ -36,6 +35,7 @@ const GoalList = () => {
                 setHasMore(false); // 추가 데이터 없음
             } else {
                 setHasMore(true);
+                // 썸네일 URL 확인하고 설정
                 setGoals(prevGoals => (reset ? response.data.content : [...prevGoals, ...response.data.content]));
             }
         } catch (error) {
@@ -51,19 +51,6 @@ const GoalList = () => {
         setHasMore(true);
         setGoals([]);
         fetchGoals(0, true); // 첫 페이지부터 새로 불러오기
-    };
-
-    // 참가 버튼 클릭 핸들러
-    const handleJoin = (goalId) => {
-        axios.post(`http://localhost:8080/goals/${goalId}/join`, { memberId: 1 })
-            .then(() => {
-                alert("참가 완료!");
-                setJoinedGoals((prev) => [...prev, goalId]);
-            })
-            .catch((error) => {
-                console.error("참가 실패:", error);
-                alert("참가 중 오류가 발생했습니다.");
-            });
     };
 
     // 무한 스크롤 감지
@@ -137,11 +124,7 @@ const GoalList = () => {
                 {goals.length > 0 ? (
                     goals.map((goal) => (
                         <div className="col-md-4 mb-4" key={goal.goalId}>
-                            <GoalCard
-                                goal={goal}
-                                onJoin={handleJoin}
-                                isJoined={joinedGoals.includes(goal.goalId)}
-                            />
+                            <GoalCard goal={goal} />
                         </div>
                     ))
                 ) : (
