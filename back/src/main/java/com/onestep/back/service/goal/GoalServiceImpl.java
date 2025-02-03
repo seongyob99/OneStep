@@ -60,6 +60,7 @@ public class GoalServiceImpl implements GoalService {
                 .endDate(goal.getEndDate())
                 .participants(goal.getParticipants())
                 .categoryId(goal.getCategory().getCategoryId())
+                .categoryName(goal.getCategory().getCateName()) // ✅ 추가
                 .memberId(goal.getAdminMember().getMemberId())
                 .thumbnail(goal.getThumbnail())
                 .build()).collect(Collectors.toList());
