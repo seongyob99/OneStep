@@ -1,20 +1,30 @@
 .chat-page {
     display: flex;
-    height: 75vh;
+    height: 80vh;
+    justify-content: center;
+    border: 2px solid rgb(207, 207, 207);
+    // margin: 0px 100px 0px 100px
 }
 
+
 .chat-list-container {
-    width: 500px;
+    width: 300px;
     padding: 20px;
-    background-color: #f0f0f0;
-    text-align: center;
-    border-right: 1px solid #ccc;
+    background-color: #edf5fa;
+    // text-align: center;
+    border-right: 3px solid #c4c4c4;
+    display: flex; // Flex 컨테이너로 설정
+    flex-direction: column; // 세로로 배치
 }
 
 .chat-list-scroll {
-    height: 100%;
+    flex: 1; // 남은 공간을 채움
     overflow-y: auto;
     text-align: center;
+}
+
+.chat-list-scroll::-webkit-scrollbar {
+    display: none;
 }
 
 .chat-room-container {
@@ -24,4 +34,5 @@
     padding: 20px;
     height: 100%;
     overflow-y: hidden;
+    background-color: #e7e7e7;
 }
