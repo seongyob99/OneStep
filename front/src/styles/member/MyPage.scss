@@ -1,0 +1,44 @@
+// 색상 변수
+$background-color: #f9f9f9;
+$card-background: white;
+$text-color: #333;
+$box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+$loading-color: #555;
+
+.my-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: $background-color;
+  border-radius: 8px;
+  box-shadow: $box-shadow;
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .info-card {
+    padding: 20px;
+    background: $card-background;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    p {
+      margin: 8px 0;
+      font-size: 16px;
+
+      strong {
+        color: $text-color;
+      }
+    }
+  }
+
+  .loading,
+  .error {
+    text-align: center;
+    color: $loading-color;
+    font-size: 18px;
+    margin-top: 20px;
+  }
+}

@@ -1,0 +1,58 @@
+// 색상 변수
+$primary-color: #007bff;
+$primary-hover: #0056b3;
+$border-color: #ccc;
+$background-color: #f9f9f9;
+$text-success: green;
+
+// 컨테이너 스타일
+.member-detail {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: $background-color;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  form {
+    label {
+      display: block;
+      margin-bottom: 10px;
+
+      input,
+      select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 4px;
+        margin-bottom: 16px;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+      }
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: $primary-color;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: $primary-hover;
+      }
+    }
+  }
+
+  .success-message {
+    text-align: center;
+    color: $text-success;
+    font-weight: bold;
+  }
+}
