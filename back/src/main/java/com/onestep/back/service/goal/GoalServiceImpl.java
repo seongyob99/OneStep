@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -33,42 +36,33 @@ public class GoalServiceImpl implements GoalService {
     private final MemberRepository memberRepository;
     private final CategoriesRepository categoriesRepository;
 
-    // 📌 목표 목록 조회 (페이징 적용)
+
+    // 목록 조회
     @Override
-    public Page<GoalDTO> getPagedList(String categoryName, String title, Pageable pageable) {
-        // 목표 목록을 페이지 단위로 조회
-        Page<Goals> goalsPage = goalRepository.findByCategoryCateNameContainingAndTitleContaining(
-                categoryName == null ? "" : categoryName,
-                title == null ? "" : title,
-                pageable
-        );
+    public List<GoalDTO> getList(Long categoryId, String title) {
+        log.info("🔍 getList 실행: categoryId={}, title={}", categoryId, title);
+        List<Goals> goals;
 
-        // 페이지된 데이터를 GoalDTO로 변환
-        return goalsPage.map(goal -> {
-            // 📌 썸네일 파일명 가져오기
-            String thumbnailFileName = goal.getThumbnail();
+        if (categoryId != null) {
+            goals = goalRepository.findByCategoryCategoryIdAndTitleContaining(categoryId, title == null ? "" : title);
+        } else {
+            goals = goalRepository.findByTitleContaining(title == null ? "" : title);
+        }
 
-            // 📌 썸네일 URL 설정 (파일명이 있으면 URL을 설정하고, 없으면 기본 이미지 사용)
-            String thumbnailUrl = (thumbnailFileName != null && !thumbnailFileName.isEmpty()) ?
-                    "http://localhost:8080/uploads/" + thumbnailFileName :
-                    "http://localhost:8080/uploads/default.jpg";
-
-            // 📌 GoalDTO 반환
-            return GoalDTO.builder()
-                    .goalId(goal.getGoalId())
-                    .title(goal.getTitle())
-                    .description(goal.getDescription())
-                    .rule(goal.getRule())
-                    .certCycle(goal.getCertCycle())
-                    .startDate(goal.getStartDate())
-                    .endDate(goal.getEndDate())
-                    .participants(goal.getParticipants())
-                    .categoryId(goal.getCategory().getCategoryId())
-                    .memberId(goal.getAdminMember().getMemberId())
-                    .thumbnail(goal.getThumbnail()) // 📌 DB에 저장된 파일명
-                    .thumbnailUrl(thumbnailUrl)  // 📌 클라이언트에서 접근할 URL
-                    .build();
-        });
+        log.info("📌 조회된 목표 개수: {}", goals.size());
+        return goals.stream().map(goal -> GoalDTO.builder()
+                .goalId(goal.getGoalId())
+                .title(goal.getTitle())
+                .description(goal.getDescription())
+                .rule(goal.getRule())
+                .certCycle(goal.getCertCycle())
+                .startDate(goal.getStartDate())
+                .endDate(goal.getEndDate())
+                .participants(goal.getParticipants())
+                .categoryId(goal.getCategory().getCategoryId())
+                .memberId(goal.getAdminMember().getMemberId())
+                .thumbnail(goal.getThumbnail())
+                .build()).collect(Collectors.toList());
     }
 
     // 📌 목표 등록 (파일 업로드 포함)
@@ -110,28 +104,6 @@ public class GoalServiceImpl implements GoalService {
         log.info("✅ 목표 저장 완료: ID={}, 썸네일={}", savedGoal.getGoalId(), savedGoal.getThumbnail());
 
         return savedGoal.getGoalId();
-    }
-
-    // 📌 목표 참가
-    @Override
-    public void join(Long goalId, Long memberId) {
-        log.info("목표 참가 요청: goalId={}, memberId={}", goalId, memberId);
-    }
-
-    // 📌 목표 수정
-    @Override
-    public Long update(GoalDTO goalDTO) {
-        Goals existingGoal = goalRepository.findById(goalDTO.getGoalId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 목표입니다."));
-        modelMapper.map(goalDTO, existingGoal);
-        Goals updatedGoal = goalRepository.save(existingGoal);
-        return updatedGoal.getGoalId();
-    }
-
-    // 📌 목표 삭제
-    @Override
-    public void delete(Long goalId) {
-        goalRepository.deleteById(goalId);
     }
 
     // 📂 파일 업로드 처리
