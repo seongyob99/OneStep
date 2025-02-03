@@ -25,7 +25,11 @@ public class Chats extends BaseEntity {
     @Column(name = "chat_name")
     private String chatName;
 
-    @ManyToMany(mappedBy = "chats", fetch = FetchType.LAZY)
+    @ManyToMany
+    @JoinTable(name = "chats_members",
+            joinColumns = @JoinColumn(name = "chat_id"),
+            inverseJoinColumns = @JoinColumn(name = "member_id")
+    )
     private List<Members> members;
 
     @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)

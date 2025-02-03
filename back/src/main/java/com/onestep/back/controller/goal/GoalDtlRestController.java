@@ -39,6 +39,20 @@ public class GoalDtlRestController {
         return Map.of("goalDTO", goalDTO);
     }
 
+    // 수정하기
+    @PutMapping("/updateGoal")
+    public Map<String, GoalDTO> updateGoal(@RequestBody GoalDTO goalDTO) {
+        goalDtlService.updateGoal(goalDTO);
+        return Map.of("goalDTO", goalDTO);
+    }
+
+    // 삭제하기
+    @DeleteMapping("/{goalId}")
+    public Map<String, Long> deleteGoal(@PathVariable Long goalId) {
+        goalDtlService.deleteGoal(goalId);
+        return Map.of("goalId", goalId);
+    }
+
     // 최근 인증기록 조회
     @PostMapping("/getRecentCert/{goalId}")
     public List<CertificationsDTO> getRecentCert(@PathVariable Long goalId) {

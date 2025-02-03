@@ -82,4 +82,18 @@ public class GoalDtlServiceImpl implements GoalDtlService{
         );
         goalRepository.save(goal);
     }
+
+    // 수정하기
+    @Override
+    public void updateGoal(GoalDTO goalDTO) {
+        Goals goal = goalRepository.findById(goalDTO.getGoalId()).orElseThrow();
+        // 수정 로직
+        goalRepository.save(goal);
+    }
+
+    // 삭제하기
+    @Override
+    public void deleteGoal(Long goalId) {
+        goalRepository.deleteById(goalId);
+    }
 }
