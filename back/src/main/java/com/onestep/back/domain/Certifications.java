@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "certifications")
 @Getter
-@ToString
+@ToString(exclude = {"goal", "member"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

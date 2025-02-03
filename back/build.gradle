@@ -72,7 +72,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-oauth2-client
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: '3.4.0'// 소셜로그인(카카오)
 
-
+    // 스프링 부트 웹소켓 도구
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 tasks.named('test') {
