@@ -15,4 +15,8 @@ public interface GoalDtlService {
     void joinGoal(GoalDTO goalDTO);
 
     void removeMember(GoalDTO goalDTO);
+
+    void updateGoal(GoalDTO goalDTO);
+
+    void deleteGoal(Long goalId);
 }
