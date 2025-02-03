@@ -1,4 +1,4 @@
-package com.onestep.back.dto;
+package com.onestep.back.dto.goal;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

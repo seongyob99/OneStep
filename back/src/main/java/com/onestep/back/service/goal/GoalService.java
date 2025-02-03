@@ -1,6 +1,6 @@
 package com.onestep.back.service.goal;
 
-import com.onestep.back.dto.GoalDTO;
+import com.onestep.back.dto.goal.GoalDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

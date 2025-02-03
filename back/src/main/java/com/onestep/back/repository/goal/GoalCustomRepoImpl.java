@@ -1,7 +1,7 @@
 package com.onestep.back.repository.goal;
 
 import com.onestep.back.domain.*;
-import com.onestep.back.dto.goal.CertDTO;
+import com.onestep.back.dto.upload.CertificationsDTO;
 import com.onestep.back.dto.goal.GoalDtlDTO;
 import com.querydsl.core.Tuple;
 import lombok.extern.log4j.Log4j2;
@@ -82,9 +82,9 @@ public class GoalCustomRepoImpl extends QuerydslRepositorySupport implements Goa
                 .orderBy(certifications.count().coalesce(0L).desc(), certifications.certDate.max().desc(), certifications.regDate.asc())
                 .fetch();
 
-        // CertDTO 추가
+        // CertificationsDTO 추가
         memberResult.forEach(tuple -> {
-            dto.getMembers().add(CertDTO.builder()
+            dto.getMembers().add(CertificationsDTO.builder()
                     .goalId(tuple.get(goals.goalId))
                     .memberId(tuple.get(members.memberId))
                     .name(tuple.get(members.name))

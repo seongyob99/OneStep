@@ -1,6 +1,6 @@
 package com.onestep.back.service.category;
 
-import com.onestep.back.dto.CategoriesDTO;
+import com.onestep.back.dto.category.CategoriesDTO;
 
 import java.util.List;
 

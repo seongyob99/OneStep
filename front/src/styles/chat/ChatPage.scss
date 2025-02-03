@@ -1,0 +1,27 @@
+.chat-page {
+    display: flex;
+    height: 75vh;
+}
+
+.chat-list-container {
+    width: 500px;
+    padding: 20px;
+    background-color: #f0f0f0;
+    text-align: center;
+    border-right: 1px solid #ccc;
+}
+
+.chat-list-scroll {
+    height: 100%;
+    overflow-y: auto;
+    text-align: center;
+}
+
+.chat-room-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 20px;
+    height: 100%;
+    overflow-y: hidden;
+}

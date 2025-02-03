@@ -9,8 +9,7 @@ import java.util.List;
 @Entity
 @Table(name = "members")
 @Getter
-@Setter
-@ToString
+@ToString(exclude = {"chats", "goals", "certifications"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -43,10 +42,7 @@ public class Members extends BaseEntity {
     @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private List<Goals> goals;
 
-    @ManyToMany
-    @JoinTable(name = "chats_members",
-            joinColumns = @JoinColumn(name = "member_id"),
-            inverseJoinColumns = @JoinColumn(name = "chat_id"))
+    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private List<Chats> chats;
 
     @OneToMany(mappedBy = "adminMember", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
