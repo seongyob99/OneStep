@@ -20,12 +20,10 @@ public class MemberController {
         return ResponseEntity.ok(member);
     }
 
-    // 2. 회원 정보 수정
-    @PutMapping("/{memberId}")
-    public ResponseEntity<String> updateMember(
-            @PathVariable String memberId,
-            @RequestBody MemberDTO memberDTO) {
-        memberService.updateMember(memberId, memberDTO);
+    // 2. 회원 정보 수정 (memberId 제거)
+    @PutMapping("/update")
+    public ResponseEntity<String> updateMember(@RequestBody MemberDTO memberDTO) {
+        memberService.updateMember(memberDTO.getMemberId(), memberDTO);
         return ResponseEntity.ok("회원 정보가 수정되었습니다.");
     }
 }
