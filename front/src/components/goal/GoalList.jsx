@@ -4,39 +4,45 @@ import axios from "axios";
 import GoalCard from "./GoalCard";
 
 const GoalList = () => {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('');
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("");
     const [goals, setGoals] = useState([]);
-    const [currentPage, setCurrentPage] = useState(0); // 현재 페이지
-    const [isFetching, setIsFetching] = useState(false); // 데이터 가져오는 중인지 여부
-    const [hasMore, setHasMore] = useState(true); // 더 불러올 데이터가 있는지 여부
-    const observer = useRef(null); // Intersection Observer 관리
+    const [currentPage, setCurrentPage] = useState(0);
+    const [isFetching, setIsFetching] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const observer = useRef(null);
+    const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
     const navigate = useNavigate();
 
-    // 목표 목록 가져오기 (페이지네이션 적용)
+    // 📌 목표 목록 가져오기 (페이지네이션 적용)
     const fetchGoals = async (page = 0, reset = false) => {
-        if (!hasMore && !reset) return; // 더 불러올 데이터가 없으면 중단
+        if (!hasMore && !reset) return;
         setIsFetching(true);
 
         try {
-            const response = await axios.get("http://localhost:8080/goals/list", {
+            const response = await axios.get(`${SERVER_URL}/goals/list`, {
                 params: {
-                    categoryName: selectedCategory || undefined,
+                    categoryId: selectedCategory || undefined,
                     title: searchTerm || undefined,
                     page: page,
-                    size: 6, // 한 번에 6개씩 불러오기
+                    size: 6,
                 },
             });
 
             console.log("📌 서버 응답 데이터:", response.data);
 
-            if (response.data.content.length === 0) {
-                setHasMore(false); // 추가 데이터 없음
+            if (!response.data || response.data.length === 0) {
+                setHasMore(false);
             } else {
                 setHasMore(true);
-                // 썸네일 URL 확인하고 설정
-                setGoals(prevGoals => (reset ? response.data.content : [...prevGoals, ...response.data.content]));
+
+                setGoals(prevGoals => {
+                    const newGoals = response.data.filter(
+                        newGoal => !prevGoals.some(existingGoal => existingGoal.goalId === newGoal.goalId)
+                    );
+                    return reset ? response.data : [...prevGoals, ...newGoals];
+                });
             }
         } catch (error) {
             console.error("목표 리스트 불러오는 중 오류 발생:", error);
@@ -45,26 +51,22 @@ const GoalList = () => {
         }
     };
 
-    // 검색 버튼 클릭 시 새로운 검색 적용
+    // 📌 검색 버튼 클릭 시 새로운 검색 적용
     const handleSearch = () => {
         setCurrentPage(0);
         setHasMore(true);
         setGoals([]);
-        fetchGoals(0, true); // 첫 페이지부터 새로 불러오기
+        fetchGoals(0, true);
     };
 
-    // 무한 스크롤 감지
+    // 📌 무한 스크롤 감지
     useEffect(() => {
-        if (isFetching) return;
+        if (isFetching || !hasMore) return;
         if (!observer.current) return;
 
         const observerCallback = (entries) => {
-            if (entries[0].isIntersecting) {
-                setCurrentPage(prevPage => {
-                    const nextPage = prevPage + 1;
-                    fetchGoals(nextPage);
-                    return nextPage;
-                });
+            if (entries[0].isIntersecting && !isFetching) {
+                setCurrentPage(prevPage => prevPage + 1);
             }
         };
 
@@ -79,7 +81,7 @@ const GoalList = () => {
         return () => newObserver.disconnect();
     }, [isFetching, hasMore]);
 
-    // 처음 로딩 시 데이터 가져오기
+    // 📌 첫 로딩 시 데이터 가져오기
     useEffect(() => {
         fetchGoals();
     }, []);
@@ -109,10 +111,11 @@ const GoalList = () => {
                     className="form-select"
                 >
                     <option value="">전체</option>
-                    <option value="기타">기타</option>
-                    <option value="공부">공부</option>
-                    <option value="습관">습관</option>
-                    <option value="운동">운동</option>
+                    <option value="1">운동</option>
+                    <option value="2">건강</option>
+                    <option value="3">학습</option>
+                    <option value="4">습관</option>
+                    <option value="5">기타</option>
                 </select>
                 <button className="btn btn-secondary" onClick={handleSearch}>
                     검색
@@ -122,8 +125,8 @@ const GoalList = () => {
             {/* 목표 카드 리스트 */}
             <div className="row">
                 {goals.length > 0 ? (
-                    goals.map((goal) => (
-                        <div className="col-md-4 mb-4" key={goal.goalId}>
+                    goals.map((goal, index) => (
+                        <div className="col-md-4 mb-4" key={`${goal.goalId}-${index}`}>
                             <GoalCard goal={goal} />
                         </div>
                     ))
