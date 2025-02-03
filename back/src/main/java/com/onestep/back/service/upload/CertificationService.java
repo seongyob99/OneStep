@@ -1,8 +1,8 @@
-package com.onestep.back.service.Upload;
+package com.onestep.back.service.upload;
 
 
 import com.onestep.back.domain.Certifications;
-import com.onestep.back.dto.Upload.CertificationsDTO;
+import com.onestep.back.dto.upload.CertificationsDTO;
 
 
 import java.time.LocalDate;

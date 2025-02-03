@@ -1,4 +1,4 @@
-package com.onestep.back.dto;
+package com.onestep.back.dto.category;
 
 import lombok.*;
 

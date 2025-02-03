@@ -1,7 +1,4 @@
-package com.onestep.back.dto.Upload;
-
-
-
+package com.onestep.back.dto.upload;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +19,8 @@ public class CertificationsDTO {
     @NotNull
     private String memberId;
 
+    private String name;
+
     @NotNull
     @FutureOrPresent
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -29,4 +28,6 @@ public class CertificationsDTO {
 
     @NotNull
     private String filePath;
+
+    private Long certCnt;
 }

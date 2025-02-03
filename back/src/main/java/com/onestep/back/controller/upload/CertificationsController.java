@@ -1,17 +1,15 @@
-package com.onestep.back.controller.Upload;
+package com.onestep.back.controller.upload;
 
-import com.onestep.back.dto.Upload.CertificationsDTO;
-import com.onestep.back.dto.Upload.UploadFileDTO;
-import com.onestep.back.dto.Upload.UploadResultDTO;
-import com.onestep.back.service.Upload.CertificationService;
+import com.onestep.back.dto.upload.CertificationsDTO;
+import com.onestep.back.dto.upload.UploadFileDTO;
+import com.onestep.back.dto.upload.UploadResultDTO;
+import com.onestep.back.service.upload.CertificationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,8 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

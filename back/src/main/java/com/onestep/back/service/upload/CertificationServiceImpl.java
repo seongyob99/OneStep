@@ -1,32 +1,20 @@
-package com.onestep.back.service.Upload;
+package com.onestep.back.service.upload;
 
 
 import com.onestep.back.domain.CertificationId;
 import com.onestep.back.domain.Certifications;
 import com.onestep.back.domain.Goals;
 import com.onestep.back.domain.Members;
-import com.onestep.back.dto.Upload.CertificationsDTO;
-import com.onestep.back.repository.Upload.CertificationsRepository;
-import com.onestep.back.repository.Upload.GoalsRepository;
-import com.onestep.back.repository.Upload.MembersRepository;
+import com.onestep.back.dto.upload.CertificationsDTO;
+import com.onestep.back.repository.member.MemberRepository;
+import com.onestep.back.repository.upload.CertificationsRepository;
 
-import net.coobird.thumbnailator.Thumbnailator;
-import org.springframework.beans.factory.annotation.Value;
-
+import com.onestep.back.repository.goal.GoalRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,8 +26,8 @@ import java.util.stream.Collectors;
 public class CertificationServiceImpl implements CertificationService {
 
     private final CertificationsRepository certificationsRepository;
-    private final GoalsRepository goalsRepository;
-    private final MembersRepository membersRepository;
+    private final GoalRepository goalsRepository;
+    private final MemberRepository membersRepository;
 
     @Override
     public void register(CertificationsDTO dto) {

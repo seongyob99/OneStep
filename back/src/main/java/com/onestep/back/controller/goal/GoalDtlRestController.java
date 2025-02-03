@@ -1,7 +1,7 @@
 package com.onestep.back.controller.goal;
 
-import com.onestep.back.dto.GoalDTO;
-import com.onestep.back.dto.goal.CertDTO;
+import com.onestep.back.dto.goal.GoalDTO;
+import com.onestep.back.dto.upload.CertificationsDTO;
 import com.onestep.back.dto.goal.GoalDtlDTO;
 import com.onestep.back.service.goal.GoalDtlService;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ public class GoalDtlRestController {
 
     // 최근 인증기록 조회
     @PostMapping("/getRecentCert/{goalId}")
-    public List<CertDTO> getRecentCert(@PathVariable Long goalId) {
+    public List<CertificationsDTO> getRecentCert(@PathVariable Long goalId) {
         return goalDtlService.getRecentCert(goalId);
     }
 }

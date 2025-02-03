@@ -1,8 +1,9 @@
-package com.onestep.back.repository.Upload;
+package com.onestep.back.repository.upload;
 
 
 import com.onestep.back.domain.CertificationId;
 import com.onestep.back.domain.Certifications;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -41,4 +42,12 @@ public interface CertificationsRepository extends JpaRepository<Certifications, 
 //
 //    // 특정 사용자의 특정 목표에 대한 인증 목록 조회
 //    List<Certifications> findByGoal_GoalIdAndMember_MemberId(Long goalId, Long memberId);
+
+
+    // 최근 인증 기록 탑4 조회
+    @Query("SELECT c FROM Certifications c WHERE c.goal.goalId = :goalId ORDER BY c.regDate DESC")
+    List<Certifications> findRecentCertificationsByGoalId(@Param("goalId") Long goalId, Pageable pageable);
+
+    // 내보내기, 그만두기 시 삭제할 인증 기록 조회
+    List<Certifications> findByGoalGoalIdAndMemberMemberId(Long goalId, String memberId);
 }

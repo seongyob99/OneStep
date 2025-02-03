@@ -2,11 +2,11 @@ package com.onestep.back.service.goal;
 
 import com.onestep.back.domain.Certifications;
 import com.onestep.back.domain.Goals;
-import com.onestep.back.dto.GoalDTO;
-import com.onestep.back.dto.goal.CertDTO;
+import com.onestep.back.dto.goal.GoalDTO;
+import com.onestep.back.dto.upload.CertificationsDTO;
 import com.onestep.back.dto.goal.GoalDtlDTO;
-import com.onestep.back.repository.MemberRepository;
-import com.onestep.back.repository.goal.CertRepository;
+import com.onestep.back.repository.member.MemberRepository;
+import com.onestep.back.repository.upload.CertificationsRepository;
 import com.onestep.back.repository.goal.GoalRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -27,7 +27,7 @@ public class GoalDtlServiceImpl implements GoalDtlService{
     private String uploadPath;
 
     private final GoalRepository goalRepository;
-    private final CertRepository certRepository;
+    private final CertificationsRepository certRepository;
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
 
@@ -39,12 +39,12 @@ public class GoalDtlServiceImpl implements GoalDtlService{
 
     // 최근 인증 기록 탑4 조회
     @Override
-    public List<CertDTO> getRecentCert(Long goalId) {
+    public List<CertificationsDTO> getRecentCert(Long goalId) {
         Pageable pageable = PageRequest.of(0, 4);
         List<Certifications> certifications = certRepository.findRecentCertificationsByGoalId(goalId, pageable);
 
         return certifications.stream()
-                .map(cert -> modelMapper.map(cert, CertDTO.class))
+                .map(cert -> modelMapper.map(cert, CertificationsDTO.class))
                 .collect(Collectors.toList());
     }
 

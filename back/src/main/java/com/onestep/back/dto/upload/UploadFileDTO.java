@@ -1,4 +1,4 @@
-package com.onestep.back.dto.Upload;
+package com.onestep.back.dto.upload;
 
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;

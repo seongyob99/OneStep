@@ -2,7 +2,7 @@ package com.onestep.back.service.member;
 
 import com.onestep.back.domain.Members;
 import com.onestep.back.dto.member.MemberDTO;
-import com.onestep.back.repository.MemberRepository;
+import com.onestep.back.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
