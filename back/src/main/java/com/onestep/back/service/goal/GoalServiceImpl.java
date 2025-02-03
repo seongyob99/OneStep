@@ -12,11 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.onestep.back.dto.GoalDTO;
+import com.onestep.back.dto.goal.GoalDTO;
 import com.onestep.back.domain.Categories;
 import com.onestep.back.domain.Goals;
 import com.onestep.back.domain.Members;
-import com.onestep.back.repository.MemberRepository;
+import com.onestep.back.repository.member.MemberRepository;
 import com.onestep.back.repository.category.CategoriesRepository;
 import com.onestep.back.repository.goal.GoalRepository;
 

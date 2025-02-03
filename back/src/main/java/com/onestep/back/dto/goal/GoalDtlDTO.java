@@ -1,6 +1,7 @@
 package com.onestep.back.dto.goal;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.onestep.back.dto.upload.CertificationsDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,5 +30,5 @@ public class GoalDtlDTO {
     private LocalDate endDate;
     private Long participants;
     private String thumbnail;
-    private List<CertDTO> members;
+    private List<CertificationsDTO> members;
 }

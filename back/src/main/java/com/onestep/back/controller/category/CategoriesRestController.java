@@ -1,6 +1,6 @@
 package com.onestep.back.controller.category;
 
-import com.onestep.back.dto.CategoriesDTO;
+import com.onestep.back.dto.category.CategoriesDTO;
 import com.onestep.back.service.category.CategoriesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

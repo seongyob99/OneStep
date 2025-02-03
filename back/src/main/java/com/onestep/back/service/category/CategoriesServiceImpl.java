@@ -1,7 +1,7 @@
 package com.onestep.back.service.category;
 
 import com.onestep.back.domain.Categories;
-import com.onestep.back.dto.CategoriesDTO;
+import com.onestep.back.dto.category.CategoriesDTO;
 import com.onestep.back.repository.category.CategoriesRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
