@@ -43,10 +43,7 @@ public class Members extends BaseEntity {
     @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private List<Goals> goals;
 
-    @ManyToMany
-    @JoinTable(name = "chats_members",
-            joinColumns = @JoinColumn(name = "member_id"),
-            inverseJoinColumns = @JoinColumn(name = "chat_id"))
+    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private List<Chats> chats;
 
     @OneToMany(mappedBy = "adminMember", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
