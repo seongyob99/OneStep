@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,27 +36,14 @@ public class GoalRestController {
 
     // 목표 목록 조회
     @GetMapping("/list")
-    public Page<GoalDTO> getPagedGoalList(
-            @RequestParam(required = false) String categoryName,
-            @RequestParam(required = false) String title,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        log.info("📌 목표 목록 조회 요청: categoryName={}, title={}, page={}, size={}", categoryName, title, page, size);
+    public ResponseEntity<List<GoalDTO>> getGoalList(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String title) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<GoalDTO> goals = goalService.getPagedList(categoryName, title, pageable);
+        log.info("📌 목표 목록 조회 요청: categoryId={}, title={}", categoryId, title);
 
-        // ✅ 각 GoalDTO에 thumbnailUrl 추가
-        goals.forEach(goal -> {
-            if (goal.getThumbnail() != null && !goal.getThumbnail().isEmpty()) {
-                goal.setThumbnailUrl("http://localhost:8080/uploads/" + goal.getThumbnail());
-            } else {
-                goal.setThumbnailUrl("http://localhost:8080/uploads/default.jpg"); // 기본 이미지 설정
-            }
-        });
-
-        return goals;
+        List<GoalDTO> goals = goalService.getList(categoryId, title);
+        return ResponseEntity.ok(goals);
     }
 
     // 목표 등록
@@ -84,7 +72,42 @@ public class GoalRestController {
         goalDTO.setMemberId(memberId);
         goalDTO.setCategoryId(categoryId);
 
+        if (goalDTO.getEndDate() == null && goalDTO.getStartDate() != null) {
+            goalDTO.setEndDate(goalDTO.getStartDate().plusMonths(6));
+            log.info("📌 endDate가 없어 기본값 설정됨: {}", goalDTO.getEndDate());
+        }
+
         try {
+            // ✅ 필수 값 검증
+            if (goalDTO.getTitle() == null || goalDTO.getTitle().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("❌ 제목은 필수입니다.");
+            }
+            if (goalDTO.getDescription() == null || goalDTO.getDescription().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("❌ 설명은 필수입니다.");
+            }
+            if (categoryId == null) {
+                return ResponseEntity.badRequest().body("❌ 카테고리를 선택해야 합니다.");
+            }
+            if (goalDTO.getStartDate() == null) {
+                return ResponseEntity.badRequest().body("❌ 시작 날짜는 필수입니다.");
+            }
+
+            // ✅ 참가 인원 검증 (1 이상 숫자만 허용)
+            if (goalDTO.getParticipants() == null || goalDTO.getParticipants() < 1) {
+                return ResponseEntity.badRequest().body("❌ 참가 인원은 1명 이상이어야 합니다.");
+            }
+            if (String.valueOf(goalDTO.getParticipants()).matches("^0[0-9]+$")) {
+                return ResponseEntity.badRequest().body("❌ 참가 인원은 0으로 시작할 수 없습니다.");
+            }
+
+            // ✅ 인증 주기 검증 (1 이상 숫자만 허용)
+            if (goalDTO.getCertCycle() == null || goalDTO.getCertCycle() < 1) {
+                return ResponseEntity.badRequest().body("❌ 인증 주기는 1 이상이어야 합니다.");
+            }
+            if (String.valueOf(goalDTO.getCertCycle()).matches("^0[0-9]+$")) {
+                return ResponseEntity.badRequest().body("❌ 인증 주기는 0으로 시작할 수 없습니다.");
+            }
+
             // 🛠 파일 업로드 처리
             if (file != null && !file.isEmpty()) {
                 log.info("📂 파일 업로드 시작: {}", file.getOriginalFilename());
@@ -117,7 +140,7 @@ public class GoalRestController {
             Long goalId = goalService.register(goalDTO);
             log.info("✅ 목표 등록 완료, ID: {}", goalId);
 
-            // 🔹 응답 데이터 생성 (등록된 목표 ID 및 썸네일 URL 반환)
+            // 🔹 응답 데이터 생성 (등록된 목표 ID 반환)
             Map<String, Object> response = new HashMap<>();
             response.put("goalId", goalId);
 
@@ -134,25 +157,5 @@ public class GoalRestController {
         }
     }
 
-    // 목표 참가
-    @PostMapping("/{goalId}/join")
-    public void joinGoal(@PathVariable Long goalId, @RequestBody Map<String, Object> requestData) {
-        Long memberId = Long.valueOf(requestData.get("memberId").toString());
-        log.info("목표 참가 요청: goalId={}, memberId={}", goalId, memberId);
-        goalService.join(goalId, memberId);
-    }
 
-    // 목표 수정
-    @PutMapping("/update")
-    public Long updateGoal(@RequestBody GoalDTO goalDTO) {
-        log.info("목표 수정 요청: {}", goalDTO);
-        return goalService.update(goalDTO);
-    }
-
-    // 목표 삭제
-    @DeleteMapping("/{goalId}")
-    public void deleteGoal(@PathVariable Long goalId) {
-        log.info("목표 삭제 요청: goalId={}", goalId);
-        goalService.delete(goalId);
-    }
 }
