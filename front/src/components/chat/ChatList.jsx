@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import '../../styles/chat/ChatList.scss';
+import '@styles/chat/ChatList.scss';
 
 const ChatList = ({ setSelectedChatId }) => {
     const [chatList, setChatList] = useState([]);
@@ -31,7 +31,7 @@ const ChatList = ({ setSelectedChatId }) => {
                         className={`chat-item ${selectedChatId === chat.chatId ? 'selected' : ''}`}
                         onClick={() => handleChatSelect(chat.chatId)}
                     >
-                        <Link to={`/chat/${chat.chatId}`} className="chat-link">
+                        <Link to={`/chat/${chat.chatId}`} className="chat-link" replace>
                             {chat.chatName}
                         </Link>
                     </li>

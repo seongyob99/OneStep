@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { List, AutoSizer } from 'react-virtualized'; // AutoSizer 추가
-import '../../styles/chat/ChatRoom.scss';  // SCSS 파일 import
+import '@styles/chat/ChatRoom.scss';  // SCSS 파일 import
 
 const ChatRoom = () => {
     const { chatId } = useParams();
