@@ -99,16 +99,18 @@
 
 /* 내 메시지에 추가할 스타일 */
 .message-text-mine {
-    background-color: #ffe0a7; // 연한 초록색
+    background-color: #4880ED; // 연한 초록색
     border-radius: 10px;
     padding: 8px 12px;
+    color: white;
 }
 
 /* (선택 사항) 다른 사람 메시지에 추가할 스타일 */
 .message-text-other {
-    background-color: #aaffb1; // 연한 회색
+    background-color: #F3F4F6; // 연한 회색
     border-radius: 10px;
     padding: 8px 12px;
+
 }
 
 

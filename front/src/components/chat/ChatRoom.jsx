@@ -197,7 +197,7 @@ const ChatRoom = () => {
 
     return (
         <div className="chat-room">
-            <h3>{chatRoomName} <span className="small"><IoPersonSharp /> {memberCount}</span></h3>
+            <h3>{chatRoomName} <span className="small"><IoPersonSharp color="red" /> {memberCount}</span></h3>
             <div className="messages-container">
                 <AutoSizer>
                     {({ width, height }) => (

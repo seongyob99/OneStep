@@ -1,17 +1,23 @@
 import { Outlet } from 'react-router-dom';
 import '@styles/Layout.scss';
+import { Container } from 'react-bootstrap';
 
 const Layout = () => {
     return (
         <div className="layout">
             <header className="header">
-                <div>Header</div>
+                <Container>
+                    {/* <div><img src='../src/assets/img/ONESTEP-logo.png' alt='ONESTEP Logo' />header</div> */}
+                    <div>header</div>
+                </Container>
             </header>
             <main className="main">
                 <Outlet />
             </main>
             <footer className="footer">
-                <div>Footer</div>
+                <Container>
+                    <div>Footer</div>
+                </Container>
             </footer>
         </div>
     );
