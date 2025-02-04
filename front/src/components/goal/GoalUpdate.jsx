@@ -51,6 +51,7 @@ const GoalUpdate = () => {
             setForm(response.data);
             setMemberCnt(response.data.members.length);
             setCurrentImg(response.data.thumbnail);
+            setNoEndDate(!response.data.endDate);
         } catch (err) {
             alert("상세정보를 가져오지 못했습니다.");
         }
@@ -88,11 +89,16 @@ const GoalUpdate = () => {
                                 alert("소수점은 입력할 수 없습니다.");
                                 return;
                             }
-                            if (name === 'participants' && numericValue < memberCnt) {
-                                alert("현재 참가 인원보다 적은 수는 입력할 수 없습니다.");
-                                return;
-                            }
                         }
+                        draft[name] = value;
+                    } else if (name === 'endDate' && form.startDate) {
+                        // const startDate = new Date(form.startDate);
+                        // const endDate = new Date(value);
+
+                        // if (endDate < startDate) {
+                        //     alert("종료일은 시작일보다 이후여야 합니다.");
+                        //     draft.endDate = form.startDate; // 종료일을 시작일로 수정
+                        // }
                         draft[name] = value;
                     } else {
                         draft[name] = value;
@@ -127,6 +133,10 @@ const GoalUpdate = () => {
         if (!form.categoryId || !form.title.trim() || !form.description.trim()
             || !form.startDate || !form.certCycle || !form.rule.trim()) {
             alert("모든 필드를 입력해주세요.");
+            return;
+        }
+        if (form.participants < memberCnt) {
+            alert("현재 참가 인원이 정원보다 많을 수 없습니다.");
             return;
         }
         if (!noEndDate && !form.endDate) {
@@ -225,7 +235,7 @@ const GoalUpdate = () => {
                     </div>
                     <div className="flex-1 ml-4">
                         <label className="form-label">정원</label>
-                        <span className="current-member">(현재 {memberCnt}명)</span>
+                        <span className="small-font">(현재 {memberCnt}명)</span>
 
                         <div className="flex">
                             <input
@@ -254,7 +264,7 @@ const GoalUpdate = () => {
                             type="date"
                             name="endDate"
                             className="form-control"
-                            value={form.endDate}
+                            value={form.endDate ? form.endDate : ''}
                             onChange={onChange}
                             disabled={noEndDate}
                         />
@@ -280,6 +290,7 @@ const GoalUpdate = () => {
                 </div>
                 <div className="thumbnail-input mb-4">
                     <label className="form-label">썸네일</label>
+                    <span className="small-font ml-2" style={{ color: "#fc4c24" }}>* 이미지는 1:1 비율로 넣어주세요 (권장)</span>
                     {form.thumbnail ? (
                         <div className="thumbnail-preview mb-2">
                             <img

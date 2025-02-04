@@ -1,190 +1,211 @@
-import React, { useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { produce } from 'immer';
+import { Container } from 'react-bootstrap';
 
 const GoalRegister = () => {
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [participants, setParticipants] = useState(1);
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-    const [thumbnail, setThumbnail] = useState(null);
-    const [certCycle, setCertCycle] = useState("");
-    const [rule, setRule] = useState("");
-    const [categoryId, setCategoryId] = useState(""); // 카테고리 선택 값 추가
+    const [form, setForm] = useState({
+        title: "",
+        description: "",
+        participants: 1,
+        startDate: "",
+        endDate: "",
+        certCycle: 1,
+        rule: "",
+        categoryId: "",
+        file: null
+    });
+    const [cateList, setCateList] = useState([]);
+    const [noEndDate, setNoEndDate] = useState(false);
     const navigate = useNavigate();
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-    const categories = [
-        { id: 1, name: "운동" },
-        { id: 2, name: "건강" },
-        { id: 3, name: "학습" },
-        { id: 4, name: "습관" },
-        { id: 5, name: "기타" }
-    ];
+    // 📌 카테고리 목록 불러오기
+    useEffect(() => {
+        axios.get(`${SERVER_URL}/categories`)
+            .then(response => setCateList(response.data))
+            .catch(() => alert("카테고리를 불러오는 데 실패했습니다."));
+    }, []);
+
+    // 📌 입력값 변경 핸들러 (Validation 추가)
+    const onChange = useCallback((e) => {
+        const { name, value, type, checked } = e.target;
+
+        if (type === 'checkbox') {
+            setNoEndDate(checked);
+            if (checked) {
+                setForm(
+                    produce((draft) => {
+                        draft.endDate = "";
+                    })
+                );
+            }
+        } else {
+            // 🚨 참가 인원 & 인증 주기 필드
+            if (name === "participants" || name === "certCycle") {
+                // 🚨 숫자가 아닌 값 입력 시 경고 & 즉시 초기화
+                if (!/^\d*$/.test(value)) {
+                    alert("🚨 유효한 숫자를 입력해주세요.");
+                    e.target.value = ""; // 입력창 즉시 초기화
+                    return;
+                }
+
+                const numericValue = Number(value);
+
+                // 🚨 0 이하 입력 방지
+                if (numericValue <= 0) {
+                    alert("🚨 1 이상의 숫자를 입력해주세요.");
+                    e.target.value = ""; // 입력창 즉시 초기화
+                    return;
+                }
+
+                // 🚨 소수점 입력 방지
+                if (value.includes(".")) {
+                    alert("🚨 소수점은 입력할 수 없습니다.");
+                    e.target.value = ""; // 입력창 즉시 초기화
+                    return;
+                }
+
+                setForm(
+                    produce((draft) => {
+                        draft[name] = numericValue; // 정상 입력만 반영
+                    })
+                );
+            } else {
+                setForm(
+                    produce((draft) => {
+                        draft[name] = value;
+                    })
+                );
+            }
+        }
+    }, []);
 
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    // 📌 종료일 없음 체크박스 핸들러
+    const toggleNoEndDate = () => {
+        setNoEndDate(!noEndDate);
+        setForm(prev => ({ ...prev, endDate: noEndDate ? "" : null }));
+    };
 
-        if (!title || !description || !certCycle || !startDate || !rule || !categoryId) {
+    // 📌 파일 업로드 핸들러 (썸네일 미리보기 포함)
+    const onFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setForm(prev => ({ ...prev, file }));
+        }
+    };
+
+    // 📌 목표 등록 요청 (Validation 추가)
+    const handleRegister = async () => {
+        console.log("📌 현재 입력 데이터:", form);
+        if (!form.categoryId || !form.title.trim() || !form.description.trim()
+            || !form.startDate || !form.certCycle || !form.rule.trim()) {
             alert("🚨 모든 필드를 입력해주세요.");
+            return;
+        }
+        if (!noEndDate && !form.endDate) {
+            alert("🚨 종료일을 입력해주세요.");
+            return;
+        }
+        if (!form.file) {
+            alert("🚨 썸네일은 필수입니다.");
             return;
         }
 
         const formData = new FormData();
-        formData.append("title", title);
-        formData.append("description", description);
-        formData.append("participants", participants);
-        formData.append("startDate", startDate);
-        formData.append("endDate", endDate);
-        formData.append("certCycle", certCycle);
-        formData.append("memberId", "user01");
-        formData.append("categoryId", Number(categoryId));
-        formData.append("rule", rule);
+        formData.append("title", form.title);
+        formData.append("description", form.description);
+        formData.append("participants", form.participants);
+        formData.append("startDate", form.startDate);
+        formData.append("endDate", noEndDate ? "" : form.endDate);
+        formData.append("certCycle", form.certCycle);
+        formData.append("rule", form.rule);
+        formData.append("categoryId", Number(form.categoryId));
+        formData.append("memberId", "user01"); // 로그인 유저
 
-        if (thumbnail) {
-            formData.append("file", thumbnail);
+        if (form.file) {
+            formData.append("file", form.file);
         }
 
-        axios.post(`${SERVER_URL}/goals/register`, formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-        })
-            .then(() => {
-                alert("✅ 목표 등록 완료!");
-                navigate("/");
-            })
-            .catch((error) => {
-                console.error("❌ 등록 실패:", error);
-                alert(`목표 등록 중 오류가 발생했습니다: ${error.message}`);
+        try {
+            await axios.post(`${SERVER_URL}/goals/register`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
             });
+            alert("✅ 목표 등록 완료!");
+            navigate("/");
+        } catch (error) {
+            alert("❌ 목표 등록에 실패했습니다.");
+        }
     };
 
     return (
-        <div className="container mt-8">
-            <h1 className="text-2xl font-bold mb-4">목표 등록</h1>
-            <form onSubmit={handleSubmit}>
-                {/* ✅ 목표 제목 */}
-                <div className="mb-4">
-                    <label className="form-label">목표 제목</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                    />
-                </div>
+        <Container>
+            <div className="container mt-4">
+                <h1 className="text-2xl font-bold mb-4">목표 등록</h1>
+                <hr />
+                <form>
+                    {/* ✅ 카테고리 선택 */}
+                    <div className="mb-4">
+                        <label className="form-label">카테고리</label>
+                        <select name="categoryId" className="form-control" value={form.categoryId} onChange={onChange}>
+                            <option value="">카테고리를 선택하세요</option>
+                            {cateList.map(category => (
+                                <option key={category.categoryId} value={category.categoryId}>{category.cateName}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                {/* ✅ 목표 설명 */}
-                <div className="mb-4">
-                    <label className="form-label">목표 설명</label>
-                    <textarea
-                        className="form-control"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                    />
-                </div>
+                    {/* ✅ 제목, 설명 */}
+                    <div className="mb-4">
+                        <label className="form-label">목표 제목</label>
+                        <input type="text" name="title" className="form-control" value={form.title} onChange={onChange} />
+                    </div>
+                    <div className="mb-4">
+                        <label className="form-label">목표 설명</label>
+                        <textarea name="description" className="form-control" value={form.description} onChange={onChange} />
+                    </div>
 
-                {/* ✅ 참가 인원 필드 (숫자 증감 버튼 제거) */}
-                <div className="mb-4">
-                    <label className="form-label">참가 인원</label>
-                    <input
-                        type="number"
-                        min="1"
-                        className="form-control no-spin"
-                        value={participants}
-                        onChange={(e) => {
-                            let value = e.target.value.replace(/^0+/, ""); // 0으로 시작하는 값 제거
-                            if (!/^\d*$/.test(value)) return; // 숫자가 아니면 입력 방지
-                            setParticipants(value);
-                        }}
-                    />
-                </div>
+                    {/* ✅ 참가 인원 */}
+                    <div className="mb-4">
+                        <label className="form-label">참가 인원</label>
+                        <input type="number" name="participants" className="form-control" value={form.participants} onChange={onChange} />
+                    </div>
 
-                {/* ✅ 시작일 */}
-                <div className="mb-4">
-                    <label className="form-label">시작일</label>
-                    <input
-                        type="date"
-                        className="form-control"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                    />
-                </div>
+                    {/* ✅ 시작일 & 종료일 */}
+                    <div className="mb-4">
+                        <label className="form-label">시작일</label>
+                        <input type="date" name="startDate" className="form-control" value={form.startDate} onChange={onChange} />
+                    </div>
+                    <div className="mb-4">
+                        <label className="form-label">종료일</label>
+                        <input type="date" name="endDate" className="form-control" value={form.endDate} onChange={onChange} disabled={noEndDate} />
+                        <input type="checkbox" checked={noEndDate} onChange={toggleNoEndDate} /> 종료일 없음
+                    </div>
 
-                {/* ✅ 종료일 */}
-                <div className="mb-4">
-                    <label className="form-label">종료일</label>
-                    <input
-                        type="date"
-                        className="form-control"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        placeholder="종료일 (선택 사항)"
-                    />
-                </div>
+                    {/* ✅ 인증 주기 추가 */}
+                    <div className="mb-4">
+                        <label className="form-label">인증 주기</label>
+                        <input type="number" name="certCycle" className="form-control" value={form.certCycle} onChange={onChange} />
+                    </div>
 
-                {/* ✅ 인증 주기 필드 (숫자 증감 버튼 제거) */}
-                <div className="mb-4">
-                    <label className="form-label">인증 주기</label>
-                    <input
-                        type="number"
-                        min="1"
-                        className="form-control no-spin"
-                        value={certCycle}
-                        onChange={(e) => {
-                            let value = e.target.value.replace(/^0+/, ""); // 0으로 시작하는 값 제거
-                            if (!/^\d*$/.test(value)) return; // 숫자가 아니면 입력 방지
-                            setCertCycle(value);
-                        }}
-                        placeholder="예: 1, 7, 30"
-                    />
-                </div>
+                    {/* ✅ 인증 규칙 */}
+                    <div className="mb-4">
+                        <label className="form-label">인증 규칙</label>
+                        <input type="text" name="rule" className="form-control" value={form.rule} onChange={onChange} />
+                    </div>
 
-                {/* ✅ 인증 규칙 */}
-                <div className="mb-4">
-                    <label className="form-label">인증 규칙</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={rule}
-                        onChange={(e) => setRule(e.target.value)}
-                        placeholder="예: 하루 1회 인증 필수"
-                    />
-                </div>
+                    {/* ✅ 썸네일 업로드 */}
+                    <div className="mb-4">
+                        <label className="form-label">썸네일</label>
+                        <input type="file" name="file" className="form-control" onChange={onFileChange} />
+                    </div>
 
-                {/* ✅ 카테고리 선택 필드 */}
-                <div className="mb-4">
-                    <label className="form-label">카테고리</label>
-                    <select
-                        className="form-control"
-                        value={categoryId}
-                        onChange={(e) => setCategoryId(e.target.value)}
-                    >
-                        <option value="">카테고리를 선택하세요</option>
-                        {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                                {category.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* ✅ 썸네일 사진 */}
-                <div className="mb-4">
-                    <label className="form-label">썸네일 사진</label>
-                    <input
-                        type="file"
-                        className="form-control"
-                        onChange={(e) => setThumbnail(e.target.files[0])}
-                    />
-                </div>
-
-                <button type="submit" className="btn btn-primary">
-                    등록
-                </button>
-            </form>
-        </div>
+                    <button type="button" className="btn btn-primary" onClick={handleRegister}>등록</button>
+                </form>
+            </div>
+        </Container>
     );
 };
 

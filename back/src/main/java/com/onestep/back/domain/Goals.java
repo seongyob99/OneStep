@@ -1,5 +1,6 @@
 package com.onestep.back.domain;
 
+import com.onestep.back.dto.goal.GoalDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -64,4 +65,16 @@ public class Goals extends BaseEntity {
 
     @Column(name = "thumbnail")  // 📌 썸네일 파일명 추가
     private String thumbnail;
+
+    public void changeGoal(GoalDTO goalDTO, Categories category) {
+        this.category = category;
+        this.title = goalDTO.getTitle();
+        this.description = goalDTO.getDescription();
+        this.rule = goalDTO.getRule();
+        this.certCycle = goalDTO.getCertCycle();
+        this.thumbnail = goalDTO.getThumbnail();
+        this.startDate = goalDTO.getStartDate();
+        this.endDate = goalDTO.getEndDate();
+        this.participants = goalDTO.getParticipants();
+    }
 }

@@ -10,5 +10,4 @@ public interface GoalService {
     List<GoalDTO> getList(Long categoryId, String title);
 
     Long register(GoalDTO goalDTO); // 목표 등록
-
 }
