@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Log4j2
 @RestController
-@RequestMapping("/member")
+@RequestMapping("/api/member")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
 public class MemberRestController {
