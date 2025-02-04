@@ -6,6 +6,4 @@ import java.util.List;
 
 public interface ChatService {
     List<ChatsDTO> getAllChats();
-
-
 }

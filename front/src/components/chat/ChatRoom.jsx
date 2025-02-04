@@ -8,7 +8,6 @@ const ChatRoom = () => {
     const { chatId } = useParams();
     const { selectedChat } = useOutletContext();
     const chatRoomName = selectedChat ? selectedChat.chatName : chatId;
-
     const [messages, setMessages] = useState([]);
     const [error, setError] = useState(null);
     const [newMessage, setNewMessage] = useState('');
@@ -33,10 +32,9 @@ const ChatRoom = () => {
     const loadMessages = (loadMore = false) => {
         const lastMessageId =
             loadMore && messages.length > 0 ? messages[0].messageId : null;
-        axios
-            .get(`${SERVER_URL}/chat/${chatId}/messages`, {
-                params: { loadMore, lastMessageId },
-            })
+        axios.get(`${SERVER_URL}/chat/${chatId}/messages`, {
+            params: { loadMore, lastMessageId },
+        })
             .then((response) => {
                 const newMessages = response.data;
                 setMessages((prev) =>
