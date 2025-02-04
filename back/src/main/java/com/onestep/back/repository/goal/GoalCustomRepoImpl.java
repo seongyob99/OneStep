@@ -80,6 +80,7 @@ public class GoalCustomRepoImpl extends QuerydslRepositorySupport implements Goa
                         certifications.certDate.max().as("latestCertDate")
                 )
                 .orderBy(certifications.count().coalesce(0L).desc(), certifications.certDate.max().desc(), certifications.regDate.asc())
+                .limit(7)
                 .fetch();
 
         // CertificationsDTO 추가

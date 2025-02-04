@@ -4,15 +4,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.onestep.back.dto.goal.GoalDTO;
+import com.onestep.back.dto.member.MemberDTO;
 import com.onestep.back.domain.Categories;
 import com.onestep.back.domain.Goals;
 import com.onestep.back.domain.Members;
@@ -33,27 +38,39 @@ public class GoalServiceImpl implements GoalService {
     private final MemberRepository memberRepository;
     private final CategoriesRepository categoriesRepository;
 
-    // 📌 목표 목록 조회 (페이징 적용)
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    // ✅ 목표 목록 조회
     @Override
-    public Page<GoalDTO> getPagedList(String categoryName, String title, Pageable pageable) {
-        // 목표 목록을 페이지 단위로 조회
-        Page<Goals> goalsPage = goalRepository.findByCategoryCateNameContainingAndTitleContaining(
-                categoryName == null ? "" : categoryName,
-                title == null ? "" : title,
-                pageable
-        );
+    public List<GoalDTO> getList(Long categoryId, String title) {
+        log.info("🔍 getList 실행: categoryId={}, title={}", categoryId, title);
+        List<Goals> goals;
 
-        // 페이지된 데이터를 GoalDTO로 변환
-        return goalsPage.map(goal -> {
-            // 📌 썸네일 파일명 가져오기
-            String thumbnailFileName = goal.getThumbnail();
+        if (categoryId != null) {
+            goals = goalRepository.findByCategoryCategoryIdAndTitleContaining(categoryId, title == null ? "" : title);
+        } else {
+            goals = goalRepository.findByTitleContaining(title == null ? "" : title);
+        }
 
-            // 📌 썸네일 URL 설정 (파일명이 있으면 URL을 설정하고, 없으면 기본 이미지 사용)
-            String thumbnailUrl = (thumbnailFileName != null && !thumbnailFileName.isEmpty()) ?
-                    "http://localhost:8080/uploads/" + thumbnailFileName :
-                    "http://localhost:8080/uploads/default.jpg";
+        log.info("📌 조회된 목표 개수: {}", goals.size());
+        return goals.stream().map(goal -> {
+            // ✅ 현재 참가 인원 계산 (goal.getMembers().size())
+            Long currentParticipants = (long) goal.getMembers().size();
 
-            // 📌 GoalDTO 반환
+            // ✅ 멤버 리스트 변환 (MemberDTO로 변환)
+            List<MemberDTO> memberDTOList = goal.getMembers().stream()
+                    .map(member -> MemberDTO.builder()
+                            .memberId(member.getMemberId())
+                            .name(member.getName())
+                            .email(member.getEmail())
+                            .phone(member.getPhone())
+                            .birth(member.getBirth() != null ? member.getBirth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null) // ✅ LocalDate → String 변환
+                            .sex(member.getSex())
+                            .social(member.isSocial())
+                            .build())
+                    .collect(Collectors.toList());
+
             return GoalDTO.builder()
                     .goalId(goal.getGoalId())
                     .title(goal.getTitle())
@@ -62,16 +79,18 @@ public class GoalServiceImpl implements GoalService {
                     .certCycle(goal.getCertCycle())
                     .startDate(goal.getStartDate())
                     .endDate(goal.getEndDate())
-                    .participants(goal.getParticipants())
+                    .participants(goal.getParticipants())  // ✅ 모집 정원
+                    .currentParticipants(currentParticipants)  // ✅ 현재 참가 인원
+                    .members(memberDTOList)  // ✅ 멤버 리스트 추가
                     .categoryId(goal.getCategory().getCategoryId())
+                    .categoryName(goal.getCategory().getCateName())
                     .memberId(goal.getAdminMember().getMemberId())
-                    .thumbnail(goal.getThumbnail()) // 📌 DB에 저장된 파일명
-                    .thumbnailUrl(thumbnailUrl)  // 📌 클라이언트에서 접근할 URL
+                    .thumbnail(goal.getThumbnail())
                     .build();
-        });
+        }).collect(Collectors.toList());
     }
 
-    // 📌 목표 등록 (파일 업로드 포함)
+    // ✅ 목표 등록 (파일 업로드 포함)
     @Override
     public Long register(GoalDTO goalDTO) {
         log.info("🚀 목표 등록 요청: {}", goalDTO);
@@ -92,7 +111,7 @@ public class GoalServiceImpl implements GoalService {
         Members adminMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("❌ Invalid member ID: " + memberId));
 
-        // 📌 목표 저장 (썸네일 포함)
+        // ✅ 목표 저장 (썸네일 포함)
         Goals goal = Goals.builder()
                 .title(goalDTO.getTitle() != null ? goalDTO.getTitle() : "제목 없음")
                 .description(goalDTO.getDescription() != null ? goalDTO.getDescription() : "설명 없음")
@@ -103,7 +122,7 @@ public class GoalServiceImpl implements GoalService {
                 .startDate(goalDTO.getStartDate())
                 .endDate(goalDTO.getEndDate())
                 .participants(goalDTO.getParticipants() > 0 ? goalDTO.getParticipants() : 1)
-                .thumbnail(goalDTO.getThumbnail())  // 📌 썸네일 파일명 저장
+                .thumbnail(goalDTO.getThumbnail())
                 .build();
 
         Goals savedGoal = goalRepository.save(goal);
@@ -112,29 +131,7 @@ public class GoalServiceImpl implements GoalService {
         return savedGoal.getGoalId();
     }
 
-    // 📌 목표 참가
-    @Override
-    public void join(Long goalId, Long memberId) {
-        log.info("목표 참가 요청: goalId={}, memberId={}", goalId, memberId);
-    }
-
-    // 📌 목표 수정
-    @Override
-    public Long update(GoalDTO goalDTO) {
-        Goals existingGoal = goalRepository.findById(goalDTO.getGoalId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 목표입니다."));
-        modelMapper.map(goalDTO, existingGoal);
-        Goals updatedGoal = goalRepository.save(existingGoal);
-        return updatedGoal.getGoalId();
-    }
-
-    // 📌 목표 삭제
-    @Override
-    public void delete(Long goalId) {
-        goalRepository.deleteById(goalId);
-    }
-
-    // 📂 파일 업로드 처리
+    // ✅ 파일 업로드 처리
     public void handleFileUpload(MultipartFile file, GoalDTO goalDTO) {
         if (file != null && !file.isEmpty()) {
             log.info("📂 파일 업로드 시작: {}", file.getOriginalFilename());
@@ -165,7 +162,7 @@ public class GoalServiceImpl implements GoalService {
                 log.error("파일 업로드 중 오류 발생: ", e);
             }
 
-            // 📌 DB에는 파일명만 저장
+            // ✅ DB에는 파일명만 저장
             goalDTO.setThumbnail(fileName);
             log.info("📂 goal.getThumbnail(): {}", goalDTO.getThumbnail());
         } else {
