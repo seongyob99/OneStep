@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MemberDTO {
     private String memberId; // Long → String으로 변경
-    private String password;
     private String name;
     private String email;
+    private String password;
     private String phone;
     private String birth;
     private String sex;
