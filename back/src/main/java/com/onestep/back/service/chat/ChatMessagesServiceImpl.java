@@ -36,9 +36,10 @@ public class ChatMessagesServiceImpl implements ChatMessagesService {
 
         // 채팅 메시지 엔티티 리스트를 ChatMessagesDTO로 변환
         List<ChatMessagesDTO> chatMessagesDTOList = chatMessages.stream()
-                .map(ChatMessagesDTO::new)  // ChatMessages 엔티티를 DTO로 변환
+                .map(ChatMessagesDTO::new)  // ChatMessages 엔티티를 DTO로 변환 (멤버 수 계산 포함)
                 .collect(Collectors.toList());
 
         return chatMessagesDTOList;  // DTO 리스트 반환
     }
+
 }

@@ -1,72 +1,154 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import axios from 'axios';
-import { List, AutoSizer } from 'react-virtualized'; // AutoSizer 추가
-import '../../styles/chat/ChatRoom.scss';  // SCSS 파일 import
+import { List, AutoSizer, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
+import '@styles/chat/ChatRoom.scss';
+import { IoPersonSharp } from "react-icons/io5";
 
 const ChatRoom = () => {
     const { chatId } = useParams();
+    const [memberCount, setMemberCount] = useState(null);
+    const { selectedChat } = useOutletContext();
+    const chatRoomName = selectedChat ? selectedChat.chatName : chatId;
     const [messages, setMessages] = useState([]);
     const [error, setError] = useState(null);
-    const [newMessage, setNewMessage] = useState('');  // 새로운 메시지 상태 추가
+    const [newMessage, setNewMessage] = useState('');
+    const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+    const [isAtBottom, setIsAtBottom] = useState(true);
+    const [showNewMessageIndicator, setShowNewMessageIndicator] = useState(false);
+    const [lastConfirmedMessageId, setLastConfirmedMessageId] = useState(null);
+
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     const listRef = useRef(null);
-    const memberId = '현재 사용자';  // 실제 사용자 ID로 변경 필요
+    const memberId = '현재 사용자'; // 실제 사용자 ID로 변경 필요
 
-
-
-
-    useEffect(() => {
-        console.log(`챗 id : ${chatId}`);
-        loadMessages();
-    }, [chatId]);
-
-    const loadMessages = (loadMore = false) => {
-        const lastMessageId = loadMore && messages.length > 0 ? messages[0].messageId : null;
-
-        console.log(`chat ID : ${chatId}`);
-        axios.get(`${SERVER_URL}/chat/${chatId}/messages`, {
-            params: { loadMore, lastMessageId }
+    // CellMeasurerCache를 생성 (가로는 고정, 기본 높이는 50px)
+    const cacheRef = useRef(
+        new CellMeasurerCache({
+            fixedWidth: true,
+            defaultHeight: 50,
         })
-            .then(response => {
+    );
+
+    // 메시지 로드 함수
+    const loadMessages = (loadMore = false) => {
+        const lastMessageId =
+            loadMore && messages.length > 0 ? messages[0].messageId : null;
+        axios.get(`${SERVER_URL}/chat/${chatId}/messages`, {
+            params: { loadMore, lastMessageId },
+        })
+            .then((response) => {
                 const newMessages = response.data;
-                console.log(newMessages);
-                setMessages(prev => (loadMore ? [...newMessages, ...prev] : newMessages));
+                setMessages((prev) =>
+                    loadMore ? [...newMessages, ...prev] : newMessages
+                );
+                cacheRef.current.clearAll();
             })
-            .catch(error => {
-                console.error("채팅 메시지 불러오기 실패:", error);
-                setError("메시지를 불러오는 데 실패했습니다.");
+            .catch((error) => {
+                console.error('채팅 메시지 불러오기 실패:', error);
+                setError('메시지를 불러오는 데 실패했습니다.');
             });
     };
 
+    useEffect(() => {
+        // 채팅방 번호를 기반으로 멤버 수를 가져오는 API 요청
+        axios
+            .get(`${SERVER_URL}/chat/${chatId}/memberCount`)
+            .then((response) => {
+                setMemberCount(response.data);  // 멤버 수 설정
+                console.log(response.data);
+            })
+            .catch((err) => {
+                setError('멤버 수를 가져오는 데 실패했습니다.');
+            });
+    }, [chatId]);  // chatId가 변경될 때마다 다시 요청
 
+    useEffect(() => {
+        setShouldAutoScroll(true);
+        loadMessages();
+        setLastConfirmedMessageId(null);
+    }, [chatId]);
 
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            loadMessages();
+        }, 3000);
+        return () => clearInterval(intervalId);
+    }, [chatId]);
 
+    const handleScroll = ({ scrollTop, clientHeight, scrollHeight }) => {
+        if (scrollTop + clientHeight >= scrollHeight - 5) {
+            setIsAtBottom(true);
+            setShowNewMessageIndicator(false);
+            if (messages.length > 0) {
+                setLastConfirmedMessageId(messages[messages.length - 1].messageId);
+            }
+        } else {
+            setIsAtBottom(false);
+        }
+    };
 
+    useEffect(() => {
+        const currentLastMessageId =
+            messages.length > 0 ? messages[messages.length - 1].messageId : null;
+        if ((shouldAutoScroll || isAtBottom) && listRef.current) {
+            listRef.current.scrollToRow(messages.length - 1);
+            setShouldAutoScroll(false);
+            setShowNewMessageIndicator(false);
+            setLastConfirmedMessageId(currentLastMessageId);
+        } else {
+            if (currentLastMessageId && currentLastMessageId !== lastConfirmedMessageId) {
+                setShowNewMessageIndicator(true);
+            }
+        }
+    }, [messages, shouldAutoScroll, isAtBottom, lastConfirmedMessageId]);
+
+    const handleScrollToBottom = () => {
+        if (listRef.current) {
+            listRef.current.scrollToRow(messages.length - 1);
+            setIsAtBottom(true);
+            setShowNewMessageIndicator(false);
+            const currentLastMessageId =
+                messages.length > 0 ? messages[messages.length - 1].messageId : null;
+            setLastConfirmedMessageId(currentLastMessageId);
+        }
+    };
+
+    // rowRenderer를 CellMeasurer로 감싸서 동적 높이 적용
     const rowRenderer = useCallback(
-        ({ index, key, style }) => {
+        ({ index, key, parent, style }) => {
             const message = messages[index];
-            const isCurrentUser = message.memberId === memberId;  // 현재 사용자와 메시지의 memberId 비교
+            const isCurrentUser = message.memberId === memberId;
             return (
-                <div>
-                    <div key={key} style={style} className={`message ${isCurrentUser ? 'mine' : ''}`}>
-                        {isCurrentUser ? (
-                            <div className="message-content mine">
-                                <span className="timestamp">
-                                    {new Date(message.timestamp).toLocaleDateString()} {new Date(message.timestamp).toLocaleTimeString()}
-                                </span> &nbsp;&nbsp;
-                                <span className="message-text">{message.content}</span>
-                            </div>
-                        ) : (
-                            <div className="message-content">
-                                <strong>{message.memberId}</strong>: {message.content}
-                                <span className="timestamp">
-                                    &nbsp;&nbsp;{new Date(message.timestamp).toLocaleDateString()} {new Date(message.timestamp).toLocaleTimeString()}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                </div>
+                <CellMeasurer
+                    cache={cacheRef.current}
+                    columnIndex={0}
+                    key={key}
+                    parent={parent}
+                    rowIndex={index}
+                >
+                    {({ measure, registerChild }) => (
+                        <div ref={registerChild} style={style} className={`message ${isCurrentUser ? 'mine' : ''}`}>
+                            {isCurrentUser ? (
+                                <div className="message-content mine">
+                                    <span className="timestamp">
+                                        {new Date(message.timestamp).toLocaleDateString()} {new Date(message.timestamp).toLocaleTimeString()}
+                                    </span>
+                                    &nbsp;&nbsp;
+                                    <span className="message-text message-text-mine">{message.content}</span>
+                                </div>
+                            ) : (
+                                <div className="message-content">
+                                    <strong>{message.memberId}</strong>&nbsp;
+                                    <span className='message-text message-text-other'>{message.content}</span>
+                                    <span className="timestamp">
+                                        &nbsp;&nbsp;{new Date(message.timestamp).toLocaleDateString()} {new Date(message.timestamp).toLocaleTimeString()}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </CellMeasurer>
             );
         },
         [messages, memberId]
@@ -80,47 +162,42 @@ const ChatRoom = () => {
         const messageData = {
             content: newMessage,
             timestamp: new Date().toISOString(),
-            memberId: memberId,  // 실제 사용자 ID로 변경 필요
-            isMine: true,  // 메시지가 나의 것임을 나타냄
+            memberId: memberId,
+            isMine: true,
         };
 
-        setMessages(prevMessages => [...prevMessages, messageData]);
+        setShouldAutoScroll(true);
+        setMessages((prevMessages) => [...prevMessages, messageData]);
         setNewMessage('');
 
-        // 서버로 메시지 전송
-        axios.post(`${SERVER_URL}/chat/${chatId}/messages`, {
-            memberId,  // 실제 사용자 ID
-            content: newMessage,
-            chatId: chatId
-        })
-            .then(response => {
-                console.log('메시지가 서버에 저장되었습니다:', response.data);
-                // 메시지 전송 후, 스크롤을 맨 아래로 내리기
-                listRef.current.scrollToRow(messages.length);  // 새 메시지로 스크롤
+        axios
+            .post(`${SERVER_URL}/chat/${chatId}/messages`, {
+                memberId,
+                content: newMessage,
+                chatId,
             })
-            .catch(error => {
-                console.error("메시지 전송 실패:", error);
+            .then((response) => {
+                console.log('메시지가 서버에 저장되었습니다:', response.data);
+            })
+            .catch((error) => {
+                console.error('메시지 전송 실패:', error);
             });
     };
 
-    // if (loading && !messages.length) {
-    //     return <div>로딩 중...</div>;
-    // }
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            handleMessageSend();
+        }
+    };
 
     if (error) {
         return <div>{error}</div>;
     }
 
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // 기본 Enter 키 동작(줄 바꿈)을 막기 위해
-            handleMessageSend(); // 메시지 전송 함수 호출
-        }
-    };
-
     return (
         <div className="chat-room">
-            <h3>채팅방 {chatId} 메시지</h3>
+            <h3>{chatRoomName} <span className="small"><IoPersonSharp color="red" /> {memberCount}</span></h3>
             <div className="messages-container">
                 <AutoSizer>
                     {({ width, height }) => (
@@ -129,15 +206,20 @@ const ChatRoom = () => {
                             width={width}
                             height={height}
                             rowCount={messages.length}
-                            rowHeight={50}
+                            deferredMeasurementCache={cacheRef.current}
+                            rowHeight={cacheRef.current.rowHeight}
                             rowRenderer={rowRenderer}
                             overscanRowCount={5}
-                            style={{ overflow: 'hidden' }}
+                            onScroll={handleScroll}
                         />
                     )}
                 </AutoSizer>
+                {showNewMessageIndicator && (
+                    <div className="new-message-indicator" onClick={handleScrollToBottom}>
+                        새 메시지가 도착했습니다.
+                    </div>
+                )}
             </div>
-
             <div className="message-input-container">
                 <input
                     type="text"
@@ -147,7 +229,9 @@ const ChatRoom = () => {
                     className="message-input"
                     onKeyDown={handleKeyDown}
                 />
-                <button onClick={handleMessageSend} className="send-button">보내기</button>
+                <button onClick={handleMessageSend} className="send-button">
+                    보내기
+                </button>
             </div>
         </div>
     );

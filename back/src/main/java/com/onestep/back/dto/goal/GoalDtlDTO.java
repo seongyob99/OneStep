@@ -19,6 +19,7 @@ public class GoalDtlDTO {
     private Long goalId;
     private String title;
     private String description;
+    private Long categoryId;
     private String categoryName;
     private String rule;
     private Long certCycle;

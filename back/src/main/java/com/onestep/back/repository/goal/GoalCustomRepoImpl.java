@@ -33,6 +33,7 @@ public class GoalCustomRepoImpl extends QuerydslRepositorySupport implements Goa
                         goals.goalId,
                         goals.title,
                         goals.description,
+                        categories.categoryId,
                         categories.cateName,
                         goals.rule,
                         goals.certCycle,
@@ -54,6 +55,7 @@ public class GoalCustomRepoImpl extends QuerydslRepositorySupport implements Goa
                 .goalId(goalId)
                 .title(goalResult.get(goals.title))
                 .description(goalResult.get(goals.description))
+                .categoryId(goalResult.get(categories.categoryId))
                 .categoryName(goalResult.get(categories.cateName))
                 .rule(goalResult.get(goals.rule))
                 .certCycle(goalResult.get(goals.certCycle))
@@ -80,6 +82,7 @@ public class GoalCustomRepoImpl extends QuerydslRepositorySupport implements Goa
                         certifications.certDate.max().as("latestCertDate")
                 )
                 .orderBy(certifications.count().coalesce(0L).desc(), certifications.certDate.max().desc(), certifications.regDate.asc())
+                .limit(7)
                 .fetch();
 
         // CertificationsDTO 추가
