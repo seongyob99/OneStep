@@ -54,7 +54,6 @@ const ChatRoom = () => {
             .get(`${SERVER_URL}/chat/${chatId}/memberCount`)
             .then((response) => {
                 setMemberCount(response.data);
-                console.log(response.data);
             })
             .catch((err) => {
                 setError('멤버 수를 가져오는 데 실패했습니다.');
@@ -71,7 +70,8 @@ const ChatRoom = () => {
     useEffect(() => {
         const intervalId = setInterval(() => {
             loadMessages();
-        }, 3000);
+            console.log("호출")
+        }, 2500);
         return () => clearInterval(intervalId);
     }, [chatId]);
 
@@ -167,6 +167,9 @@ const ChatRoom = () => {
         setMessages((prevMessages) => [...prevMessages, messageData]);
         setNewMessage('');
 
+        // 메시지 전송 후 새 메시지 인디케이터는 뜨지 않도록 설정
+        setShowNewMessageIndicator(false);
+
         axios
             .post(`${SERVER_URL}/chat/${chatId}/messages`, {
                 memberId,
@@ -174,7 +177,7 @@ const ChatRoom = () => {
                 chatId,
             })
             .then((response) => {
-                console.log('메시지가 서버에 저장되었습니다:', response.data);
+
             })
             .catch((error) => {
                 console.error('메시지 전송 실패:', error);
