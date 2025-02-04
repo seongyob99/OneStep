@@ -14,7 +14,6 @@ const JoinForm = () => {
     sex: '',
     social: false,
   });
-
   const [responseMessage, setResponseMessage] = useState(null);
   const [isError, setIsError] = useState(false);
   const [errors, setErrors] = useState({});
