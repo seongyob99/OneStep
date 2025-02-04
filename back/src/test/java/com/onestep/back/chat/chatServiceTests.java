@@ -25,6 +25,8 @@ public class chatServiceTests {
     @Test
     @Transactional
     public void testChatMessagesService() {
-        log.info(chatService.getMemberCount(1L));
+        log.info(chatService.getMemberCountByChatId(1L));
     }
+
+
 }

@@ -21,15 +21,11 @@ public class chatRepositoryTests {
     private ChatMessagesRepository chatMessagesRepository;
 
 
-    @Test
-    @Transactional
-    public void testChatsRepository() {
-        log.info(chatsRepository.findAll());
-    }
+
 
     @Test
     public void testChatMessagesRepository() {
-        log.info(chatMessagesRepository.findAll());
+        log.info(chatMessagesRepository.findBychat_ChatId(1L));
     }
 
 }

@@ -3,9 +3,11 @@ import { useParams, useOutletContext } from 'react-router-dom';
 import axios from 'axios';
 import { List, AutoSizer, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
 import '@styles/chat/ChatRoom.scss';
+import { IoPersonSharp } from "react-icons/io5";
 
 const ChatRoom = () => {
     const { chatId } = useParams();
+    const [memberCount, setMemberCount] = useState(null);
     const { selectedChat } = useOutletContext();
     const chatRoomName = selectedChat ? selectedChat.chatName : chatId;
     const [messages, setMessages] = useState([]);
@@ -47,6 +49,19 @@ const ChatRoom = () => {
                 setError('메시지를 불러오는 데 실패했습니다.');
             });
     };
+
+    useEffect(() => {
+        // 채팅방 번호를 기반으로 멤버 수를 가져오는 API 요청
+        axios
+            .get(`${SERVER_URL}/chat/${chatId}/memberCount`)
+            .then((response) => {
+                setMemberCount(response.data);  // 멤버 수 설정
+                console.log(response.data);
+            })
+            .catch((err) => {
+                setError('멤버 수를 가져오는 데 실패했습니다.');
+            });
+    }, [chatId]);  // chatId가 변경될 때마다 다시 요청
 
     useEffect(() => {
         setShouldAutoScroll(true);
@@ -182,7 +197,7 @@ const ChatRoom = () => {
 
     return (
         <div className="chat-room">
-            <h3>{chatRoomName}</h3>
+            <h3>{chatRoomName} <span className="small"><IoPersonSharp /> {memberCount}</span></h3>
             <div className="messages-container">
                 <AutoSizer>
                     {({ width, height }) => (

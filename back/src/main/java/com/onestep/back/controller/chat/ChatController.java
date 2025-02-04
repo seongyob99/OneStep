@@ -42,4 +42,10 @@ public class ChatController {
         log.info("chatList"+chatList);
         return ResponseEntity.ok(chatList);
     }
+
+    @GetMapping("/{chatId}/memberCount")
+    public long getMemberCount(@PathVariable Long chatId) {
+        // 해당 채팅방의 멤버 수를 반환
+        return chatService.getMemberCountByChatId(chatId);
+    }
 }
