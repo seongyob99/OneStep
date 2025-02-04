@@ -5,6 +5,7 @@ import com.onestep.back.domain.Chats;
 import com.onestep.back.domain.Goals;
 import com.onestep.back.domain.Members;
 import com.onestep.back.dto.goal.GoalDTO;
+import com.onestep.back.dto.member.MemberDTO;
 import com.onestep.back.repository.category.CategoriesRepository;
 import com.onestep.back.repository.chat.ChatsRepository;
 import com.onestep.back.repository.goal.GoalRepository;
