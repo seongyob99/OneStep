@@ -51,6 +51,7 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
                 response.setContentType("application/json");
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
             }
+
         }
     }
 }

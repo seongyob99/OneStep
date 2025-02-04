@@ -64,4 +64,5 @@ public class APILoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setContentType("application/json");
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
     }
+
 }
