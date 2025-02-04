@@ -4,6 +4,8 @@ import com.onestep.back.domain.Members;
 import com.onestep.back.dto.member.MemberDTO;
 import com.onestep.back.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 
@@ -12,6 +14,8 @@ import java.time.LocalDate;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @Override
     public MemberDTO getMemberById(String memberId) { // String 타입 사용
@@ -21,6 +25,7 @@ public class MemberServiceImpl implements MemberService {
                 member.getMemberId(),
                 member.getName(),
                 member.getEmail(),
+                member.getPassword(),
                 member.getPhone(),
                 member.getBirth() != null ? member.getBirth().toString() : null,
                 member.getSex(),
@@ -41,4 +46,20 @@ public class MemberServiceImpl implements MemberService {
         member.setSex(memberDTO.getSex());
         memberRepository.save(member);
     }
+
+    @Override
+    public MemberDTO join(MemberDTO memberDTO) throws MidExistException {
+        String mid = memberDTO.getMemberId();
+        boolean exist = memberRepository.existsById(mid);
+        if (exist) {
+            throw new MidExistException();
+        }
+        Members members = modelMapper.map(memberDTO, Members.class);
+        members.changePassword(passwordEncoder.encode(memberDTO.getPassword()));  // PasswordEncoder 사용
+
+        memberRepository.save(members);
+        return modelMapper.map(members, MemberDTO.class);
+    }
+
+
 }

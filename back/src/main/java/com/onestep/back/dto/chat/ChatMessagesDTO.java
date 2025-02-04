@@ -1,5 +1,6 @@
 package com.onestep.back.dto.chat;
 import com.onestep.back.domain.ChatMessages;
+import com.onestep.back.domain.Chats;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

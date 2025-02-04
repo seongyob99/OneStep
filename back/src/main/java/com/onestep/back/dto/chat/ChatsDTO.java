@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class ChatsDTO {
     private Long chatId;
     private String chatName;
+
 }

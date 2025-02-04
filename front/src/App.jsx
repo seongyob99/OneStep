@@ -9,6 +9,7 @@ import GoalDtl from './components/goal/GoalDtl';
 import GoalUpdate from './components/goal/GoalUpdate';
 import ChatPage from './components/chat/ChatPage';
 import ChatRoom from './components/chat/ChatRoom';
+import JoinForm from './components/member/JoinForm';
 
 function App() {
   return (
@@ -19,13 +20,16 @@ function App() {
         <Route path="/" element={<GoalList />} />
         <Route path="/goals/register" element={<GoalRegister />} />
         <Route path="/:goalid" element={<GoalDtl />} />
-        <Route path="/:goalid/update" element={<GoalUpdate />} />
+          <Route path="/:goalid/update" element={<GoalUpdate />} />
+
+          <Route path="/member/join" element={<JoinForm />} />
 
         <Route path="/chat" element={<ChatPage />}>
           <Route path=":chatId" element={<ChatRoom />} />
         </Route>
       </Route>
     </Routes>
+
   );
 }
 

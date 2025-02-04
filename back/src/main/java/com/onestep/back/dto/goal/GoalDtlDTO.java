@@ -32,4 +32,5 @@ public class GoalDtlDTO {
     private Long participants;
     private String thumbnail;
     private List<CertificationsDTO> members;
+    private Long chatId;
 }

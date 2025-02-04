@@ -32,6 +32,7 @@ public class GoalDTO {
     private Long participants;
     private Long currentParticipants; // ✅ 현재 참가 인원
     private List<MemberDTO> members; // ✅ 현재 참가 인원 리스트
+    private Long chatId;
 
     private MultipartFile file; // 업로드된 파일
 }

@@ -51,4 +51,8 @@ public class Members extends BaseEntity {
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Certifications> certifications;
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
 }

@@ -1,77 +1,120 @@
 .messages-container {
-    position: relative; // 메시지 컨테이너의 위치를 상대적으로 설정
-    overflow-y: scroll; // 세로 스크롤을 허용
-
-    &::-webkit-scrollbar {
-        display: none; // 웹킷 기반 브라우저에서 스크롤바 숨기기
-    }
+    position: relative;
+    overflow-y: scroll;
 }
 
 
 .message {
-    padding: 10px; // 메시지에 패딩 추가
-    border-bottom: 1px solid #ccc; // 메시지 하단에 구분선 추가
+    padding: 10px;
+    // border-bottom: 1px solid #ccc;
 }
 
 .message.mine {
     display: flex;
-    /* 플렉스 박스를 사용 */
     flex-direction: column-reverse;
-    /* 타임스탬프가 위로 오도록 설정 */
     align-items: flex-end;
-    /* 우측 정렬 */
     margin-left: auto;
-    /* 왼쪽 여백을 자동으로 채워서 우측에 정렬 */
     padding: 10px;
     border-radius: 10px;
 }
 
 .timestamp {
-    font-size: 0.7em; // 타임스탬프 폰트 크기
-    color: #888; // 타임스탬프 색상 (회색)
+    font-size: 0.7em;
+    color: #888;
 }
 
 .chat-room {
-    display: flex; // 플렉스 박스로 레이아웃 설정
-    flex-direction: column; // 세로 방향으로 레이아웃 배치
-    height: 100vh; // 화면 전체 높이를 차지하도록 설정
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 
     h3 {
-        padding: 10px; // h3 태그에 패딩 추가
-        margin: 0; // 기본 마진 없애기
+        padding: 10px;
+        margin: 0;
     }
 
     .messages-container {
-        flex: 1; // 남은 공간을 모두 차지하도록 설정
-        overflow: hidden; // 내부에서만 스크롤 가능하게 설정
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+        height: 100%;
     }
 }
 
 .message-input-container {
-    display: flex; // 플렉스 박스로 입력창과 버튼 배치
-    align-items: center; // 수직 가운데 정렬
-    padding: 10px; // 패딩 추가
-    border-top: 1px solid #ddd; // 입력창 위에 구분선 추가
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid #ddd;
 }
 
 .message-input {
-    flex-grow: 1; // 입력창이 남은 공간을 차지하도록 설정
-    padding: 10px; // 패딩 추가
-    margin-right: 10px; // 버튼과 간격을 주기 위해 오른쪽 마진 추가
-    border: 1px solid #ddd; // 입력창 테두리
-    border-radius: 4px; // 둥근 테두리
-    font-size: 14px; // 폰트 크기 설정
+    flex-grow: 1;
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
 }
 
 .send-button {
-    padding: 10px 15px; // 버튼에 패딩 추가
-    background-color: #007bff; // 버튼 배경색 (파란색)
-    color: white; // 버튼 텍스트 색상 (흰색)
-    border: none; // 버튼 테두리 없앰
-    border-radius: 4px; // 둥근 테두리
-    cursor: pointer; // 커서 포인터로 변경 (클릭 가능하게)
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .send-button:hover {
-    background-color: #0056b3; // 버튼 호버 시 배경색 변경 (어두운 파란색)
+    background-color: #0056b3;
+}
+
+.new-message-indicator {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #0078d4;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.message-text {
+    display: inline-block;
+    /* inline-block으로 설정하여 width 적용 */
+    max-width: 50ch;
+    /* 최대 가로 폭을 20ch로 제한 */
+    white-space: normal;
+    /* 기본 줄바꿈 허용 */
+    word-break: break-word;
+    /* 단어 단위로 줄바꿈 */
+    overflow-wrap: break-word;
+    /* 긴 단어가 있을 경우 줄바꿈 처리 */
+}
+
+/* 내 메시지에 추가할 스타일 */
+.message-text-mine {
+    background-color: #4880ED; // 연한 초록색
+    border-radius: 10px;
+    padding: 8px 12px;
+    color: white;
+}
+
+/* (선택 사항) 다른 사람 메시지에 추가할 스타일 */
+.message-text-other {
+    background-color: #F3F4F6; // 연한 회색
+    border-radius: 10px;
+    padding: 8px 12px;
+
+}
+
+
+.small {
+    font-size: 20px;
+    vertical-align: middle;
 }
