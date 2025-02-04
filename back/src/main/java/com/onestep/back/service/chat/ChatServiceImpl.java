@@ -33,5 +33,15 @@ public class ChatServiceImpl implements ChatService {
         return 0;  // 채팅방이나 멤버가 없으면 0 반환
     }
 
+    @Override
+    public List<ChatsDTO> getChatListByMemberId(String memberId) {
+        List<Chats> chats = chatsRepository.findChatsByMemberId(memberId);
+        return chats.stream()
+                .map(chat -> ChatsDTO.builder()
+                        .chatId(chat.getChatId())
+                        .chatName(chat.getChatName())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
 }

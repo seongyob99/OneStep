@@ -20,9 +20,8 @@ const ChatRoom = () => {
 
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     const listRef = useRef(null);
-    const memberId = '현재 사용자'; // 실제 사용자 ID로 변경 필요
+    const memberId = 'user01'; // 실제 사용자 ID로 변경 필요
 
-    // CellMeasurerCache를 생성 (가로는 고정, 기본 높이는 50px)
     const cacheRef = useRef(
         new CellMeasurerCache({
             fixedWidth: true,
@@ -51,17 +50,16 @@ const ChatRoom = () => {
     };
 
     useEffect(() => {
-        // 채팅방 번호를 기반으로 멤버 수를 가져오는 API 요청
         axios
             .get(`${SERVER_URL}/chat/${chatId}/memberCount`)
             .then((response) => {
-                setMemberCount(response.data);  // 멤버 수 설정
+                setMemberCount(response.data);
                 console.log(response.data);
             })
             .catch((err) => {
                 setError('멤버 수를 가져오는 데 실패했습니다.');
             });
-    }, [chatId]);  // chatId가 변경될 때마다 다시 요청
+    }, [chatId]);
 
     useEffect(() => {
         setShouldAutoScroll(true);
@@ -69,6 +67,7 @@ const ChatRoom = () => {
         setLastConfirmedMessageId(null);
     }, [chatId]);
 
+    // 새로운 메시지가 들어오면 주기적으로 메시지를 불러옴
     useEffect(() => {
         const intervalId = setInterval(() => {
             loadMessages();
@@ -91,14 +90,15 @@ const ChatRoom = () => {
     useEffect(() => {
         const currentLastMessageId =
             messages.length > 0 ? messages[messages.length - 1].messageId : null;
-        if ((shouldAutoScroll || isAtBottom) && listRef.current) {
-            listRef.current.scrollToRow(messages.length - 1);
+
+        if (shouldAutoScroll || isAtBottom) {
+            listRef.current.scrollToRow(messages.length - 1);  // 메시지 추가 시 자동으로 맨 아래로
             setShouldAutoScroll(false);
             setShowNewMessageIndicator(false);
             setLastConfirmedMessageId(currentLastMessageId);
         } else {
             if (currentLastMessageId && currentLastMessageId !== lastConfirmedMessageId) {
-                setShowNewMessageIndicator(true);
+                setShowNewMessageIndicator(true);  // 스크롤이 맨 아래가 아닐 경우 인디케이터 표시
             }
         }
     }, [messages, shouldAutoScroll, isAtBottom, lastConfirmedMessageId]);
@@ -114,7 +114,6 @@ const ChatRoom = () => {
         }
     };
 
-    // rowRenderer를 CellMeasurer로 감싸서 동적 높이 적용
     const rowRenderer = useCallback(
         ({ index, key, parent, style }) => {
             const message = messages[index];
@@ -153,8 +152,6 @@ const ChatRoom = () => {
         },
         [messages, memberId]
     );
-
-
 
     const handleMessageSend = () => {
         if (!newMessage.trim()) return;
