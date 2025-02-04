@@ -52,43 +52,41 @@ public class GoalDtlRestController {
 
     // 수정하기
     @PutMapping(value = "/updateGoal", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Map<String, GoalDTO> updateGoal(@ModelAttribute GoalDTO goalDTO) {
-        log.info(goalDTO);
-
+    public Map<String, Long> updateGoal(@ModelAttribute GoalDTO goalDTO) {
         // 썸네일 변경
-//        if(goalDTO.getFile() != null && goalDTO.getFile().isEmpty()) {
-//            // 기존 파일 지우기
-//            if (goalDTO.getThumbnail() != null) {
-//                String filePath = uploadPath + "\\" + goalDTO.getThumbnail();
-//                File file = new File(filePath);
-//                if (file.exists()) {
-//                    file.delete();
-//                }
-//            }
-//            // 새로 업로드
-//            MultipartFile file = goalDTO.getFile();
-//            String fileName = file.getOriginalFilename();
-//            String uuid = UUID.randomUUID().toString();
-//            Path savePath = Paths.get(uploadPath, uuid + "_" + fileName);
-//
-//            try {
-//                String contentType = file.getContentType();
-//                if (contentType == null || !contentType.startsWith("image")) {
-//                    throw new IllegalArgumentException("Uploaded file is not an image.");
-//                }
-//
-//                file.transferTo(savePath);
-//                goalDTO.setThumbnail(uuid + "_" + fileName);
-//
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload file", e);
-//            } catch (IllegalArgumentException e) {
-//                throw new IllegalArgumentException("Invalid file type: " + fileName, e);
-//            }
-//        }
-//        // 저장
-//        goalDtlService.updateGoal(goalDTO);
-        return Map.of("goalDTO", goalDTO);
+        if(goalDTO.getFile() != null && !goalDTO.getFile().isEmpty()) {
+            // 기존 파일 지우기
+            if (goalDTO.getThumbnail() != null) {
+                String filePath = uploadPath + "\\" + goalDTO.getThumbnail();
+                File file = new File(filePath);
+                if (file.exists()) {
+                    file.delete();
+                }
+            }
+            // 새로 업로드
+            MultipartFile file = goalDTO.getFile();
+            String fileName = file.getOriginalFilename();
+            String uuid = UUID.randomUUID().toString();
+            Path savePath = Paths.get(uploadPath, uuid + "_" + fileName);
+
+            try {
+                String contentType = file.getContentType();
+                if (contentType == null || !contentType.startsWith("image")) {
+                    throw new IllegalArgumentException("Uploaded file is not an image.");
+                }
+
+                file.transferTo(savePath);
+                goalDTO.setThumbnail(uuid + "_" + fileName);
+
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to upload file", e);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid file type: " + fileName, e);
+            }
+        }
+        // 저장
+        goalDtlService.updateGoal(goalDTO);
+        return Map.of("goalId", goalDTO.getGoalId());
     }
 
     // 삭제하기
