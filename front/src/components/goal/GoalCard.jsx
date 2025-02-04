@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const GoalCard = ({ goal }) => {
+    console.log("📌 goal 데이터 확인:", goal);
     const navigate = useNavigate();
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -22,11 +23,14 @@ const GoalCard = ({ goal }) => {
                 alt="Goal Thumbnail"
             />
             <div className="card-body">
-                <h5 className="card-title">{goal.title}</h5>
-                <h6 className="card-subtitle mb-2 text-muted">카테고리: {goal.categoryName}</h6>
-                <p className="card-text">{goal.description}</p>
-                <p className="card-text">시작일: {goal.startDate} ~ 종료일: {goal.endDate || "미정"}</p>
-                <p className="card-text">참가인원: {goal.participants}</p>
+                <div className="d-flex align-items-center">
+                    <h5 className="card-title mb-0">{goal.title}</h5>
+                    <p className="ms-2 mb-0 gray-text">| {goal.categoryName}</p>
+                </div>
+                <p className="card-text">{goal.startDate} ~ {goal.endDate || "종료 시"}</p>
+                <p className="card-text">
+                    참가 인원: <strong>{goal.members.length} / {goal.participants}</strong>
+                </p>
             </div>
         </div>
     );
