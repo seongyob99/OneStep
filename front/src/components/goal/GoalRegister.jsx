@@ -188,18 +188,4 @@ const GoalRegister = () => {
     );
 };
 
-// ✅ CSS 추가 (숫자 증감 버튼 비활성화)
-const style = document.createElement("style");
-style.innerHTML = `
-    input[type="number"].no-spin::-webkit-inner-spin-button,
-    input[type="number"].no-spin::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-    input[type="number"].no-spin {
-        -moz-appearance: textfield;
-    }
-`;
-document.head.appendChild(style);
-
 export default GoalRegister;

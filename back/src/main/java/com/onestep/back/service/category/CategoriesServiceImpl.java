@@ -5,6 +5,7 @@ import com.onestep.back.dto.category.CategoriesDTO;
 import com.onestep.back.repository.category.CategoriesRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class CategoriesServiceImpl implements CategoriesService {
 
     @Override
     public List<CategoriesDTO> getAllCategories() {
-        return categoriesRepository.findAll()
+        return categoriesRepository.findAll(Sort.by(Sort.Order.asc("categoryId")))
                 .stream()
                 .map(category -> modelMapper.map(category, CategoriesDTO.class))
                 .collect(Collectors.toList());
