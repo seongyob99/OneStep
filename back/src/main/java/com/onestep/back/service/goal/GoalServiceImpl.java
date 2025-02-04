@@ -62,11 +62,19 @@ public class GoalServiceImpl implements GoalService {
                 .startDate(goal.getStartDate())
                 .endDate(goal.getEndDate())
                 .participants(goal.getParticipants())
-                .currentParticipants((long) goal.getMembers().size())
+                .currentParticipants((long) goal.getMembers().size()) // ✅ 참가자 수 포함
                 .categoryId(goal.getCategory().getCategoryId())
                 .categoryName(goal.getCategory().getCateName())
                 .memberId(goal.getAdminMember().getMemberId())
                 .thumbnail(goal.getThumbnail())
+                .members(goal.getMembers() != null
+                        ? goal.getMembers().stream()
+                        .map(m -> MemberDTO.builder()
+                                .memberId(m.getMemberId())
+                                .name(m.getName())
+                                .build())
+                        .collect(Collectors.toList())
+                        : List.of()) // 빈 리스트 반환
                 .build()
         ).collect(Collectors.toList());
     }
@@ -106,6 +114,9 @@ public class GoalServiceImpl implements GoalService {
 
         goalRepository.addMemberToGoal(savedGoal.getGoalId(), goalDTO.getMemberId());
         log.info("✅ 목표 참가 완료 (goals_members): {}", goalDTO.getMemberId());
+
+        Goals updatedGoal = goalRepository.findByIdWithMembers(savedGoal.getGoalId());
+
 
         Chats chatRoom = Chats.builder()
                 .goal(savedGoal)

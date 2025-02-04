@@ -18,4 +18,8 @@ public interface GoalRepository extends JpaRepository<Goals, Long>, GoalCustomRe
     @Modifying
     @Query(value = "INSERT INTO goals_members (goal_id, member_id) VALUES (:goalId, :memberId)", nativeQuery = true)
     void addMemberToGoal(@Param("goalId") Long goalId, @Param("memberId") String memberId);
+
+    // 참가 인원수
+    @Query("SELECT g FROM Goals g LEFT JOIN FETCH g.members WHERE g.goalId = :goalId")
+    Goals findByIdWithMembers(@Param("goalId") Long goalId);
 }

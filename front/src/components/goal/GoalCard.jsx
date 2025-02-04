@@ -53,7 +53,7 @@ const GoalCard = ({ goal }) => {
                 </div>
                 <p className="card-text">{goal.startDate} ~ {goal.endDate || "종료 시"}</p>
                 <p className="card-text">
-                    참가 인원: <strong>{goal.members?.length ?? 0} / {goal.participants}</strong>
+                    참가 인원: <strong>{(goal.members ?? []).length} / {goal.participants}</strong>
                 </p>
             </div>
         </div>
