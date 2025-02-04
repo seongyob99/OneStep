@@ -4,18 +4,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.onestep.back.dto.goal.GoalDTO;
+import com.onestep.back.dto.member.MemberDTO;
 import com.onestep.back.domain.Categories;
 import com.onestep.back.domain.Goals;
 import com.onestep.back.domain.Members;
@@ -36,8 +38,10 @@ public class GoalServiceImpl implements GoalService {
     private final MemberRepository memberRepository;
     private final CategoriesRepository categoriesRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    // 목록 조회
+    // ✅ 목표 목록 조회
     @Override
     public List<GoalDTO> getList(Long categoryId, String title) {
         log.info("🔍 getList 실행: categoryId={}, title={}", categoryId, title);
@@ -50,23 +54,43 @@ public class GoalServiceImpl implements GoalService {
         }
 
         log.info("📌 조회된 목표 개수: {}", goals.size());
-        return goals.stream().map(goal -> GoalDTO.builder()
-                .goalId(goal.getGoalId())
-                .title(goal.getTitle())
-                .description(goal.getDescription())
-                .rule(goal.getRule())
-                .certCycle(goal.getCertCycle())
-                .startDate(goal.getStartDate())
-                .endDate(goal.getEndDate())
-                .participants(goal.getParticipants())
-                .categoryId(goal.getCategory().getCategoryId())
-                .categoryName(goal.getCategory().getCateName()) // ✅ 추가
-                .memberId(goal.getAdminMember().getMemberId())
-                .thumbnail(goal.getThumbnail())
-                .build()).collect(Collectors.toList());
+        return goals.stream().map(goal -> {
+            // ✅ 현재 참가 인원 계산 (goal.getMembers().size())
+            Long currentParticipants = (long) goal.getMembers().size();
+
+            // ✅ 멤버 리스트 변환 (MemberDTO로 변환)
+            List<MemberDTO> memberDTOList = goal.getMembers().stream()
+                    .map(member -> MemberDTO.builder()
+                            .memberId(member.getMemberId())
+                            .name(member.getName())
+                            .email(member.getEmail())
+                            .phone(member.getPhone())
+                            .birth(member.getBirth() != null ? member.getBirth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null) // ✅ LocalDate → String 변환
+                            .sex(member.getSex())
+                            .social(member.isSocial())
+                            .build())
+                    .collect(Collectors.toList());
+
+            return GoalDTO.builder()
+                    .goalId(goal.getGoalId())
+                    .title(goal.getTitle())
+                    .description(goal.getDescription())
+                    .rule(goal.getRule())
+                    .certCycle(goal.getCertCycle())
+                    .startDate(goal.getStartDate())
+                    .endDate(goal.getEndDate())
+                    .participants(goal.getParticipants())  // ✅ 모집 정원
+                    .currentParticipants(currentParticipants)  // ✅ 현재 참가 인원
+                    .members(memberDTOList)  // ✅ 멤버 리스트 추가
+                    .categoryId(goal.getCategory().getCategoryId())
+                    .categoryName(goal.getCategory().getCateName())
+                    .memberId(goal.getAdminMember().getMemberId())
+                    .thumbnail(goal.getThumbnail())
+                    .build();
+        }).collect(Collectors.toList());
     }
 
-    // 📌 목표 등록 (파일 업로드 포함)
+    // ✅ 목표 등록 (파일 업로드 포함)
     @Override
     public Long register(GoalDTO goalDTO) {
         log.info("🚀 목표 등록 요청: {}", goalDTO);
@@ -87,7 +111,7 @@ public class GoalServiceImpl implements GoalService {
         Members adminMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("❌ Invalid member ID: " + memberId));
 
-        // 📌 목표 저장 (썸네일 포함)
+        // ✅ 목표 저장 (썸네일 포함)
         Goals goal = Goals.builder()
                 .title(goalDTO.getTitle() != null ? goalDTO.getTitle() : "제목 없음")
                 .description(goalDTO.getDescription() != null ? goalDTO.getDescription() : "설명 없음")
@@ -98,7 +122,7 @@ public class GoalServiceImpl implements GoalService {
                 .startDate(goalDTO.getStartDate())
                 .endDate(goalDTO.getEndDate())
                 .participants(goalDTO.getParticipants() > 0 ? goalDTO.getParticipants() : 1)
-                .thumbnail(goalDTO.getThumbnail())  // 📌 썸네일 파일명 저장
+                .thumbnail(goalDTO.getThumbnail())
                 .build();
 
         Goals savedGoal = goalRepository.save(goal);
@@ -107,7 +131,7 @@ public class GoalServiceImpl implements GoalService {
         return savedGoal.getGoalId();
     }
 
-    // 📂 파일 업로드 처리
+    // ✅ 파일 업로드 처리
     public void handleFileUpload(MultipartFile file, GoalDTO goalDTO) {
         if (file != null && !file.isEmpty()) {
             log.info("📂 파일 업로드 시작: {}", file.getOriginalFilename());
@@ -138,7 +162,7 @@ public class GoalServiceImpl implements GoalService {
                 log.error("파일 업로드 중 오류 발생: ", e);
             }
 
-            // 📌 DB에는 파일명만 저장
+            // ✅ DB에는 파일명만 저장
             goalDTO.setThumbnail(fileName);
             log.info("📂 goal.getThumbnail(): {}", goalDTO.getThumbnail());
         } else {

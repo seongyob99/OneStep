@@ -72,9 +72,9 @@ public class GoalRestController {
         goalDTO.setMemberId(memberId);
         goalDTO.setCategoryId(categoryId);
 
-        if (goalDTO.getEndDate() == null && goalDTO.getStartDate() != null) {
-            goalDTO.setEndDate(goalDTO.getStartDate().plusMonths(6));
-            log.info("📌 endDate가 없어 기본값 설정됨: {}", goalDTO.getEndDate());
+        // ❌ 6개월 추가 로직 삭제 (endDate를 null 그대로 유지)
+        if (goalDTO.getEndDate() == null) {
+            log.info("📌 종료일 없음, 그대로 유지");
         }
 
         try {

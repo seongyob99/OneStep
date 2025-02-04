@@ -1,6 +1,7 @@
 package com.onestep.back.dto.goal;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.onestep.back.dto.member.MemberDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,6 +30,8 @@ public class GoalDTO {
     private LocalDate endDate;
     private Long categoryId;
     private Long participants;
+    private Long currentParticipants; // ✅ 현재 참가 인원
+    private List<MemberDTO> members; // ✅ 현재 참가 인원 리스트
 
     private List<MultipartFile> files; // 업로드된 파일 리스트
 }
