@@ -26,7 +26,7 @@ const GoalList = () => {
                     categoryId: selectedCategory || undefined,
                     title: searchTerm || undefined,
                     page: page,
-                    size: 6,
+                    size: 8,
                 },
             });
 
@@ -95,38 +95,39 @@ const GoalList = () => {
                     목표 등록
                 </button>
             </div>
+            <hr className="mb-4" />
 
             {/* 검색 기능 */}
-            <div className="d-flex gap-2 mb-3">
-                <input
-                    type="text"
-                    placeholder="검색어 입력"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="form-control"
-                />
-                <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="form-select"
-                >
-                    <option value="">전체</option>
-                    <option value="1">운동</option>
-                    <option value="2">건강</option>
-                    <option value="3">학습</option>
-                    <option value="4">습관</option>
-                    <option value="5">기타</option>
-                </select>
-                <button className="btn btn-secondary" onClick={handleSearch}>
-                    검색
-                </button>
+            <div className="row mb-4">
+                <div className="col-md-3">
+                    <select className="form-control" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                        <option value="">전체</option>
+                        <option value="운동">운동</option>
+                        <option value="독서">독서</option>
+                        <option value="공부">공부</option>
+                    </select>
+                </div>
+                <div className="col-md-7">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="검색어를 입력하세요"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                <div className="col-md-2">
+                    <button className="btn btn-primary w-100" onClick={handleSearch}>
+                        검색
+                    </button>
+                </div>
             </div>
 
             {/* 목표 카드 리스트 */}
-            <div className="row">
+            <div className="row g-4 justify-content-center"> {/* ✅ 카드 간격 조절 */}
                 {goals.length > 0 ? (
                     goals.map((goal, index) => (
-                        <div className="col-md-4 mb-4" key={`${goal.goalId}-${index}`}>
+                        <div className="col-md-3 d-flex" key={`${goal.goalId}-${index}`}>
                             <GoalCard goal={goal} />
                         </div>
                     ))
@@ -142,6 +143,7 @@ const GoalList = () => {
             {isFetching && <p className="text-center">⏳ 로딩 중...</p>}
         </div>
     );
+
 };
 
 export default GoalList;
