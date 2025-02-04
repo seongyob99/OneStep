@@ -1,10 +1,11 @@
 package com.onestep.back.service.goal;
 
-import com.onestep.back.domain.Certifications;
-import com.onestep.back.domain.Goals;
+import com.onestep.back.domain.*;
 import com.onestep.back.dto.goal.GoalDTO;
 import com.onestep.back.dto.upload.CertificationsDTO;
 import com.onestep.back.dto.goal.GoalDtlDTO;
+import com.onestep.back.repository.category.CategoriesRepository;
+import com.onestep.back.repository.chat.ChatsRepository;
 import com.onestep.back.repository.member.MemberRepository;
 import com.onestep.back.repository.upload.CertificationsRepository;
 import com.onestep.back.repository.goal.GoalRepository;
@@ -29,6 +30,8 @@ public class GoalDtlServiceImpl implements GoalDtlService{
     private final GoalRepository goalRepository;
     private final CertificationsRepository certRepository;
     private final MemberRepository memberRepository;
+    private final ChatsRepository chatsRepository;
+    private final CategoriesRepository cateRepository;
     private final ModelMapper modelMapper;
 
     // 목표 상세 및 참여 정보 조회
@@ -52,6 +55,14 @@ public class GoalDtlServiceImpl implements GoalDtlService{
     @Override
     public void joinGoal(GoalDTO goalDTO) {
         Goals goal = goalRepository.findById(goalDTO.getGoalId()).orElseThrow();
+        Members adminMember = memberRepository.findById(goalDTO.getMemberId()).orElseThrow();
+        // 채팅방 추가
+        chatsRepository.save(Chats.builder()
+                .goal(goal)
+                .chatName(goalDTO.getTitle())
+                .members(List.of(adminMember))
+                .build()
+        );
         // 새 멤버 추가
         goal.getMembers().add(
                 memberRepository.findById(goalDTO.getMemberId()).orElseThrow()
@@ -83,15 +94,16 @@ public class GoalDtlServiceImpl implements GoalDtlService{
         goalRepository.save(goal);
     }
 
-    // 수정하기
+    // 목표 수정
     @Override
     public void updateGoal(GoalDTO goalDTO) {
         Goals goal = goalRepository.findById(goalDTO.getGoalId()).orElseThrow();
-        // 수정 로직
+        Categories category = cateRepository.findById(goalDTO.getCategoryId()).orElseThrow();
+        goal.changeGoal(goalDTO, category);
         goalRepository.save(goal);
     }
 
-    // 삭제하기
+    // 목표 삭제
     @Override
     public void deleteGoal(Long goalId) {
         goalRepository.deleteById(goalId);
