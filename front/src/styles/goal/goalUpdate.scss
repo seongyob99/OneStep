@@ -1,0 +1,67 @@
+.form-label {
+    font-weight: bold;
+}
+
+.flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.flex-2 {
+    flex: 2;
+}
+
+.flex-9 {
+    flex: 9;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.ml-4 {
+    margin-left: 1rem;
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.current-member {
+    font-size: 13px;
+}
+
+.checkbox {
+    min-width: 95px;
+    padding-top: 30px;
+}
+
+.thumbnail-input {
+    min-height: 182px;
+
+    .thumbnail-preview {
+        position: relative;
+
+        .thumbnail-img {
+            width: auto;
+            height: 150px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            background-color: gray;
+            color: white;
+            border: none;
+            border-radius: 15%;
+            width: 20px;
+            height: 20px;
+            font-size: 14px;
+            margin-left: 5px;
+        }
+    }
+}
