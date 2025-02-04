@@ -1,14 +1,14 @@
 package com.onestep.back.service.goal;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import com.onestep.back.domain.Categories;
+import com.onestep.back.domain.Chats;
+import com.onestep.back.domain.Goals;
+import com.onestep.back.domain.Members;
+import com.onestep.back.dto.goal.GoalDTO;
+import com.onestep.back.repository.category.CategoriesRepository;
+import com.onestep.back.repository.chat.ChatsRepository;
+import com.onestep.back.repository.goal.GoalRepository;
+import com.onestep.back.repository.member.MemberRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -16,18 +16,9 @@ import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.onestep.back.dto.goal.GoalDTO;
-import com.onestep.back.dto.member.MemberDTO;
-import com.onestep.back.domain.Categories;
-import com.onestep.back.domain.Goals;
-import com.onestep.back.domain.Members;
-import com.onestep.back.domain.Chats;
-import com.onestep.back.repository.member.MemberRepository;
-import com.onestep.back.repository.category.CategoriesRepository;
-import com.onestep.back.repository.goal.GoalRepository;
-import com.onestep.back.repository.chat.ChatsRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -109,7 +100,7 @@ public class GoalServiceImpl implements GoalService {
 
         Chats chatRoom = Chats.builder()
                 .goal(savedGoal)
-                .chatName(savedGoal.getTitle() + " 채팅방")
+                .chatName(savedGoal.getTitle())
                 .build();
 
         chatsRepository.save(chatRoom);
