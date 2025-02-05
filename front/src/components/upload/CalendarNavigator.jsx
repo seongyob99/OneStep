@@ -232,16 +232,20 @@
 
 
 import React, { useState, useEffect, useCallback } from "react";
+import {useParams } from 'react-router-dom';
 import axios from "axios";
 import "../../styles/upload/calendar.scss";
+
 
 // ✅ 환경 변수에서 API 서버 URL 가져오기 (없으면 기본값 설정)
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 // const goalid = 1;
 
-const CalendarNavigator = ({ onDateClick, goalid }) => {
+const CalendarNavigator = ({ onDateClick}) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [certificationData, setCertificationData] = useState([]);
+   const goalid = useParams().goalid;
+    
 
   console.log("골아이디",goalid);
 
@@ -290,6 +294,7 @@ const CalendarNavigator = ({ onDateClick, goalid }) => {
       console.log("📢 API 응답 데이터:", response.data);
       setCertificationData(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
+      console.log("goal아이디",goalid);
       console.error("🚨 데이터 가져오기 실패:", error);
       setCertificationData([]);
     }
