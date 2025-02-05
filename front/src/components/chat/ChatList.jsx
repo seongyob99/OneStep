@@ -7,9 +7,10 @@ const ChatList = ({ setSelectedChat }) => {
     const [chatList, setChatList] = useState([]);
     const [selectedChatId, setSelectedChatIdState] = useState(null);
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+    const memberId = 'user01'; // 실제 사용자 ID로 변경 필요
 
     useEffect(() => {
-        axios.get(`${SERVER_URL}/chat/list`)
+        axios.get(`${SERVER_URL}/chat/list/${memberId}`)
             .then(response => {
                 setChatList(response.data);
             })
