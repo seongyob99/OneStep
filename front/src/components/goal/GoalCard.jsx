@@ -30,7 +30,7 @@ const GoalCard = ({ goal }) => {
                     <h5 className="goal-card-title flex-grow-1 card-title" title={goal.title}>
                         {goal.title}
                     </h5>
-                    <p className="goal-card-category mb-0 ms-2">{goal.categoryName}</p> {/* ✅ 카테고리 정상 표시 */}
+                    <p className="goal-card-category mb-0 ms-2">| {goal.categoryName}</p>
                 </div>
                 <p className="goal-card-text">{goal.startDate} ~ {goal.endDate || "종료 시"}</p>
                 <p className="goal-card-text">
