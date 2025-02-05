@@ -8,6 +8,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +20,7 @@ public class MemberServiceImpl implements MemberService {
     private final ModelMapper modelMapper;
 
     @Override
-    public MemberDTO getMemberById(String memberId) { // String 타입 사용
+    public MemberDTO getMemberById(String memberId) {
         Members member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
         return new MemberDTO(
@@ -34,17 +36,39 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void updateMember(String memberId, MemberDTO memberDTO) { // String 타입 사용
+    public void updateMember(String memberId, MemberDTO memberDTO) {
         Members member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
-        member.setName(memberDTO.getName());
-        member.setEmail(memberDTO.getEmail());
-        member.setPhone(memberDTO.getPhone());
-        if (memberDTO.getBirth() != null) {
-            member.setBirth(LocalDate.parse(memberDTO.getBirth()));
-        }
-        member.setSex(memberDTO.getSex());
-        memberRepository.save(member);
+
+        Members updatedMember = Members.builder()
+                .memberId(member.getMemberId())
+                .password(memberDTO.getPassword() != null ? passwordEncoder.encode(memberDTO.getPassword()) : member.getPassword())
+                .name(memberDTO.getName() != null ? memberDTO.getName() : member.getName())
+                .email(memberDTO.getEmail() != null ? memberDTO.getEmail() : member.getEmail())
+                .phone(memberDTO.getPhone() != null ? memberDTO.getPhone() : member.getPhone())
+                .birth(memberDTO.getBirth() != null ? LocalDate.parse(memberDTO.getBirth()) : member.getBirth())
+                .sex(memberDTO.getSex() != null ? memberDTO.getSex() : member.getSex())
+                .social(member.isSocial())
+                .goals(member.getGoals())
+                .chats(member.getChats())
+                .certifications(member.getCertifications())
+                .build();
+
+        memberRepository.save(updatedMember);
+    }
+
+    @Override
+    public void deleteMember(String memberId) {
+        Members member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
+        memberRepository.delete(member);
+    }
+
+    @Override
+    public List<String> getMemberGoals(String memberId) {
+        Members member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
+        return member.getGoals().stream().map(goal -> goal.getTitle()).collect(Collectors.toList());
     }
 
     @Override
@@ -55,11 +79,9 @@ public class MemberServiceImpl implements MemberService {
             throw new MidExistException();
         }
         Members members = modelMapper.map(memberDTO, Members.class);
-        members.changePassword(passwordEncoder.encode(memberDTO.getPassword()));  // PasswordEncoder 사용
+        members.changePassword(passwordEncoder.encode(memberDTO.getPassword()));
 
         memberRepository.save(members);
         return modelMapper.map(members, MemberDTO.class);
     }
-
-
 }
