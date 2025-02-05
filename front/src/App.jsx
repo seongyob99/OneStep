@@ -10,6 +10,7 @@ import GoalUpdate from './components/goal/GoalUpdate';
 import ChatPage from './components/chat/ChatPage';
 import ChatRoom from './components/chat/ChatRoom';
 import JoinForm from './components/member/JoinForm';
+import LoginForm from './components/member/LoginForm';
 import MyPage from './components/member/MyPage';
 import MemberDetail from './components/member/MemberDetail';
 
@@ -25,6 +26,7 @@ function App() {
         <Route path="/:goalid/update" element={<GoalUpdate />} />
 
         <Route path="/member/join" element={<JoinForm />} />
+        <Route path="/member/login" element={<LoginForm />} />
         <Route path="/member/info" element={<MyPage />} />
         <Route path="/member/edit" element={<MemberDetail />} />
 
