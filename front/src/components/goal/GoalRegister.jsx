@@ -131,8 +131,10 @@ const GoalRegister = () => {
 
     return (
         <Container>
-            <h3 className="my-4">목표 등록</h3>
-            <hr />
+            <div className="d-flex justify-content-between align-items-center my-4">
+                <h3>목표 등록</h3>
+                <button type="button" onClick={handleRegister} className="btn btn-primary mb-3">등록하기</button>
+            </div>
             <form>
                 <div className="mb-4 flex">
                     <div className="flex-1">
@@ -143,7 +145,7 @@ const GoalRegister = () => {
                             value={form.categoryId}
                             onChange={onChange}
                         >
-                            <option value="">카테고리를 선택하세요</option>
+                            <option value="">...</option>
                             {cateList.map(category => (
                                 <option key={category.categoryId} value={category.categoryId}>
                                     {category.cateName}

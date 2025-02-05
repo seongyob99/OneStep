@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import GoalCard from "./GoalCard";
-import "@styles/goal/goalUpdate.scss"; // ✅ 기존 스타일 import
+import "@styles/goal/goalList.scss";
 
 const GoalList = () => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -23,7 +23,7 @@ const GoalList = () => {
             .catch(() => alert("카테고리를 불러오는 데 실패했습니다."));
     }, []);
 
-    const fetchGoals = async (page = 0, reset = false) => {
+    const fetchGoals = useCallback(async (page = 0, reset = false) => {
         if (!hasMore && !reset) return;
         setIsFetching(true);
 
@@ -43,34 +43,32 @@ const GoalList = () => {
                 setHasMore(false);
             } else {
                 setHasMore(true);
-                const newGoals = response.data.filter(
-                    newGoal => !goals.some(existingGoal => existingGoal.goalId === newGoal.goalId)
-                );
 
-                setGoals(prevGoals => reset ? response.data : [...prevGoals, ...newGoals]);
+                setGoals(prevGoals => {
+                    const newGoals = response.data.filter(
+                        newGoal => !prevGoals.some(existingGoal => existingGoal.goalId === newGoal.goalId)
+                    );
+                    return reset ? response.data : [...prevGoals, ...newGoals];
+                });
             }
         } catch (error) {
             console.error("목표 리스트 불러오는 중 오류 발생:", error);
         } finally {
             setIsFetching(false);
         }
-    };
+    }, [hasMore, selectedCategory, searchTerm]);
 
     useEffect(() => {
-        const fetchFilteredGoals = async () => {
-            setCurrentPage(0);
-            setHasMore(true);
-            setGoals([]);
-            await fetchGoals(0, true);
-        };
-
-        fetchFilteredGoals();
-    }, [selectedCategory]);
+        setCurrentPage(0);
+        setGoals([]);
+        setHasMore(true);
+        fetchGoals(0, true);
+    }, [selectedCategory, fetchGoals]);
 
     const handleSearch = () => {
         setCurrentPage(0);
-        setHasMore(true);
         setGoals([]);
+        setHasMore(true);
         fetchGoals(0, true);
     };
 
@@ -80,7 +78,10 @@ const GoalList = () => {
 
         const observerCallback = (entries) => {
             if (entries[0].isIntersecting && !isFetching) {
-                setCurrentPage(prevPage => prevPage + 1);
+                setCurrentPage(prevPage => {
+                    fetchGoals(prevPage + 1);
+                    return prevPage + 1;
+                });
             }
         };
 
@@ -93,7 +94,7 @@ const GoalList = () => {
         const newObserver = new IntersectionObserver(observerCallback, observerOptions);
         newObserver.observe(observer.current);
         return () => newObserver.disconnect();
-    }, [isFetching, hasMore]);
+    }, [isFetching, hasMore, fetchGoals]);
 
     useEffect(() => {
         fetchGoals();
@@ -101,45 +102,40 @@ const GoalList = () => {
 
     return (
         <div className="container mt-4">
-            {/* ✅ 제목 (스타일 통일) */}
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h3 className="mb-3">목표 목록</h3>
                 <button className="btn btn-primary" onClick={() => navigate("/goals/register")}>
                     목표 등록
                 </button>
             </div>
-            <hr className="mb-4" />
 
-            {/* ✅ 검색창 스타일 통일 */}
-            <div className="row mb-4">
-                <div className="col-md-3">
-                    <select className="form-control" value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}>
-                        <option value="">전체</option>
-                        {categories.map(category => (
-                            <option key={category.categoryId} value={category.categoryId}>
-                                {category.cateName}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="col-md-7">
-                    <input
-                        type="text"
-                        className="form-control"
-                        placeholder="검색어를 입력하세요"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <div className="col-md-2">
-                    <button className="btn btn-primary w-100" onClick={handleSearch}>
-                        검색
-                    </button>
-                </div>
+            <div className="goal-search-container mb-4">
+                <select
+                    className="form-control goal-search-category"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                    <option value="">전체</option>
+                    {categories.map(category => (
+                        <option key={category.categoryId} value={category.categoryId}>
+                            {category.cateName}
+                        </option>
+                    ))}
+                </select>
+
+                <input
+                    type="text"
+                    className="form-control goal-search-input"
+                    placeholder="검색어를 입력하세요"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+
+                <button className="btn btn-info goal-search-btn" onClick={handleSearch}>
+                    검색
+                </button>
             </div>
 
-            {/* ✅ 목표 카드 리스트 스타일 통일 */}
             <div className="row g-4 justify-content-start">
                 {goals.length > 0 ? (
                     goals.map((goal, index) => (
@@ -152,7 +148,6 @@ const GoalList = () => {
                 )}
             </div>
 
-            {/* 무한 스크롤 트리거 */}
             <div ref={observer} style={{ height: "10px", margin: "20px 0" }} />
 
             {isFetching && <p className="text-center">⏳ 로딩 중...</p>}
