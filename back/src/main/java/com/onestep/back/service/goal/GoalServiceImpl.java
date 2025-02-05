@@ -39,12 +39,10 @@ public class GoalServiceImpl implements GoalService {
 
     @Override
     public List<GoalDTO> getList(Long categoryId, String title) {
-        log.info("🔍 목표 목록 조회 실행: categoryId={}, title={}", categoryId, title);
         List<Goals> goals = (categoryId != null) ?
                 goalRepository.findByCategoryCategoryIdAndTitleContaining(categoryId, title == null ? "" : title) :
                 goalRepository.findByTitleContaining(title == null ? "" : title);
 
-        log.info("📌 조회된 목표 개수: {}", goals.size());
         return goals.stream().map(goal -> GoalDTO.builder()
                 .goalId(goal.getGoalId())
                 .title(goal.getTitle())
@@ -54,19 +52,16 @@ public class GoalServiceImpl implements GoalService {
                 .startDate(goal.getStartDate())
                 .endDate(goal.getEndDate())
                 .participants(goal.getParticipants())
-                .currentParticipants((long) goal.getMembers().size()) // ✅ 참가자 수 포함
                 .categoryId(goal.getCategory().getCategoryId())
                 .categoryName(goal.getCategory().getCateName())
                 .memberId(goal.getAdminMember().getMemberId())
                 .thumbnail(goal.getThumbnail())
-                .members(goal.getMembers() != null
-                        ? goal.getMembers().stream()
+                .members(goal.getMembers().stream() // null 체크 제거
                         .map(m -> MemberDTO.builder()
                                 .memberId(m.getMemberId())
                                 .name(m.getName())
                                 .build())
-                        .collect(Collectors.toList())
-                        : List.of()) // 빈 리스트 반환
+                        .collect(Collectors.toList()))
                 .build()
         ).collect(Collectors.toList());
     }
@@ -74,13 +69,11 @@ public class GoalServiceImpl implements GoalService {
     @Transactional
     @Override
     public Long register(GoalDTO goalDTO) {
-        log.info("🚀 목표 등록 요청: {}", goalDTO);
 
         // ✅ memberId 하드코딩 유지
         if (goalDTO.getMemberId() == null || goalDTO.getMemberId().trim().isEmpty()) {
             goalDTO.setMemberId("user01");
         }
-        log.info("✅ memberId 확인 후: {}", goalDTO.getMemberId());
 
         Categories category = categoriesRepository.findById(goalDTO.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("❌ Invalid category ID: " + goalDTO.getCategoryId()));
@@ -98,25 +91,20 @@ public class GoalServiceImpl implements GoalService {
                 .startDate(goalDTO.getStartDate())
                 .endDate(goalDTO.getEndDate())
                 .participants(goalDTO.getParticipants())
+                .members(List.of(member))
                 .thumbnail(goalDTO.getThumbnail())
                 .build();
 
         Goals savedGoal = goalRepository.save(goal);
-        log.info("✅ 목표 저장 완료: ID={}", savedGoal.getGoalId());
-
-        goalRepository.addMemberToGoal(savedGoal.getGoalId(), goalDTO.getMemberId());
-        log.info("✅ 목표 참가 완료 (goals_members): {}", goalDTO.getMemberId());
-
-        Goals updatedGoal = goalRepository.findByIdWithMembers(savedGoal.getGoalId());
 
 
         Chats chatRoom = Chats.builder()
                 .goal(savedGoal)
                 .chatName(savedGoal.getTitle())
+                .members(List.of(member))
                 .build();
 
         chatsRepository.save(chatRoom);
-        log.info("✅ 채팅방 생성 완료");
 
         return savedGoal.getGoalId();
     }
