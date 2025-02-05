@@ -5,6 +5,30 @@ $text-color: #333;
 $box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 $loading-color: #555;
 
+.error-message {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}
+.actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.member-button {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #e63946;
+  }
+}
+
 .my-page {
   max-width: 600px;
   margin: 0 auto;

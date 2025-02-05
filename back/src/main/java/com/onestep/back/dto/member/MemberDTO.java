@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class MemberDTO {
-    private String memberId; // Long → String으로 변경
+    private String memberId;
     private String name;
     private String email;
     private String password;
