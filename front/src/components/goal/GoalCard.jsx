@@ -1,5 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import '@styles/goal/goalCard.scss';
+
 
 const GoalCard = ({ goal }) => {
     console.log("📌 goal 데이터 확인:", goal);
@@ -8,51 +10,31 @@ const GoalCard = ({ goal }) => {
 
     // 목표 상세 페이지 이동 함수
     const handleNavigate = () => {
-        navigate(`/${goal.goalId}`); // 목표 ID 기반 상세 페이지 이동
+        navigate(`/${goal.goalId}`);
     };
 
     return (
-        <div
-            className="card shadow-sm p-3 d-flex flex-column justify-content-between"
-            style={{ width: "100%", cursor: "pointer", borderRadius: "10px" }}
-            onClick={handleNavigate} // ✅ 카드 전체 클릭 시 이동
-        >
-            {/* ✅ 이미지 및 구분선 추가 */}
+        <div className="goal-card card shadow-sm p-3 d-flex flex-column justify-content-between" onClick={handleNavigate}>
+            {/* ✅ 이미지 및 구분선 */}
             <div className="text-center">
                 <img
                     src={goal.thumbnail ? `${SERVER_URL}/uploads/${goal.thumbnail}` : `${SERVER_URL}/uploads/default.jpg`}
-                    className="card-img-top"
+                    className="goal-card-img card-img-top"
                     alt="Goal Thumbnail"
-                    style={{
-                        height: "180px",
-                        objectFit: "cover",
-                        borderTopLeftRadius: "10px",
-                        borderTopRightRadius: "10px",
-                    }} // ✅ 이미지 높이 고정 & 비율 유지
                 />
-                <hr className="my-3" /> {/* ✅ 이미지 아래 줄 */}
+                <hr className="goal-card-hr" />
             </div>
 
             {/* ✅ 카드 본문 */}
-            <div className="card-body p-2 d-flex flex-column">
+            <div className="goal-card-body card-body">
                 <div className="d-flex align-items-center">
-                    <h5
-                        className="card-title mb-0 text-truncate"
-                        style={{
-                            maxWidth: "180px", // ✅ 제목 길이 제한
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "inline-block",
-                        }}
-                        title={goal.title} // ✅ 마우스 올리면 전체 제목 표시
-                    >
+                    <h5 className="goal-card-title card-title" title={goal.title}>
                         {goal.title}
                     </h5>
-                    <p className="ms-2 mb-0 gray-text">| {goal.categoryName}</p>
+                    <p className="goal-card-category mb-0">| {goal.categoryName}</p>
                 </div>
-                <p className="card-text">{goal.startDate} ~ {goal.endDate || "종료 시"}</p>
-                <p className="card-text">
+                <p className="goal-card-text">{goal.startDate} ~ {goal.endDate || "종료 시"}</p>
+                <p className="goal-card-text">
                     참가 인원: <strong>{(goal.members ?? []).length} / {goal.participants}</strong>
                 </p>
             </div>
