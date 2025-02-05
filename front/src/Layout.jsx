@@ -25,17 +25,11 @@ const Layout = () => {
             </main>
 
             <footer className="footer">
-                <Container>
-                    <div className="footer-content">
-                        <div className="footer-left">
-                            <p><PiCopyrightBold /> 2025 ONESTEP. All Rights Reserved.</p>
-                        </div>
-                        <div className="footer-right">
-                            <p>GIT : https://github.com/dltkdgus3769/OneStep</p>
-                            <p>Address : Busan IT Training Center, Room 501</p>
-                        </div>
-                    </div>
-                </Container>
+                <div className="footer-content">
+                    <div><PiCopyrightBold /> 2025 ONESTEP. All Rights Reserved.</div>
+                    <div>Address : Busan IT Training Center, Room 501</div>
+                    <div>GIT : https://github.com/dltkdgus3769/OneStep</div>
+                </div>
             </footer>
         </div>
     );
