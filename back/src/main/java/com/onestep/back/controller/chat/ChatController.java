@@ -36,10 +36,24 @@ public class ChatController {
     }
 
     // 채팅방 리스트 가져오기
-    @GetMapping("/list")
-    public ResponseEntity<List<ChatsDTO>> getChatList() {
-        List<ChatsDTO> chatList = chatService.getAllChats();
-        log.info("chatList"+chatList);
+//    @GetMapping("/list")
+//    public ResponseEntity<List<ChatsDTO>> getChatList() {
+//        List<ChatsDTO> chatList = chatService.getAllChats();
+//        log.info("chatList"+chatList);
+//        return ResponseEntity.ok(chatList);
+//    }
+    @GetMapping("/list/{memberId}")
+    public ResponseEntity<List<ChatsDTO>> getChatList(@PathVariable String memberId) {
+        List<ChatsDTO> chatList = chatService.getChatListByMemberId(memberId);
         return ResponseEntity.ok(chatList);
+    }
+
+
+
+
+    @GetMapping("/{chatId}/memberCount")
+    public long getMemberCount(@PathVariable Long chatId) {
+        // 해당 채팅방의 멤버 수를 반환
+        return chatService.getMemberCountByChatId(chatId);
     }
 }
