@@ -237,28 +237,28 @@ const GoalDtl = () => {
                                 {goalData.members.map((member, index) => {
                                     if (index === 0) {
                                         return (
-                                            <ListGroup.Item key={member.memberId}>
+                                            <ListGroup.Item key={member.memberId} title={`${member.name} (${member.memberId})`}>
                                                 <FaMedal color="gold" size={24} className="rank" />
                                                 {member.name} <span className="gray-text">({member.certCnt}회)</span>
                                             </ListGroup.Item>
                                         );
                                     } else if (index === 1) {
                                         return (
-                                            <ListGroup.Item key={member.memberId}>
+                                            <ListGroup.Item key={member.memberId} title={`${member.name} (${member.memberId})`}>
                                                 <FaMedal color="silver" size={24} className="rank" />
                                                 {member.name} <span className="gray-text">({member.certCnt}회)</span>
                                             </ListGroup.Item>
                                         );
                                     } else if (index === 2) {
                                         return (
-                                            <ListGroup.Item key={member.memberId}>
+                                            <ListGroup.Item key={member.memberId} title={`${member.name} (${member.memberId})`}>
                                                 <FaMedal color="brown" size={24} className="rank" />
                                                 {member.name} <span className="gray-text">({member.certCnt}회)</span>
                                             </ListGroup.Item>
                                         );
                                     } else {
                                         return (
-                                            <ListGroup.Item key={member.memberId}>
+                                            <ListGroup.Item key={member.memberId} title={`${member.name} (${member.memberId})`}>
                                                 <strong className="rank">{index + 1}위</strong>{member.name} <span className="gray-text">({member.certCnt}회)</span>
                                             </ListGroup.Item>
                                         );
