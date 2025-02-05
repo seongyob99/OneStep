@@ -1,0 +1,92 @@
+.goal-search-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.goal-search-category {
+    width: 150px;
+    /* ✅ 카테고리 선택창 크기 조정 */
+}
+
+.goal-search-input {
+    flex-grow: 1;
+    /* ✅ 검색창이 남은 공간을 차지하도록 설정 */
+}
+
+.goal-search-btn {
+    width: 100px;
+    /* ✅ 버튼 크기 조정 */
+}
+
+.form-label {
+    font-weight: bold;
+}
+
+.flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.flex-2 {
+    flex: 2;
+}
+
+.flex-9 {
+    flex: 9;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.ml-8 {
+    margin-left: 5rem;
+}
+
+.ml-4 {
+    margin-left: 1rem;
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.small-font {
+    font-size: 13px;
+}
+
+.checkbox {
+    min-width: 95px;
+    padding-top: 30px;
+}
+
+.thumbnail-input {
+    min-height: 182px;
+
+    .thumbnail-preview {
+        position: relative;
+
+        .thumbnail-img {
+            width: auto;
+            height: 150px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            background-color: gray;
+            color: white;
+            border: none;
+            border-radius: 15%;
+            width: 20px;
+            height: 20px;
+            font-size: 14px;
+            margin-left: 5px;
+        }
+    }
+}
