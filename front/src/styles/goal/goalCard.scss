@@ -25,6 +25,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     display: inline-block;
+    flex-shrink: 1;
+    /* ✅ 제목이 길 경우 자동 축소됨 */
 }
 
 .goal-card-title:hover {
@@ -34,6 +36,10 @@
 .goal-card-category {
     margin-left: 0.5rem;
     color: gray;
+    white-space: normal;
+    /* ✅ 줄 바꿈 가능하도록 변경 */
+    flex-shrink: 0;
+    /* ✅ 카테고리는 크기 고정 */
 }
 
 .goal-card-text {

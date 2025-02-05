@@ -4,6 +4,7 @@ import axios from "axios";
 import GoalCard from "./GoalCard";
 import "@styles/goal/goalList.scss";
 
+
 const GoalList = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
@@ -40,7 +41,6 @@ const GoalList = () => {
                 },
             });
 
-            console.log("📌 서버 응답 데이터:", response.data);
 
             if (!response.data || response.data.length === 0) {
                 setHasMore(false); // ✅ 더 이상 데이터가 없으면 hasMore을 false로 설정
