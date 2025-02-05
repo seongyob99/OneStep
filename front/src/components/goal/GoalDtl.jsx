@@ -147,7 +147,7 @@ const GoalDtl = () => {
 
     // 인증하기
     const onCertification = () => {
-        navigate("/cert");
+        navigate(`/cert/${goalid}`);
     };
 
     // 데이터 없는 경우 로딩창
