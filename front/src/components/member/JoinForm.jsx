@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Button, Form, Alert, Accordion } from 'react-bootstrap';
-import '../../styles/member/JoinForm.scss';
+import "@styles/member/JoinForm.scss";
 
 const JoinForm = () => {
   const [formData, setFormData] = useState({
@@ -9,11 +9,13 @@ const JoinForm = () => {
     name: '',
     email: '',
     password: '',
+    confirmPassword: '', // 추가된 비밀번호 확인 필드
     phone: '',
     birth: '',
     sex: '',
     social: false,
   });
+
   const [responseMessage, setResponseMessage] = useState(null);
   const [isError, setIsError] = useState(false);
   const [errors, setErrors] = useState({});
@@ -39,16 +41,26 @@ const JoinForm = () => {
       tempErrors.email = '유효한 이메일을 입력하세요.';
       formIsValid = false;
     }
+
     if (!formData.password) {
       tempErrors.password = '비밀번호를 입력하세요.';
       formIsValid = false;
-    } else if (formData.password.length < 8) {
-      tempErrors.password = '비밀번호는 최소 8자 이상이어야 합니다.';
+    } else if (formData.password.length < 6) {
+      tempErrors.password = '비밀번호는 최소 6자 이상이어야 합니다.';
       formIsValid = false;
     } else if (!/[A-Za-z]/.test(formData.password) || !/\d/.test(formData.password)) {
       tempErrors.password = '비밀번호는 영문자와 숫자가 포함되어야 합니다.';
       formIsValid = false;
     }
+
+    if (!formData.confirmPassword) {
+      tempErrors.confirmPassword = '비밀번호 확인을 입력하세요.';
+      formIsValid = false;
+    } else if (formData.password !== formData.confirmPassword) {
+      tempErrors.confirmPassword = '비밀번호가 일치하지 않습니다.';
+      formIsValid = false;
+    }
+
     if (!formData.phone) {
       tempErrors.phone = '전화번호를 입력하세요.';
       formIsValid = false;
@@ -56,10 +68,12 @@ const JoinForm = () => {
       tempErrors.phone = '전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678';
       formIsValid = false;
     }
+
     if (!formData.birth) {
       tempErrors.birth = '생년월일을 입력하세요.';
       formIsValid = false;
     }
+
     if (!formData.sex) {
       tempErrors.sex = '성별을 선택하세요.';
       formIsValid = false;
@@ -78,7 +92,6 @@ const JoinForm = () => {
 
     try {
       const response = await axios.post(`${SERVER_URL}/member/join`, formData);
-      
 
       setIsError(false);
       setResponseMessage(response.data.message);
@@ -163,6 +176,19 @@ const JoinForm = () => {
               </div>
 
               <div className="form-group">
+                <label>비밀번호 확인</label>
+                <Form.Control
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  isInvalid={!!errors.confirmPassword}
+                  required
+                />
+                {errors.confirmPassword && <div className="error-text">{errors.confirmPassword}</div>}
+              </div>
+
+              <div className="form-group">
                 <label>전화번호</label>
                 <Form.Control
                   type="text"
@@ -211,18 +237,6 @@ const JoinForm = () => {
                   <label htmlFor="female">여성</label>
                 </div>
                 {errors.sex && <div className="error-text">{errors.sex}</div>}
-              </div>
-
-              <div className="form-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    name="social"
-                    checked={formData.social}
-                    onChange={(e) => setFormData({ ...formData, social: e.target.checked })}
-                  />
-                  소셜 회원가입
-                </label>
               </div>
 
               <Button variant="primary" type="submit">
