@@ -4,14 +4,15 @@ import axios from 'axios';
 import '@styles/goal/goalDtl.scss';
 import { Container, Row, Col, Button, ListGroup, Image, Spinner, Modal } from 'react-bootstrap';
 import { FaMedal, FaCalendarAlt, FaUser, FaUserCog } from 'react-icons/fa';
-import { GiDuration } from "react-icons/gi";
-import { RiTodoLine } from "react-icons/ri";
+import { BsCalendarWeekFill } from "react-icons/bs";
+import { RiTodoFill, RiArrowDownSLine } from "react-icons/ri";
 
 const GoalDtl = () => {
     const [goalData, setGoalData] = useState(null);
     const [imageData, setImageData] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedMember, setSelectedMember] = useState(null);
+    const [isMembersVisible, setIsMembersVisible] = useState(false);
     const [dataChanged, setDataChanged] = useState(false);
 
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
@@ -51,6 +52,11 @@ const GoalDtl = () => {
         getRecentCert();
     }, [dataChanged]);
 
+    // 인원 리스트 조회
+    const handleArrowClick = () => {
+        setIsMembersVisible(prevState => !prevState);
+    };
+
     // 관리자 외 참가자 목록
     const filteredMembers = useMemo(() => {
         return goalData?.members.filter((member) => member.memberId !== goalData.adminMemberId);
@@ -75,7 +81,7 @@ const GoalDtl = () => {
                 alert("작업에 실패했습니다. 다시 시도해주세요.");
             }
         }
-    }, []);
+    }, [goalData]);
 
     // 내보내기 및 그만두기
     const removeMember = useCallback(async (memberId) => {
@@ -118,6 +124,27 @@ const GoalDtl = () => {
         }
     }, [selectedMember]);
 
+    // 수정하기
+    const onUpdate = useCallback(() => {
+        navigate(`/${goalid}/update`)
+    }, []);
+
+    // 삭제하기
+    const onDelete = useCallback(async () => {
+        const confirmDelete = confirm(`이 목표를 삭제하시겠습니까?`);
+        if (confirmDelete) {
+            try {
+                await axios.delete(
+                    `${SERVER_URL}/goals/dtl/${goalid}`,
+                    { headers: { 'Content-Type': 'application/json' } }
+                );
+                navigate("/");
+            } catch (err) {
+                alert("목표 삭제에 실패했습니다. 다시 시도해주세요.");
+            }
+        }
+    }, []);
+
     // 인증하기
     const onCertification = () => {
         navigate("/cert");
@@ -142,7 +169,7 @@ const GoalDtl = () => {
                 <Col>
                     <Row className="mt-4 d-flex align-items-center">
                         <Col>
-                            <h3 className="d-inline">{goalData.title}</h3>
+                            <h3 className="d-inline goal-title">{goalData.title}</h3>
                             <p className="d-inline ms-2 mb-0 gray-text">| {goalData.categoryName}</p>
                             <p className="my-2">{goalData.description}</p>
                         </Col>
@@ -154,7 +181,11 @@ const GoalDtl = () => {
                                 </>
                             }
                             {!isStarted &&
-                                <Button variant="primary" className="ms-2" onClick={onJoin}>참가하기</Button>
+                                <>
+                                    <Button variant="danger" className="ms-2" onClick={onUpdate}>수정하기</Button>
+                                    <Button variant="danger" className="ms-2" onClick={onDelete}>삭제하기</Button>
+                                    <Button variant="primary" className="ms-2" onClick={onJoin}>참가하기</Button>
+                                </>
                             }
                         </Col>
                     </Row>
@@ -166,13 +197,31 @@ const GoalDtl = () => {
                     <div className="mb-4">
                         <h5><FaUserCog className="me-2" />방장</h5>
                         <p>{goalData.adminMemberName} ({goalData.adminMemberId})</p>
-                        <h5><FaUser className="me-2" />인원</h5>
+                        <h5 className="d-flex align-items-center">
+                            <FaUser className="me-2" />인원
+                            <div className="arrow-container position-relative"> {/* 새로운 div 추가 */}
+                                <RiArrowDownSLine
+                                    className={`ms-2 ${isMembersVisible ? 'rotated' : ''}`}
+                                    onClick={handleArrowClick}
+                                />
+                                {/* 인원 리스트 */}
+                                {isMembersVisible && (
+                                    <div className="member-list-modal">
+                                        <ul>
+                                            {goalData.members.map((member, index) => (
+                                                <li key={index}>{member.name} ({member.memberId})</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        </h5>
                         <p>{goalData.members.length} / {goalData.participants}</p>
                         <h5><FaCalendarAlt className="me-2" />기간</h5>
                         <p>{goalData.startDate} ~ {goalData.endDate || '종료 시'}</p>
-                        <h5><GiDuration className="me-2" />주기</h5>
+                        <h5><BsCalendarWeekFill className="me-2" />주기</h5>
                         <p>{goalData.certCycle}일마다</p>
-                        <h5><RiTodoLine className="me-2" />규칙</h5>
+                        <h5><RiTodoFill className="me-2" />규칙</h5>
                         <p>{goalData.rule}</p>
                     </div>
                 </Col>
@@ -188,28 +237,28 @@ const GoalDtl = () => {
                                 {goalData.members.map((member, index) => {
                                     if (index === 0) {
                                         return (
-                                            <ListGroup.Item key={member.memberId}>
+                                            <ListGroup.Item key={member.memberId} title={`${member.name} (${member.memberId})`}>
                                                 <FaMedal color="gold" size={24} className="rank" />
                                                 {member.name} <span className="gray-text">({member.certCnt}회)</span>
                                             </ListGroup.Item>
                                         );
                                     } else if (index === 1) {
                                         return (
-                                            <ListGroup.Item key={member.memberId}>
+                                            <ListGroup.Item key={member.memberId} title={`${member.name} (${member.memberId})`}>
                                                 <FaMedal color="silver" size={24} className="rank" />
                                                 {member.name} <span className="gray-text">({member.certCnt}회)</span>
                                             </ListGroup.Item>
                                         );
                                     } else if (index === 2) {
                                         return (
-                                            <ListGroup.Item key={member.memberId}>
+                                            <ListGroup.Item key={member.memberId} title={`${member.name} (${member.memberId})`}>
                                                 <FaMedal color="brown" size={24} className="rank" />
                                                 {member.name} <span className="gray-text">({member.certCnt}회)</span>
                                             </ListGroup.Item>
                                         );
                                     } else {
                                         return (
-                                            <ListGroup.Item key={member.memberId}>
+                                            <ListGroup.Item key={member.memberId} title={`${member.name} (${member.memberId})`}>
                                                 <strong className="rank">{index + 1}위</strong>{member.name} <span className="gray-text">({member.certCnt}회)</span>
                                             </ListGroup.Item>
                                         );

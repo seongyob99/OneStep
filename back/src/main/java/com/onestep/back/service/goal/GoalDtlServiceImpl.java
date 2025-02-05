@@ -1,10 +1,11 @@
 package com.onestep.back.service.goal;
 
-import com.onestep.back.domain.Certifications;
-import com.onestep.back.domain.Goals;
+import com.onestep.back.domain.*;
 import com.onestep.back.dto.goal.GoalDTO;
 import com.onestep.back.dto.upload.CertificationsDTO;
 import com.onestep.back.dto.goal.GoalDtlDTO;
+import com.onestep.back.repository.category.CategoriesRepository;
+import com.onestep.back.repository.chat.ChatsRepository;
 import com.onestep.back.repository.member.MemberRepository;
 import com.onestep.back.repository.upload.CertificationsRepository;
 import com.onestep.back.repository.goal.GoalRepository;
@@ -29,6 +30,8 @@ public class GoalDtlServiceImpl implements GoalDtlService{
     private final GoalRepository goalRepository;
     private final CertificationsRepository certRepository;
     private final MemberRepository memberRepository;
+    private final ChatsRepository chatsRepository;
+    private final CategoriesRepository cateRepository;
     private final ModelMapper modelMapper;
 
     // 목표 상세 및 참여 정보 조회
@@ -52,17 +55,21 @@ public class GoalDtlServiceImpl implements GoalDtlService{
     @Override
     public void joinGoal(GoalDTO goalDTO) {
         Goals goal = goalRepository.findById(goalDTO.getGoalId()).orElseThrow();
-        // 새 멤버 추가
-        goal.getMembers().add(
-                memberRepository.findById(goalDTO.getMemberId()).orElseThrow()
-        );
+        Members newMember = memberRepository.findById(goalDTO.getMemberId()).orElseThrow();
+        Chats chats = goal.getChat();
+        // 목표 및 채팅방에 새 멤버 추가
+        goal.getMembers().add(newMember);
         goalRepository.save(goal);
+        chats.getMembers().add(newMember);
+        chatsRepository.save(chats);
     }
 
     // 목표 내보내기, 그만두기
     @Override
     public void removeMember(GoalDTO goalDTO) {
         Goals goal = goalRepository.findById(goalDTO.getGoalId()).orElseThrow();
+        Members delMember = memberRepository.findById(goalDTO.getMemberId()).orElseThrow();
+        Chats chats = goal.getChat();
         // 인증 정보 삭제
         List<Certifications> delCert = certRepository.findByGoalGoalIdAndMemberMemberId(goal.getGoalId(), goalDTO.getMemberId());
         for (Certifications cert : delCert) {
@@ -76,10 +83,25 @@ public class GoalDtlServiceImpl implements GoalDtlService{
             }
         }
         certRepository.deleteAll(delCert);
-        // 멤버 삭제
-        goal.getMembers().remove(
-                memberRepository.findById(goalDTO.getMemberId()).orElseThrow()
-        );
+        // 목표 및 채팅방에서 멤버 삭제
+        goal.getMembers().remove(delMember);
         goalRepository.save(goal);
+        chats.getMembers().remove(delMember);
+        chatsRepository.save(chats);
+    }
+
+    // 목표 수정
+    @Override
+    public void updateGoal(GoalDTO goalDTO) {
+        Goals goal = goalRepository.findById(goalDTO.getGoalId()).orElseThrow();
+        Categories category = cateRepository.findById(goalDTO.getCategoryId()).orElseThrow();
+        goal.changeGoal(goalDTO, category);
+        goalRepository.save(goal);
+    }
+
+    // 목표 삭제
+    @Override
+    public void deleteGoal(Long goalId) {
+        goalRepository.deleteById(goalId);
     }
 }

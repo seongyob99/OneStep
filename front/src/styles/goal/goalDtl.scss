@@ -1,6 +1,12 @@
 h5 {
     display: flex;
     align-items: center;
+    font-weight: 600;
+}
+
+h3,
+h4 {
+    font-weight: 600;
 }
 
 .rank {
@@ -37,4 +43,59 @@ h5 {
 .goal-thumbnail {
     height: 75px;
     object-fit: cover; // 이미지 비율 유지하며 잘리지 않게 설정
+    margin-right: 10px;
+}
+
+.goal-title {
+    white-space: nowrap;
+    /* 텍스트가 한 줄로 표시되도록 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* 텍스트가 길어지면 말줄임표(...) 표시 */
+}
+
+.gray-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* 말줄임표 */
+}
+
+.arrow-container {
+    position: relative;
+}
+
+.arrow-container svg {
+    cursor: pointer;
+}
+
+.member-list-modal {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    /* RiArrowDownSLine 오른쪽에 위치 */
+    margin-left: 10px;
+    border: #d3d3d3 1px solid;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    z-index: 1050;
+    max-height: 300px;
+    overflow-y: auto;
+    /* 스크롤 가능 */
+    border-radius: 8px;
+    width: auto;
+    min-width: 100px;
+    background-color: #fff;
+}
+
+.member-list-modal ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.member-list-modal li {
+    padding: 5px 5px;
+    font-size: 15px;
+    white-space: nowrap;
 }

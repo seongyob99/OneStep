@@ -50,4 +50,7 @@ public interface CertificationsRepository extends JpaRepository<Certifications, 
 
     // 내보내기, 그만두기 시 삭제할 인증 기록 조회
     List<Certifications> findByGoalGoalIdAndMemberMemberId(Long goalId, String memberId);
+    // 회원 탈퇴시, 모든 인증 기록 조회
+    List<Certifications> findByMemberMemberId(String memberId);
+
 }
