@@ -39,7 +39,7 @@ const GoalCard = ({ goal }) => {
                     <h5
                         className="card-title mb-0 text-truncate"
                         style={{
-                            maxWidth: "150px", // ✅ 제목 길이 제한
+                            maxWidth: "180px", // ✅ 제목 길이 제한
                             whiteSpace: "nowrap",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
