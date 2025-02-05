@@ -29,7 +29,7 @@ public class MemberServiceImpl implements MemberService {
                 member.getEmail(),
                 member.getPassword(),
                 member.getPhone(),
-                member.getBirth() != null ? member.getBirth().toString() : null,
+                member.getBirth(),
                 member.getSex(),
                 member.isSocial()
         );
@@ -46,7 +46,7 @@ public class MemberServiceImpl implements MemberService {
                 .name(memberDTO.getName() != null ? memberDTO.getName() : member.getName())
                 .email(memberDTO.getEmail() != null ? memberDTO.getEmail() : member.getEmail())
                 .phone(memberDTO.getPhone() != null ? memberDTO.getPhone() : member.getPhone())
-                .birth(memberDTO.getBirth() != null ? LocalDate.parse(memberDTO.getBirth()) : member.getBirth())
+                .birth(memberDTO.getBirth() != null ? memberDTO.getBirth() : member.getBirth())
                 .sex(memberDTO.getSex() != null ? memberDTO.getSex() : member.getSex())
                 .social(member.isSocial())
                 .goals(member.getGoals())
