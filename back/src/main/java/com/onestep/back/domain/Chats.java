@@ -34,4 +34,6 @@ public class Chats extends BaseEntity {
 
     @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessages> chatMessages;
+
+
 }

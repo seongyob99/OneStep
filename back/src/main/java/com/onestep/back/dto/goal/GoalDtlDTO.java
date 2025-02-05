@@ -19,6 +19,7 @@ public class GoalDtlDTO {
     private Long goalId;
     private String title;
     private String description;
+    private Long categoryId;
     private String categoryName;
     private String rule;
     private Long certCycle;
@@ -31,4 +32,5 @@ public class GoalDtlDTO {
     private Long participants;
     private String thumbnail;
     private List<CertificationsDTO> members;
+    private Long chatId;
 }

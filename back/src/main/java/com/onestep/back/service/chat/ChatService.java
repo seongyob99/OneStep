@@ -7,5 +7,7 @@ import java.util.List;
 public interface ChatService {
     List<ChatsDTO> getAllChats();
 
+    int getMemberCountByChatId(Long chatId);
 
+    List<ChatsDTO> getChatListByMemberId(String memberId);
 }
