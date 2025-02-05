@@ -221,8 +221,10 @@ const GoalUpdate = () => {
 
     return (
         <Container>
-            <h3 className="my-4">목표 수정</h3>
-            <hr />
+            <div className="d-flex justify-content-between align-items-center my-4">
+                <h3>목표 수정</h3>
+                <button type="button" onClick={handleUpdate} className="btn btn-primary mb-3">저장하기</button>
+            </div>
             <form>
                 <div className="mb-4 flex">
                     <div className="flex-1">
@@ -233,7 +235,6 @@ const GoalUpdate = () => {
                             value={form.categoryId}
                             onChange={onChange}
                         >
-                            <option value="">전체</option>
                             {cateList.map((category) => (
                                 <option key={category.categoryId} value={category.categoryId}>
                                     {category.cateName}
@@ -356,9 +357,6 @@ const GoalUpdate = () => {
                             onChange={onFileChange}
                         />
                     )}
-                </div>
-                <div className="text-right">
-                    <button type="button" onClick={handleUpdate} className="btn btn-primary mb-3">저장하기</button>
                 </div>
             </form>
         </Container>
