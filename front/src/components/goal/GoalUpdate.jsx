@@ -91,22 +91,57 @@ const GoalUpdate = () => {
                             }
                         }
                         draft[name] = value;
-                    } else if (name === 'endDate' && form.startDate) {
-                        // const startDate = new Date(form.startDate);
-                        // const endDate = new Date(value);
 
-                        // if (endDate < startDate) {
-                        //     alert("종료일은 시작일보다 이후여야 합니다.");
-                        //     draft.endDate = form.startDate; // 종료일을 시작일로 수정
-                        // }
+                    } else if (name === 'startDate') {
+                        const selectedStartDate = new Date(value);
+                        selectedStartDate.setHours(0, 0, 0, 0);
+
+                        const tomorrow = new Date();
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        tomorrow.setHours(0, 0, 0, 0);
+
+                        if (selectedStartDate < tomorrow) {
+                            alert("시작일은 내일 이후여야 합니다.");
+                            return;
+                        }
+
+                        const startDate = new Date(value);
+                        startDate.setHours(0, 0, 0, 0);
+                        const endDate = new Date(form.endDate);
+                        endDate.setHours(0, 0, 0, 0);
+
+                        if (endDate <= startDate) {
+                            alert("시작일은 종료일 이전이여야 합니다.");
+                            return;
+                        }
+
                         draft[name] = value;
+
+                    } else if (name === 'endDate') {
+                        if (!form.startDate) {
+                            alert("시작일을 먼저 입력해주세요.");
+                            return;
+                        }
+
+                        const startDate = new Date(form.startDate);
+                        startDate.setHours(0, 0, 0, 0);
+                        const endDate = new Date(value);
+                        endDate.setHours(0, 0, 0, 0);
+
+                        if (endDate <= startDate) {
+                            alert("종료일은 시작일 이후여야 합니다.");
+                            return;
+                        }
+
+                        draft[name] = value;
+
                     } else {
                         draft[name] = value;
                     }
                 })
             );
         }
-    }, [memberCnt]);
+    }, [form, memberCnt]);
 
     // onFileChange
     const onFileChange = useCallback((e) => {
@@ -142,6 +177,13 @@ const GoalUpdate = () => {
         if (!noEndDate && !form.endDate) {
             alert("종료일을 입력해주세요.");
             return;
+        }
+        if (form.endDate) {
+            const dateDiff = Math.floor((new Date(form.endDate) - new Date(form.startDate)) / (1000 * 3600 * 24)); // 날짜 차이
+            if (form.certCycle > dateDiff) {
+                alert(`인증 주기는 시작일과 종료일 사이 최대 일수를 초과할 수 없습니다.`);
+                return;
+            }
         }
         if (!form.thumbnail && !form.file) {
             alert("썸네일은 필수입니다.");
@@ -221,19 +263,6 @@ const GoalUpdate = () => {
                 </div>
                 <div className="mb-4 flex">
                     <div className="flex-1">
-                        <label className="form-label">인증 주기</label>
-                        <div className="flex">
-                            <input
-                                type="text"
-                                name="certCycle"
-                                className="form-control no-spin"
-                                value={form.certCycle}
-                                onChange={onChange}
-                            />
-                            <span>일</span>
-                        </div>
-                    </div>
-                    <div className="flex-1 ml-4">
                         <label className="form-label">정원</label>
                         <span className="small-font">(현재 {memberCnt}명)</span>
 
@@ -248,7 +277,7 @@ const GoalUpdate = () => {
                             <span>명</span>
                         </div>
                     </div>
-                    <div className="flex-2 ml-4">
+                    <div className="flex-1 ml-8">
                         <label className="form-label">시작일</label>
                         <input
                             type="date"
@@ -258,7 +287,7 @@ const GoalUpdate = () => {
                             onChange={onChange}
                         />
                     </div>
-                    <div className="flex-2 ml-4">
+                    <div className="flex-1 ml-4">
                         <label className="form-label">종료일</label>
                         <input
                             type="date"
@@ -277,6 +306,19 @@ const GoalUpdate = () => {
                             onChange={onChange}
                         />
                         <label>종료일 없음</label>
+                    </div>
+                    <div className="flex-1 ml-8">
+                        <label className="form-label">인증 주기</label>
+                        <div className="flex">
+                            <input
+                                type="text"
+                                name="certCycle"
+                                className="form-control no-spin"
+                                value={form.certCycle}
+                                onChange={onChange}
+                            />
+                            <span>일</span>
+                        </div>
                     </div>
                 </div>
                 <div className="mb-4">

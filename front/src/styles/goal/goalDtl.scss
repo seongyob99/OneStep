@@ -46,6 +46,21 @@ h4 {
     margin-right: 10px;
 }
 
+.goal-title {
+    white-space: nowrap;
+    /* 텍스트가 한 줄로 표시되도록 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* 텍스트가 길어지면 말줄임표(...) 표시 */
+}
+
+.gray-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* 말줄임표 */
+}
+
 .arrow-container {
     position: relative;
 }

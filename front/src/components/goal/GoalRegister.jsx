@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { produce } from 'immer';
 import { Container } from 'react-bootstrap';
+import '@styles/goal/goalUpdate.scss';
 
 const GoalRegister = () => {
     const [form, setForm] = useState({
@@ -21,14 +22,14 @@ const GoalRegister = () => {
     const navigate = useNavigate();
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-    // 📌 카테고리 목록 불러오기
+    // 카테고리 목록 불러오기
     useEffect(() => {
         axios.get(`${SERVER_URL}/categories`)
             .then(response => setCateList(response.data))
             .catch(() => alert("카테고리를 불러오는 데 실패했습니다."));
     }, []);
 
-    // 📌 입력값 변경 핸들러 (Validation 추가)
+    // 입력값 변경 핸들러
     const onChange = useCallback((e) => {
         const { name, value, type, checked } = e.target;
 
@@ -42,34 +43,30 @@ const GoalRegister = () => {
                 );
             }
         } else {
-            // 🚨 참가 인원 & 인증 주기 필드
             if (name === "participants" || name === "certCycle") {
-                // 🚨 숫자가 아닌 값 입력 시 경고 & 즉시 초기화
                 if (!/^\d*$/.test(value)) {
                     alert("🚨 유효한 숫자를 입력해주세요.");
-                    e.target.value = ""; // 입력창 즉시 초기화
+                    e.target.value = "";
                     return;
                 }
 
                 const numericValue = Number(value);
 
-                // 🚨 0 이하 입력 방지
                 if (numericValue <= 0) {
                     alert("🚨 1 이상의 숫자를 입력해주세요.");
-                    e.target.value = ""; // 입력창 즉시 초기화
+                    e.target.value = "";
                     return;
                 }
 
-                // 🚨 소수점 입력 방지
                 if (value.includes(".")) {
                     alert("🚨 소수점은 입력할 수 없습니다.");
-                    e.target.value = ""; // 입력창 즉시 초기화
+                    e.target.value = "";
                     return;
                 }
 
                 setForm(
                     produce((draft) => {
-                        draft[name] = numericValue; // 정상 입력만 반영
+                        draft[name] = numericValue;
                     })
                 );
             } else {
@@ -82,14 +79,7 @@ const GoalRegister = () => {
         }
     }, []);
 
-
-    // 📌 종료일 없음 체크박스 핸들러
-    const toggleNoEndDate = () => {
-        setNoEndDate(!noEndDate);
-        setForm(prev => ({ ...prev, endDate: noEndDate ? "" : null }));
-    };
-
-    // 📌 파일 업로드 핸들러 (썸네일 미리보기 포함)
+    // 파일 업로드 핸들러
     const onFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -97,9 +87,8 @@ const GoalRegister = () => {
         }
     };
 
-    // 📌 목표 등록 요청 (Validation 추가)
+    // 목표 등록 요청
     const handleRegister = async () => {
-        console.log("📌 현재 입력 데이터:", form);
         if (!form.categoryId || !form.title.trim() || !form.description.trim()
             || !form.startDate || !form.certCycle || !form.rule.trim()) {
             alert("🚨 모든 필드를 입력해주세요.");
@@ -142,69 +131,127 @@ const GoalRegister = () => {
 
     return (
         <Container>
-            <div className="container mt-4">
-                <h1 className="text-2xl font-bold mb-4">목표 등록</h1>
-                <hr />
-                <form>
-                    {/* ✅ 카테고리 선택 */}
-                    <div className="mb-4">
+            <h3 className="my-4">목표 등록</h3>
+            <hr />
+            <form>
+                <div className="mb-4 flex">
+                    <div className="flex-1">
                         <label className="form-label">카테고리</label>
-                        <select name="categoryId" className="form-control" value={form.categoryId} onChange={onChange}>
+                        <select
+                            name="categoryId"
+                            className="form-control"
+                            value={form.categoryId}
+                            onChange={onChange}
+                        >
                             <option value="">카테고리를 선택하세요</option>
                             {cateList.map(category => (
-                                <option key={category.categoryId} value={category.categoryId}>{category.cateName}</option>
+                                <option key={category.categoryId} value={category.categoryId}>
+                                    {category.cateName}
+                                </option>
                             ))}
                         </select>
                     </div>
-
-                    {/* ✅ 제목, 설명 */}
-                    <div className="mb-4">
-                        <label className="form-label">목표 제목</label>
-                        <input type="text" name="title" className="form-control" value={form.title} onChange={onChange} />
+                    <div className="flex-9 ml-4">
+                        <label className="form-label">제목</label>
+                        <input
+                            type="text"
+                            name="title"
+                            className="form-control"
+                            value={form.title}
+                            onChange={onChange}
+                        />
                     </div>
-                    <div className="mb-4">
-                        <label className="form-label">목표 설명</label>
-                        <textarea name="description" className="form-control" value={form.description} onChange={onChange} />
-                    </div>
-
-                    {/* ✅ 참가 인원 */}
-                    <div className="mb-4">
-                        <label className="form-label">참가 인원</label>
-                        <input type="number" name="participants" className="form-control" value={form.participants} onChange={onChange} />
-                    </div>
-
-                    {/* ✅ 시작일 & 종료일 */}
-                    <div className="mb-4">
-                        <label className="form-label">시작일</label>
-                        <input type="date" name="startDate" className="form-control" value={form.startDate} onChange={onChange} />
-                    </div>
-                    <div className="mb-4">
-                        <label className="form-label">종료일</label>
-                        <input type="date" name="endDate" className="form-control" value={form.endDate} onChange={onChange} disabled={noEndDate} />
-                        <input type="checkbox" checked={noEndDate} onChange={toggleNoEndDate} /> 종료일 없음
-                    </div>
-
-                    {/* ✅ 인증 주기 추가 */}
-                    <div className="mb-4">
+                </div>
+                <div className="mb-4">
+                    <label className="form-label">설명</label>
+                    <textarea
+                        name="description"
+                        className="form-control"
+                        value={form.description}
+                        onChange={onChange}
+                    />
+                </div>
+                <div className="mb-4 flex">
+                    <div className="flex-1">
                         <label className="form-label">인증 주기</label>
-                        <input type="number" name="certCycle" className="form-control" value={form.certCycle} onChange={onChange} />
+                        <div className="flex">
+                            <input
+                                type="text"
+                                name="certCycle"
+                                className="form-control no-spin"
+                                value={form.certCycle}
+                                onChange={onChange}
+                            />
+                            <span>일</span>
+                        </div>
                     </div>
-
-                    {/* ✅ 인증 규칙 */}
-                    <div className="mb-4">
-                        <label className="form-label">인증 규칙</label>
-                        <input type="text" name="rule" className="form-control" value={form.rule} onChange={onChange} />
+                    <div className="flex-1 ml-4">
+                        <label className="form-label">정원</label>
+                        <div className="flex">
+                            <input
+                                type="text"
+                                name="participants"
+                                className="form-control no-spin"
+                                value={form.participants}
+                                onChange={onChange}
+                            />
+                            <span>명</span>
+                        </div>
                     </div>
-
-                    {/* ✅ 썸네일 업로드 */}
-                    <div className="mb-4">
-                        <label className="form-label">썸네일</label>
-                        <input type="file" name="file" className="form-control" onChange={onFileChange} />
+                    <div className="flex-2 ml-4">
+                        <label className="form-label">시작일</label>
+                        <input
+                            type="date"
+                            name="startDate"
+                            className="form-control"
+                            value={form.startDate}
+                            onChange={onChange}
+                        />
                     </div>
-
-                    <button type="button" className="btn btn-primary" onClick={handleRegister}>등록</button>
-                </form>
-            </div>
+                    <div className="flex-2 ml-4">
+                        <label className="form-label">종료일</label>
+                        <input
+                            type="date"
+                            name="endDate"
+                            className="form-control"
+                            value={form.endDate ? form.endDate : ''}
+                            onChange={onChange}
+                            disabled={noEndDate}
+                        />
+                    </div>
+                    <div className="ml-2 flex checkbox">
+                        <input
+                            type="checkbox"
+                            name="noEndDate"
+                            checked={noEndDate}
+                            onChange={onChange}
+                        />
+                        <label>종료일 없음</label>
+                    </div>
+                </div>
+                <div className="mb-4">
+                    <label className="form-label">인증 규칙</label>
+                    <textarea
+                        name="rule"
+                        className="form-control"
+                        value={form.rule}
+                        onChange={onChange}
+                    />
+                </div>
+                <div className="thumbnail-input mb-4">
+                    <label className="form-label">썸네일</label>
+                    <span className="small-font ml-2" style={{ color: "#fc4c24" }}>* 이미지는 1:1 비율로 넣어주세요 (권장)</span>
+                    <input
+                        type="file"
+                        name="file"
+                        className="form-control"
+                        onChange={onFileChange}
+                    />
+                </div>
+                <div className="text-right">
+                    <button type="button" onClick={handleRegister} className="btn btn-primary mb-3">등록하기</button>
+                </div>
+            </form>
         </Container>
     );
 };

@@ -23,11 +23,13 @@ public class GoalCustomRepoImpl extends QuerydslRepositorySupport implements Goa
         QCategories categories = QCategories.categories;
         QMembers members = QMembers.members;
         QCertifications certifications = QCertifications.certifications;
+        QChats chats = QChats.chats;
 
         // 목표 정보 조회
         Tuple goalResult = from(goals)
                 .leftJoin(goals.category, categories)
                 .leftJoin(goals.adminMember, members)
+                .leftJoin(goals.chat, chats)
                 .where(goals.goalId.eq(goalId))
                 .select(
                         goals.goalId,
@@ -42,7 +44,8 @@ public class GoalCustomRepoImpl extends QuerydslRepositorySupport implements Goa
                         goals.startDate,
                         goals.endDate,
                         goals.participants,
-                        goals.thumbnail
+                        goals.thumbnail,
+                        chats.chatId
                 )
                 .fetchOne();
 
@@ -65,6 +68,7 @@ public class GoalCustomRepoImpl extends QuerydslRepositorySupport implements Goa
                 .endDate(goalResult.get(goals.endDate))
                 .participants(goalResult.get(goals.participants))
                 .thumbnail(goalResult.get(goals.thumbnail))
+                .chatId(goalResult.get(chats.chatId))
                 .members(new ArrayList<>())
                 .build();
 

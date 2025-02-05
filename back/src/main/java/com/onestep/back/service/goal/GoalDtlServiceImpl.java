@@ -55,25 +55,21 @@ public class GoalDtlServiceImpl implements GoalDtlService{
     @Override
     public void joinGoal(GoalDTO goalDTO) {
         Goals goal = goalRepository.findById(goalDTO.getGoalId()).orElseThrow();
-        Members adminMember = memberRepository.findById(goalDTO.getMemberId()).orElseThrow();
-        // 채팅방 추가
-        chatsRepository.save(Chats.builder()
-                .goal(goal)
-                .chatName(goalDTO.getTitle())
-                .members(List.of(adminMember))
-                .build()
-        );
-        // 새 멤버 추가
-        goal.getMembers().add(
-                memberRepository.findById(goalDTO.getMemberId()).orElseThrow()
-        );
+        Members newMember = memberRepository.findById(goalDTO.getMemberId()).orElseThrow();
+        Chats chats = goal.getChat();
+        // 목표 및 채팅방에 새 멤버 추가
+        goal.getMembers().add(newMember);
         goalRepository.save(goal);
+        chats.getMembers().add(newMember);
+        chatsRepository.save(chats);
     }
 
     // 목표 내보내기, 그만두기
     @Override
     public void removeMember(GoalDTO goalDTO) {
         Goals goal = goalRepository.findById(goalDTO.getGoalId()).orElseThrow();
+        Members delMember = memberRepository.findById(goalDTO.getMemberId()).orElseThrow();
+        Chats chats = goal.getChat();
         // 인증 정보 삭제
         List<Certifications> delCert = certRepository.findByGoalGoalIdAndMemberMemberId(goal.getGoalId(), goalDTO.getMemberId());
         for (Certifications cert : delCert) {
@@ -87,11 +83,11 @@ public class GoalDtlServiceImpl implements GoalDtlService{
             }
         }
         certRepository.deleteAll(delCert);
-        // 멤버 삭제
-        goal.getMembers().remove(
-                memberRepository.findById(goalDTO.getMemberId()).orElseThrow()
-        );
+        // 목표 및 채팅방에서 멤버 삭제
+        goal.getMembers().remove(delMember);
         goalRepository.save(goal);
+        chats.getMembers().remove(delMember);
+        chatsRepository.save(chats);
     }
 
     // 목표 수정

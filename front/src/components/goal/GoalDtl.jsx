@@ -169,7 +169,7 @@ const GoalDtl = () => {
                 <Col>
                     <Row className="mt-4 d-flex align-items-center">
                         <Col>
-                            <h3 className="d-inline">{goalData.title}</h3>
+                            <h3 className="d-inline goal-title">{goalData.title}</h3>
                             <p className="d-inline ms-2 mb-0 gray-text">| {goalData.categoryName}</p>
                             <p className="my-2">{goalData.description}</p>
                         </Col>
