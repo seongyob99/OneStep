@@ -1,0 +1,45 @@
+.goal-card {
+    width: 100%;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.goal-card-img {
+    object-fit: cover;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    aspect-ratio: 1 / 1;
+}
+
+.goal-card-body {
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.goal-card-title {
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+
+.goal-card-title:hover {
+    text-decoration: underline;
+}
+
+.goal-card-category {
+    margin-left: 0.5rem;
+    color: gray;
+}
+
+.goal-card-text {
+    margin: 0.25rem 0;
+}
+
+.goal-card-hr {
+    margin: 1rem 0;
+}
