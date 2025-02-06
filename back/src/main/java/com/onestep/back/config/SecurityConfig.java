@@ -9,8 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,9 +19,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -31,67 +32,52 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
 
     @Bean
+    public AuthenticationManager authenticationManager() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(apiUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return new ProviderManager(authProvider);
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable());
+        http.csrf(csrf -> csrf.disable());
         http.cors(Customizer.withDefaults());
 
-        // Spring Security의 로그인 관련 필터 및 JWT 인증 필터 추가
-        AuthenticationManagerBuilder authenticationManagerBuilder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
+        // 세션을 사용하지 않는 Stateless 설정
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        authenticationManagerBuilder
-                .userDetailsService(apiUserDetailsService)  // 사용자 인증 처리
-                .passwordEncoder(passwordEncoder());       // 비밀번호 암호화 처리
-
-        AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
-
-        // 로그인 필터 설정
-        APILoginFilter apiLoginFilter = new APILoginFilter("/generateToken", authenticationManager, jwtUtil);
-        apiLoginFilter.setAuthenticationManager(authenticationManager);
-
-
-        // 로그인 필터를 UsernamePasswordAuthenticationFilter 앞에 배치
+        // 로그인 필터 설정 (AuthenticationManager를 직접 주입)
+        APILoginFilter apiLoginFilter = new APILoginFilter("/member/login", authenticationManager(), jwtUtil);
         http.addFilterBefore(apiLoginFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // JWT 토큰 검증 필터 추가
-        http.addFilterBefore(
-                new TokenCheckFilter(jwtUtil),
-                UsernamePasswordAuthenticationFilter.class
-        );
+        //  JWT 인증 필터 추가
+        http.addFilterBefore(new TokenCheckFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
-        // 리프레시 토큰 필터 추가
-        http.addFilterBefore(
-                new RefreshTokenFilter("/refreshToken", jwtUtil),
-                TokenCheckFilter.class
-        );
-
-        // 세션 관리 비활성화, Stateless 설정
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        //  리프레시 토큰 필터 추가
+        http.addFilterBefore(new RefreshTokenFilter("/refreshToken", jwtUtil), TokenCheckFilter.class);
 
         return http.build();
     }
 
-    // CORS 설정 유지
+    // CORS 설정
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowCredentials(true);  // 자격 증명 허용
-        config.addAllowedOrigin("http://localhost:5173");  // React 앱 URL
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("http://localhost:5173");
         config.addAllowedHeader("*");
-        config.addAllowedMethod("*");  // 모든 HTTP 메소드 허용
+        config.addAllowedMethod("*");
 
-        source.registerCorsConfiguration("/**", config);  // 모든 엔드포인트에 CORS 설정
-
+        source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
 
-    // PasswordEncoder 설정 유지
+    // PasswordEncoder 설정
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
-

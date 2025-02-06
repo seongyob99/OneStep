@@ -4,14 +4,17 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
+@Log4j2
 @Component
 public class JWTUtil {
 
@@ -26,14 +29,24 @@ public class JWTUtil {
 
     public String generateToken(Map<String, Object> claims, String subject, boolean isRefresh) {
         long expirationTime = isRefresh ? REFRESH_TOKEN_EXPIRY : ACCESS_TOKEN_EXPIRY;
+
+        log.info("🔹 토큰 생성 시작 | Subject: {}, Expiry: {}, IsRefresh: {}", subject, expirationTime, isRefresh);
+        log.info("🔹 Claims: {}", claims);
+
+        if (isRefresh) {
+            claims.put("type", "refresh");
+        }
+
         return Jwts.builder()
-                .setClaims(claims)
+                .setClaims(claims != null ? claims : new HashMap<>())
                 .setSubject(subject)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
+
 
     public Claims parseToken(String token) {
         return Jwts.parserBuilder()

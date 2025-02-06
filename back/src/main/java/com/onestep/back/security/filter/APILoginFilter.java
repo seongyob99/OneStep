@@ -1,12 +1,15 @@
 package com.onestep.back.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onestep.back.domain.Members;
 import com.onestep.back.util.JWTUtil;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Log4j2
 @Slf4j
 public class APILoginFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -33,8 +37,10 @@ public class APILoginFilter extends UsernamePasswordAuthenticationFilter {
 
         try {
             Map<String, String> credentials = new ObjectMapper().readValue(request.getInputStream(), Map.class);
-            String username = credentials.get("username");
+            String username = credentials.get("memberId");
+            log.info("username: " + username);
             String password = credentials.get("password");
+            log.info("password: " + password);
 
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(username, password);
@@ -50,12 +56,17 @@ public class APILoginFilter extends UsernamePasswordAuthenticationFilter {
                                             FilterChain chain, Authentication authResult) throws IOException {
 
         String username = authResult.getName();
+        UserDetails userDetails = (UserDetails) authResult.getPrincipal();
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", authResult.getAuthorities());
+        claims.put("username", username);
+        claims.put("email", userDetails.getUsername());
+
 
         String accessToken = jwtUtil.generateToken(claims, username, false);
         String refreshToken = jwtUtil.generateToken(claims, username, true);
+        log.info("refreshToken: " + refreshToken);
+
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);

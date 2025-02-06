@@ -5,12 +5,13 @@ import com.onestep.back.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class APIUserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
+public class APIUserDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
@@ -22,7 +23,7 @@ public class APIUserDetailsService implements org.springframework.security.core.
 
         return User.builder()
                 .username(member.getMemberId())
-                .password(member.getPassword())  // 패스워드 필드
+                .password(member.getPassword())
                 .build();
     }
 
