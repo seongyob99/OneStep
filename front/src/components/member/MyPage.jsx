@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Container, Row, Col, Card, ListGroup, Tabs, Tab, Spinner, Button } from "react-bootstrap";
-import { FaUserCog } from "react-icons/fa";
+import '@styles/member/MyPage.scss';
 
 const MyPage = () => {
   const [member, setMember] = useState({});
@@ -10,6 +10,10 @@ const MyPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedTab, setSelectedTab] = useState("ongoing");
+
+  const [ongoingPage, setOngoingPage] = useState(1);
+  const [completedPage, setCompletedPage] = useState(1);
+  const [PAGE_SIZE] = useState(7);
 
   const SERVER_URL = import.meta.env.VITE_SERVER_URL;
   const navigate = useNavigate();
@@ -23,7 +27,6 @@ const MyPage = () => {
           axios.get(`${SERVER_URL}/api/member/${memberId}`),
           axios.get(`${SERVER_URL}/api/member/${memberId}/goals`),
         ]);
-        console.log("Goals Response:", goalsResponse.data); // 로그 추가
         setMember(memberResponse.data);
         setGoals(goalsResponse.data || []);
       } catch (err) {
@@ -61,6 +64,15 @@ const MyPage = () => {
     (goal) => goal.endDate && new Date(goal.endDate) <= new Date()
   );
 
+  const getPaginatedGoals = (goals, currentPage) => {
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const endIndex = startIndex + PAGE_SIZE;
+    return goals.slice(startIndex, endIndex);
+  };
+
+  const totalOngoingPages = Math.ceil(ongoingGoals.length / PAGE_SIZE);
+  const totalCompletedPages = Math.ceil(completedGoals.length / PAGE_SIZE);
+
   const handleEditInfo = () => {
     navigate("/member/detail");
   };
@@ -68,7 +80,7 @@ const MyPage = () => {
   const handleDeleteAccount = async () => {
     const confirmDelete = window.confirm("정말로 회원 탈퇴를 진행하시겠습니까?");
     if (!confirmDelete) return;
-  
+
     try {
       const memberId = "user03"; // 로그인된 사용자 ID
       await axios.delete(`${SERVER_URL}/api/member/${memberId}`);
@@ -79,76 +91,124 @@ const MyPage = () => {
       alert(`회원 탈퇴 중 오류가 발생했습니다: ${error.response?.data || error.message}`);
     }
   };
-  
+
 
   return (
     <Container>
       <Row className="my-4">
         <Col>
-          <h1>마이페이지</h1>
+          <h3>마이페이지</h3>
         </Col>
       </Row>
-      <Row>
+      <Row className="mt-4">
         <Col md={6}>
-          <Card>
-            <Card.Header>
-              <h4>
-                <FaUserCog className="me-2" />
-                내 정보
-              </h4>
-            </Card.Header>
-            <Card.Body>
-              <p><strong>회원 ID:</strong> {member.memberId}</p>
-              <p><strong>이름:</strong> {member.name}</p>
-              <p><strong>이메일:</strong> {member.email}</p>
-              <p><strong>생일:</strong> {member.birth}</p>
-              <p><strong>전화번호:</strong> {member.phone}</p>
-              <p><strong>성별:</strong> {member.sex}</p>
-              <p><strong>소셜가입유무:</strong> {member.social ? "예" : "아니오"}</p>
-
-              <div className="d-flex justify-content-between mt-4">
-                <Button variant="primary" onClick={handleEditInfo}>
-                  회원정보 수정
-                </Button>
-                <Button variant="danger" onClick={handleDeleteAccount}>
-                  회원 탈퇴
-                </Button>
-              </div>
-            </Card.Body>
-          </Card>
+          <div className="mb-4">
+            <h5>회원 ID</h5>
+            <p>{member.memberId}</p>
+            <h5>이름</h5>
+            <p>{member.name}</p>
+            <h5>이메일</h5>
+            <p>{member.email}</p>
+            <h5>생일</h5>
+            <p>{member.birth}</p>
+            <h5>전화번호</h5>
+            <p>{member.phone}</p>
+            <h5>성별</h5>
+            <p>{member.sex === "M" ? "남성" : "여성"}</p>
+          </div>
+          <div className="d-flex">
+            <Button variant="primary" onClick={handleEditInfo}>
+              회원정보 수정
+            </Button>
+            <Button variant="danger" className="ml-2" onClick={handleDeleteAccount}>
+              회원 탈퇴
+            </Button>
+          </div>
         </Col>
         <Col md={6}>
+          <h4>참가 중인 목표</h4>
           <Card>
-            <Card.Header>
-              <h4>참가 중인 목표</h4>
-            </Card.Header>
-            <Card.Body>
-            <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} className="mb-3">
-  <Tab eventKey="ongoing" title="진행 중">
-    {ongoingGoals.length > 0 ? (
-      <ListGroup>
-        {ongoingGoals.map((goal, index) => (
-          <ListGroup.Item key={index}>{goal}</ListGroup.Item> /* goal 자체를 출력 */
-        ))}
-      </ListGroup>
-    ) : (
-      <p>현재 진행 중인 목표가 없습니다.</p>
-    )}
-  </Tab>
-  <Tab eventKey="completed" title="종료">
-    {completedGoals.length > 0 ? (
-      <ListGroup>
-        {completedGoals.map((goal, index) => (
-          <ListGroup.Item key={index}>{goal}</ListGroup.Item>/* goal 자체를 출력 */
-        ))}
-      </ListGroup>
-    ) : (
-      <p>종료된 목표가 없습니다.</p>
-    )}
-  </Tab>
-</Tabs>
-
+            <Card.Body style={{ height: 380 }}>
+              <Tabs activeKey={selectedTab} onSelect={(k) => setSelectedTab(k)} className="mb-3">
+                <Tab eventKey="ongoing" title="진행 중">
+                  {ongoingGoals.length > 0 ? (
+                    <>
+                      <ListGroup>
+                        {getPaginatedGoals(ongoingGoals, ongoingPage).map((goal, index) => (
+                          <ListGroup.Item
+                            key={index}
+                            className="hover-item"
+                            onClick={() => navigate(`/${goal.goalId}`)}
+                          >
+                            {goal.title}
+                          </ListGroup.Item>
+                        ))}
+                      </ListGroup>
+                    </>
+                  ) : (
+                    <p>현재 진행 중인 목표가 없습니다.</p>
+                  )}
+                </Tab>
+                <Tab eventKey="completed" title="종료">
+                  {completedGoals.length > 0 ? (
+                    <>
+                      <ListGroup>
+                        {getPaginatedGoals(completedGoals, completedPage).map((goal, index) => (
+                          <ListGroup.Item
+                            key={index}
+                            className="hover-item"
+                            onClick={() => navigate(`/${goal.goalId}`)}
+                          >
+                            {goal.title}
+                          </ListGroup.Item>
+                        ))}
+                      </ListGroup>
+                    </>
+                  ) : (
+                    <p>종료된 목표가 없습니다.</p>
+                  )}
+                </Tab>
+              </Tabs>
             </Card.Body>
+            <Card.Footer className="d-flex justify-content-center">
+              {selectedTab === "ongoing" ? (
+                <>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setOngoingPage(ongoingPage - 1)}
+                    disabled={ongoingPage === 1}
+                  >
+                    이전
+                  </Button>
+                  <span className="mx-3">{`Page ${ongoingPage} of ${totalOngoingPages}`}</span>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setOngoingPage(ongoingPage + 1)}
+                    disabled={ongoingPage === totalOngoingPages}
+                  >
+                    다음
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setCompletedPage(completedPage - 1)}
+                    disabled={completedPage === 1}
+                  >
+                    이전
+                  </Button>
+                  <span className="mx-3">{`Page ${completedPage} of ${totalCompletedPages}`}</span>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setCompletedPage(completedPage + 1)}
+                    disabled={completedPage === totalCompletedPages}
+                  >
+                    다음
+                  </Button>
+                </>
+              )}
+            </Card.Footer>
           </Card>
         </Col>
       </Row>
