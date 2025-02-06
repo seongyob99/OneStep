@@ -41,63 +41,15 @@ const GoalRegister = () => {
             if (name === "participants" || name === "certCycle") {
                 if (!/^\d*$/.test(value)) {
                     alert("유효한 숫자를 입력해주세요.");
-                    e.target.value = "";
                     return;
                 }
-
-                const numericValue = Number(value);
-
-                if (numericValue <= 0) {
-                    alert("1 이상의 숫자를 입력해주세요.");
-                    e.target.value = "";
-                    return;
-                }
-
-                if (value.includes(".")) {
-                    alert("소수점은 입력할 수 없습니다.");
-                    e.target.value = "";
-                    return;
-                }
-            }
-
-            if (name === "startDate") {
-                const selectedStartDate = new Date(value);
-                selectedStartDate.setHours(0, 0, 0, 0);
-
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                tomorrow.setHours(0, 0, 0, 0);
-
-                if (selectedStartDate < tomorrow) {
-                    alert("시작일은 내일 이후여야 합니다.");
-                    setForm(produce((draft) => { draft.startDate = ""; }));
-                    return;
-                }
-            }
-
-            if (name === "endDate") {
-                const selectedEndDate = new Date(value);
-                selectedEndDate.setHours(0, 0, 0, 0);
-
-                if (!form.startDate) {
-                    alert("시작일을 먼저 입력해주세요.");
-                    setForm(produce((draft) => { draft.endDate = ""; }));
-                    return;
-                }
-
-                const startDate = new Date(form.startDate);
-                startDate.setHours(0, 0, 0, 0);
-
-                if (selectedEndDate <= startDate) {
-                    alert("종료일은 시작일 이후여야 합니다.");
-                    setForm(produce((draft) => { draft.endDate = ""; }));
-                    return;
-                }
+                setForm(produce((draft) => { draft[name] = value; }));
+                return;
             }
 
             setForm(produce((draft) => { draft[name] = value; }));
         }
-    }, [form]);
+    }, [noEndDate]);
 
     const onFileChange = (e) => {
         const file = e.target.files[0];
@@ -106,70 +58,95 @@ const GoalRegister = () => {
         }
     };
 
-    // 🔹 파일 업로드 취소 함수
     const handleFileCancel = () => {
         setForm(prev => ({ ...prev, file: null }));
-
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
     };
 
     const handleRegister = async () => {
+        // 필수 필드 검증
         if (!form.categoryId || !form.title.trim() || !form.description.trim()
             || !form.startDate || !form.certCycle || !form.rule.trim()) {
             alert("모든 필드를 입력해주세요.");
             return;
         }
-        if (!noEndDate && !form.endDate) {
-            alert("종료일을 입력해주세요.");
+
+        // 정원 검증
+        const participants = Number(form.participants);
+        if (isNaN(participants) || participants < 1) {
+            alert("정원은 1 이상의 숫자를 입력해주세요.");
             return;
         }
+
+        // 인증 주기 검증
+        const certCycle = Number(form.certCycle);
+        if (isNaN(certCycle) || certCycle < 1) {
+            alert("인증 주기는 1 이상의 숫자를 입력해주세요.");
+            return;
+        }
+
+        // 시작일 검증
+        const startDate = new Date(form.startDate);
+        if (isNaN(startDate.getTime())) {
+            alert("유효한 시작일을 입력해주세요.");
+            return;
+        }
+        startDate.setHours(0, 0, 0, 0);
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        if (startDate < tomorrow) {
+            alert("시작일은 내일 이후여야 합니다.");
+            return;
+        }
+
+        // 종료일 검증
+        if (!noEndDate) {
+            if (!form.endDate) {
+                alert("종료일을 입력해주세요.");
+                return;
+            }
+
+            const endDate = new Date(form.endDate);
+            if (isNaN(endDate.getTime())) {
+                alert("유효한 종료일을 입력해주세요.");
+                return;
+            }
+            endDate.setHours(0, 0, 0, 0);
+
+            if (endDate <= startDate) {
+                alert("종료일은 시작일 이후여야 합니다.");
+                return;
+            }
+
+            // 인증 주기 일수 검증
+            const dateDiff = Math.floor((endDate - startDate) / (1000 * 3600 * 24));
+            if (certCycle > dateDiff) {
+                alert(`인증 주기는 시작일과 종료일 사이 최대 일수(${dateDiff}일)를 초과할 수 없습니다.`);
+                return;
+            }
+        }
+
+        // 파일 검증
         if (!form.file) {
             alert("썸네일은 필수입니다.");
             return;
         }
 
-        if (form.endDate && form.startDate) {
-            const startDate = new Date(form.startDate);
-            startDate.setHours(0, 0, 0, 0);
-
-            const endDate = new Date(form.endDate);
-            endDate.setHours(0, 0, 0, 0);
-
-            if (isNaN(startDate) || isNaN(endDate)) {
-                alert("날짜를 올바르게 입력해주세요.");
-                return;
-            }
-
-            const dateDiff = Math.floor((endDate - startDate) / (1000 * 3600 * 24));
-            const certCycleNum = Number(form.certCycle);
-
-            if (isNaN(certCycleNum) || certCycleNum <= 0) {
-                alert("인증 주기는 1 이상의 숫자여야 합니다.");
-                return;
-            }
-
-            if (certCycleNum > dateDiff) {
-                alert(`인증 주기는 시작일과 종료일 사이 최대 일수를 초과할 수 없습니다.`);
-                return;
-            }
-        }
-
+        // 폼 데이터 생성
         const formData = new FormData();
         formData.append("title", form.title);
         formData.append("description", form.description);
-        formData.append("participants", form.participants);
+        formData.append("participants", participants);
         formData.append("startDate", form.startDate);
         formData.append("endDate", noEndDate ? "" : form.endDate);
-        formData.append("certCycle", form.certCycle);
+        formData.append("certCycle", certCycle);
         formData.append("rule", form.rule);
         formData.append("categoryId", Number(form.categoryId));
         formData.append("memberId", "user01");
-
-        if (form.file) {
-            formData.append("file", form.file);
-        }
+        formData.append("file", form.file);
 
         try {
             await axios.post(`${SERVER_URL}/goals/register`, formData, {
@@ -181,7 +158,6 @@ const GoalRegister = () => {
             alert("목표 등록에 실패했습니다.");
         }
     };
-
 
     return (
         <Container>

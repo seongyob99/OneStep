@@ -2,10 +2,17 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import '@styles/goal/goalCard.scss';
 
-
 const GoalCard = ({ goal }) => {
     const navigate = useNavigate();
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
+    // ✅ 제목이 길면 앞부분 유지하고 뒤쪽만 ... 처리
+    const truncateTitle = (title, maxLength = 10) => {
+        if (title.length > maxLength) {
+            return title.slice(0, 7) + "..."; // ✅ 앞 7글자는 유지, 나머지는 '...' 처리
+        }
+        return title;
+    };
 
     // 목표 상세 페이지 이동 함수
     const handleNavigate = () => {
@@ -28,7 +35,7 @@ const GoalCard = ({ goal }) => {
             <div className="goal-card-body card-body">
                 <div className="d-flex align-items-center">
                     <h5 className="goal-card-title flex-grow-1 card-title" title={goal.title}>
-                        {goal.title}
+                        {truncateTitle(goal.title, 15)} {/* ✅ 제목 길이 제한 적용 */}
                     </h5>
                     <p className="goal-card-category mb-0 ms-2">| {goal.categoryName}</p>
                 </div>
