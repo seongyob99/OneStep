@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { produce } from 'immer';
@@ -9,6 +9,7 @@ const GoalUpdate = () => {
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     const navigate = useNavigate();
     const goalid = useParams().goalid;
+    const fileInputRef = useRef(null);
 
     const [cateList, setCateList] = useState([]);
     const [noEndDate, setNoEndDate] = useState(false);
@@ -151,6 +152,15 @@ const GoalUpdate = () => {
             })
         );
     }, []);
+
+    // 파일 업로드 취소
+    const handleFileCancel = () => {
+        setForm(prev => ({ ...prev, file: null }));
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
 
     // 썸네일 제거 시 처리
     const removeThumbnail = () => {
@@ -350,12 +360,25 @@ const GoalUpdate = () => {
                             </button>
                         </div>
                     ) : (
-                        <input
-                            type="file"
-                            name="file"
-                            className="form-control"
-                            onChange={onFileChange}
-                        />
+                        <>
+                            <input
+                                type="file"
+                                name="file"
+                                className="form-control"
+                                ref={fileInputRef}
+                                onChange={onFileChange}
+                            />
+                            {form.file && (
+                                <div className="mt-2 d-flex">
+                                    <p>
+                                        {form.file.name}
+                                        <button type="button" className="btn btn-danger ml-2" onClick={handleFileCancel}>
+                                            취소
+                                        </button>
+                                    </p>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </form>
