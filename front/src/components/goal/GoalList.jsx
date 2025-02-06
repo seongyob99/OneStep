@@ -4,6 +4,7 @@ import axios from "axios";
 import GoalCard from "./GoalCard";
 import "@styles/goal/goalList.scss";
 
+
 const GoalList = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
@@ -26,7 +27,7 @@ const GoalList = () => {
 
     // ✅ 목표 리스트 불러오는 함수
     const fetchGoals = useCallback(async (page = 0, reset = false) => {
-        if (isFetching || !hasMore) return; // ✅ 불필요한 요청 방지
+        if (isFetching || !hasMore) return;
 
         setIsFetching(true);
 
@@ -40,18 +41,17 @@ const GoalList = () => {
                 },
             });
 
-            console.log("📌 서버 응답 데이터:", response.data);
-
             if (!response.data || response.data.length === 0) {
-                setHasMore(false); // ✅ 더 이상 데이터가 없으면 hasMore을 false로 설정
+                setHasMore(false);
             } else {
-                setHasMore(response.data.length === 8); // ✅ 8개 미만이면 hasMore = false
+                setHasMore(response.data.length === 8);
                 setGoals(prevGoals => (reset ? response.data : [...prevGoals, ...response.data]));
             }
         } catch (error) {
             console.error("목표 리스트 불러오는 중 오류 발생:", error);
+            setHasMore(false); // ✅ 요청 실패 시 더 이상 데이터 없음 처리
         } finally {
-            setIsFetching(false);
+            setIsFetching(false); // ✅ 요청 실패 여부와 상관없이 로딩 상태 해제
         }
     }, [hasMore, isFetching, selectedCategory, searchTerm]);
 
@@ -139,7 +139,9 @@ const GoalList = () => {
                         </div>
                     ))
                 ) : (
-                    <p className="text-center">검색 결과가 없습니다.</p>
+                    <p className="text-center">
+                        {searchTerm || selectedCategory ? "검색 결과가 없습니다." : "목표 목록이 없습니다."}
+                    </p>
                 )}
             </div>
 
@@ -147,6 +149,7 @@ const GoalList = () => {
             <div ref={observer} style={{ height: "10px", margin: "20px 0" }} />
 
             {isFetching && <p className="text-center">⏳ 로딩 중...</p>}
+
         </div>
     );
 };

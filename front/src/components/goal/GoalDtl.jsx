@@ -146,9 +146,9 @@ const GoalDtl = () => {
     }, []);
 
     // 인증하기
-    const onCertification = () => {
-        navigate("/cert");
-    };
+    const onCertification = useCallback(() => {
+        navigate(`/cert/${goalid}`);
+    }, []);
 
     // 데이터 없는 경우 로딩창
     if (!goalData) {

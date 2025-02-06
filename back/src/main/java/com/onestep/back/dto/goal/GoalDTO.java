@@ -30,7 +30,6 @@ public class GoalDTO {
     private LocalDate endDate;
     private Long categoryId;
     private Long participants;
-    private Long currentParticipants; // ✅ 현재 참가 인원
     private List<MemberDTO> members; // ✅ 현재 참가 인원 리스트
     private Long chatId;
 
