@@ -15,8 +15,11 @@ const MemberDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [validationError, setValidationError] = useState(null);
+  const [currentPassword, setCurrentPassword] = useState(""); // 현재 비밀번호
+  const [newPassword, setNewPassword] = useState(""); // 새 비밀번호
+  const [confirmPassword, setConfirmPassword] = useState(""); // 새 비밀번호 확인
   const navigate = useNavigate();
-  const SERVER_URL = "http://localhost:8080";
+  const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
   // 오늘 날짜 계산
   const today = new Date().toISOString().split("T")[0];
@@ -24,7 +27,7 @@ const MemberDetail = () => {
   // 사용자 정보 가져오기
   const fetchMember = async () => {
     try {
-      const memberId = "user01"; // 로그인된 사용자 ID
+      const memberId = "user03"; // 로그인된 사용자 ID
       const response = await axios.get(`${SERVER_URL}/api/member/${memberId}`);
       setMember(response.data);
     } catch (error) {
@@ -50,8 +53,12 @@ const MemberDetail = () => {
     if (!member.phone.trim() || !/^\d{3}-\d{3,4}-\d{4}$/.test(member.phone)) {
       return "전화번호는 000-0000-0000 형식으로 입력해주세요.";
     }
-    if (member.birth && new Date(member.birth) > new Date()) {
-      return "생년월일은 오늘 날짜를 초과할 수 없습니다.";
+    if (member.birth && new Date(member.birth) > new Date()) 
+    if (newPassword && newPassword.length < 8) {
+      return "새 비밀번호는 최소 8자 이상이어야 합니다.";
+    }
+    if (newPassword !== confirmPassword) {
+      return "변경할 비밀번호와 비밀번호 확인이 일치하지 않습니다.";
     }
     return null; // 유효성 검사를 통과한 경우
   };
@@ -66,7 +73,11 @@ const MemberDetail = () => {
 
     setValidationError(null); // 이전 에러 초기화
     try {
-      await axios.put(`${SERVER_URL}/api/member/update`, member);
+      await axios.put(`${SERVER_URL}/api/member/update`, {
+        ...member,
+        currentPassword, // 기존 비밀번호
+        newPassword, // 새 비밀번호
+      });
       alert("회원 정보가 성공적으로 수정되었습니다.");
       navigate("/mypage"); // 수정 성공 시 마이페이지로 이동
     } catch (error) {
@@ -93,7 +104,7 @@ const MemberDetail = () => {
 
   return (
     <Container>
-      <h1>정보 수정</h1>
+      <h3 className="my-4">
       {validationError && <Alert variant="danger">{validationError}</Alert>}
       <Form>
         <Form.Group className="mb-3">
@@ -143,14 +154,20 @@ const MemberDetail = () => {
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Check
-            type="checkbox"
-            name="social"
-            label="소셜 로그인 여부"
-            checked={member.social}
-            onChange={(e) =>
-              setMember({ ...member, social: e.target.checked })
-            }
+          <Form.Label>비밀번호 변경</Form.Label>
+          <Form.Control
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label>비밀번호 확인</Form.Label>
+          <Form.Control
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </Form.Group>
 
@@ -158,6 +175,7 @@ const MemberDetail = () => {
           저장하기
         </Button>
       </Form>
+      </h3>
     </Container>
   );
 };
