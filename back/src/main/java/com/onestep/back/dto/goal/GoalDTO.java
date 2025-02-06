@@ -34,4 +34,6 @@ public class GoalDTO {
     private Long chatId;
 
     private MultipartFile file; // 업로드된 파일
+
+
 }
