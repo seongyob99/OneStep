@@ -52,6 +52,7 @@ public class MemberServiceImpl implements MemberService {
         Members member = memberRepository.findById(memberDTO.getMemberId())
                 .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
         member.updateMember(memberDTO);
+        member.changePassword(passwordEncoder.encode(memberDTO.getPassword()));
         memberRepository.save(member);
     }
 

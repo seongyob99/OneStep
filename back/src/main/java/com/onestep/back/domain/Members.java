@@ -60,7 +60,7 @@ public class Members extends BaseEntity {
     public void updateMember(MemberDTO memberDTO) {
         this.name = memberDTO.getName();
         this.email = memberDTO.getEmail();
-        this.password = memberDTO.getPassword(); // 암호화 필요
+//        this.password = memberDTO.getPassword(); // 암호화 필요
         this.phone = memberDTO.getPhone();
         this.birth = memberDTO.getBirth();
     }
