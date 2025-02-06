@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AutoSizer, Grid } from "react-virtualized";
@@ -12,8 +12,9 @@ const GoalList = () => {
     const [selectedCategory, setSelectedCategory] = useState("");
     const [categories, setCategories] = useState([]);
     const [goals, setGoals] = useState([]);
+    const [columnCount, setColumnCount] = useState(4); // ✅ columnCount 상태 저장
+    const gridRef = useRef(null); // ✅ Grid 리렌더링 강제 업데이트용 ref
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -29,9 +30,7 @@ const GoalList = () => {
                 title: searchKeyword || undefined,
             },
         })
-            .then(response => {
-                setGoals(response.data);
-            })
+            .then(response => setGoals(response.data))
             .catch(error => console.error("목표 리스트 불러오는 중 오류 발생:", error));
     }, [selectedCategory, searchKeyword]);
 
@@ -39,8 +38,18 @@ const GoalList = () => {
         setSearchKeyword(searchTerm);
     };
 
-    // ✅ 한 줄에 표시할 카드 개수
-    const columnCount = 4;
+    // ✅ 화면 크기 변경될 때 `columnCount` 유지하도록 설정
+    const updateColumnCount = useCallback((width) => {
+        const cardMaxWidth = 200;
+        const newColumnCount = Math.max(1, Math.min(4, Math.floor(width / cardMaxWidth)));
+
+        if (newColumnCount !== columnCount) {
+            setColumnCount(newColumnCount);
+            if (gridRef.current) {
+                gridRef.current.forceUpdateGrid(); // ✅ 강제 리렌더링
+            }
+        }
+    }, [columnCount]);
 
     // ✅ 개별 목표 렌더링 함수
     const cellRenderer = ({ columnIndex, rowIndex, key, style }) => {
@@ -98,15 +107,16 @@ const GoalList = () => {
                     {goals.length > 0 ? (
                         <AutoSizer disableHeight>
                             {({ width }) => {
-                                const cardMaxWidth = 200; // ✅ 카드 크기
-                                const columnCount = Math.max(1, Math.min(4, Math.floor(width / cardMaxWidth))); // ✅ 최소 1개, 최대 4개 유지
+                                updateColumnCount(width); // ✅ 화면 크기 변경될 때 columnCount 업데이트
+
                                 const columnWidth = Math.floor(width / columnCount);
-                                const rowCount = Math.max(1, Math.ceil(goals.length / columnCount)); // ✅ 최소 1개 이상 유지
-                                const rowHeight = 400; // ✅ 카드 높이 일정하게 유지
+                                const rowCount = Math.ceil(goals.length / columnCount); // ✅ 정확한 rowCount 계산
+                                const rowHeight = 400;
 
                                 return (
                                     <Grid
-                                        key={`${width}-${goals.length}`}  // ✅ key 값 추가하여 리렌더링 시 데이터 유지
+                                        ref={gridRef} // ✅ Grid 리렌더링 시 강제 업데이트 가능하도록 참조 저장
+                                        key={width}  // ✅ `width` 변경될 때마다 강제 리렌더링
                                         width={width}
                                         height={rowCount * rowHeight + 20}
                                         columnWidth={columnWidth}
