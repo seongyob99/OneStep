@@ -23,8 +23,90 @@
     }
   }
 
-
+  .month-calendar {
+    display: flex;
+    flex-wrap: nowrap; // ✅ 줄 바꿈 방지
+    overflow-x: auto; // ✅ 가로 스크롤 추가
+    white-space: nowrap; // ✅ 줄 바꿈 방지
+    justify-content: flex-start; // ✅ 좌측 정렬 (중앙 정렬을 원하면 center)
+    gap: 4px; // ✅ 간격 조정
+    padding: 10px 0;
+    margin-bottom: 10px;
   
+    .day {
+      display: inline-block;
+      min-width: 30px; // ✅ 날짜 크기 조정 (더 줄여도 가능)
+      padding: 5px 8px; // ✅ 여백 줄이기
+      font-size: 12px; // ✅ 글씨 크기 줄이기
+      text-align: center;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+  
+      &:hover {
+        background-color: #f0f0f0;
+      }
+    }
+  
+    .selected-day {
+      background-color: #007bff;
+      color: #fff;
+      border-color: #007bff;
+    }
+  }
+  
+  .month-selector {
+    position: relative;
+    display: inline-block;
+  }
+  
+  // .month-dropdown {
+  //   position: absolute;
+  //   background: white;
+  //   border: 1px solid #ccc;
+  //   padding: 5px;
+  //   z-index: 1000;
+  //   width: 80px;
+  // }
+  
+  // .month-option {
+  //   padding: 5px;
+  //   cursor: pointer;
+  // }
+  
+  // .month-option:hover {
+  //   background: #f0f0f0;
+  // }
+  
+  .month-dropdown {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 1000;
+    width: 200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); // ✅ 3개씩 배치
+    gap: 10px; // ✅ 간격 추가
+  }
+  
+  .month-option {
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    // background: #f8f9fa;
+    border-radius: 5px;
+  }
+  
+  .month-option:hover {
+    background: #e9ecef;
+  }
+  
+
   .date-navigation {
     display: flex;
     justify-content: space-between; 
