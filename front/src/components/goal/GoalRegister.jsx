@@ -305,13 +305,14 @@ const GoalRegister = () => {
                         ref={fileInputRef}
                         onChange={onFileChange}
                     />
-
                     {form.file && (
-                        <div className="mt-2">
-                            <p>{form.file.name}</p>
-                            <button type="button" className="btn btn-danger btn-sm" onClick={handleFileCancel}>
-                                취소
-                            </button>
+                        <div className="mt-2 d-flex">
+                            <p>
+                                {form.file.name}
+                                <button type="button" className="btn btn-danger ml-2" onClick={handleFileCancel}>
+                                    취소
+                                </button>
+                            </p>
                         </div>
                     )}
                 </div>
