@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import CertModal from "./CertModal";
@@ -21,6 +21,7 @@ const CalendarNavigator = ({ onDateClick }) => {
   const [selectedFilePath, setSelectedFilePath] = useState(""); // ✅ 선택된 파일 경로
 
   const goalid = useParams().goalid;
+  const selectedDayRef = useRef(null);
 
 
   // 날짜 포맷 (yy-mm-dd)
@@ -55,6 +56,9 @@ const CalendarNavigator = ({ onDateClick }) => {
     setSelectedDate((prevDate) => {
       const newDate = new Date(prevDate);
       newDate.setDate(newDate.getDate() + days);
+
+      setSelectedMonth(newDate.getMonth() + 1);
+
       return newDate;
     });
   };
@@ -93,10 +97,12 @@ const CalendarNavigator = ({ onDateClick }) => {
     }
   }, [goalid, selectedDate]);
 
-  // 컴포넌트가 처음 렌더링될 때 실행
-  useEffect(() => {
-    fetchCertifications();
-  }, [fetchCertifications]);
+  // // 컴포넌트가 처음 렌더링될 때 실행
+  // useEffect(() => {
+  //   fetchCertifications();
+  // }, [fetchCertifications]); //selectedDate가 변경될 때 실행
+
+
 
   const showImageModal = (imageUrl, user, filePath) => {
     setSelectedImage(imageUrl);
@@ -105,15 +111,12 @@ const CalendarNavigator = ({ onDateClick }) => {
     setShowModal(true);
   };
 
-  // 날짜 클릭 시 해당 날짜로 이동하는 함수
-  // const handleDayClick = (day) => {
-  //   const newSelectedDate = new Date(selectedDate);
-  //   newSelectedDate.setDate(day); // ✅ 선택한 날짜로 변경
-  //   setSelectedDate(newSelectedDate); // ✅ 상태 업데이트
-
-  //   if (onDateClick) {
-  //     onDateClick(formatDate(newSelectedDate)); // ✅ 부모 컴포넌트에 변경된 날짜 전달
-  //   }
+  useEffect(() => {
+    fetchCertifications();
+    if (selectedDayRef.current) {
+      selectedDayRef.current.scrollIntoView({ behavior: "smooth", inline: "center" });
+    }
+  }, [fetchCertifications, selectedDate]); 
 
   return (
     <div className="calendar-navigator">
@@ -138,15 +141,29 @@ const CalendarNavigator = ({ onDateClick }) => {
       </div>
       {/* ----------------------------------------------- */}
       {/* 해당 월의 달력 */}
-      <div className="month-calendar">
+      {/* <div className="month-calendar" >
         {getDaysInMonth(selectedDate.getFullYear(), selectedMonth).map((day) => (
           <span
             key={day}
             className={selectedDate.getDate() === day ? "day selected-day" : "day"}
             onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedMonth - 1, day))}
+            
           >
             {day}
           </span>
+        ))}
+      </div> */}
+
+<div className="month-calendar">
+      {getDaysInMonth(selectedDate.getFullYear(), selectedMonth).map((day) => (
+        <span
+          key={day}
+          ref={selectedDate.getDate() === day ? selectedDayRef : null} // ✅ 선택된 날짜에만 ref 적용
+          className={selectedDate.getDate() === day ? "day selected-day" : "day"}
+          onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedMonth - 1, day))}
+        >
+          {day}
+        </span>
         ))}
       </div>
       {/* ----------------------------------------------- */}
@@ -157,8 +174,13 @@ const CalendarNavigator = ({ onDateClick }) => {
           <span
             key={index}
             className={date.toDateString() === selectedDate.toDateString() ? "selected-date" : ""}
+            // onClick={() => {
+            //   setSelectedDate(date);
+            //   if (onDateClick) onDateClick(formatDate(date));
+            // }}
             onClick={() => {
               setSelectedDate(date);
+              setSelectedMonth(date.getMonth() + 1); // ✅ 월도 같이 변경
               if (onDateClick) onDateClick(formatDate(date));
             }}
           >
