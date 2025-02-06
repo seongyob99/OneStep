@@ -15,7 +15,7 @@ const Layout = () => {
                     </div>
                     <div className="header-right">
                         <div className="chat" onClick={() => navigate("/chat")}><BiSolidMessage /></div>
-                        <button className="login-btn" onClick={() => navigate("/member/login")}>로그인</button>
+                        <button className="login-btn">로그인</button>
                     </div>
                 </Container>
             </header>
@@ -25,11 +25,17 @@ const Layout = () => {
             </main>
 
             <footer className="footer">
-                <div className="footer-content">
-                    <div><PiCopyrightBold /> 2025 ONESTEP. All Rights Reserved.</div>
-                    <div>Address : Busan IT Training Center, Room 501</div>
-                    <div>GIT : https://github.com/dltkdgus3769/OneStep</div>
-                </div>
+                <Container>
+                    <div className="footer-content">
+                        <div className="footer-left">
+                            <p><PiCopyrightBold /> 2025 ONESTEP. All Rights Reserved.</p>
+                        </div>
+                        <div className="footer-right">
+                            <p>GIT : https://github.com/dltkdgus3769/OneStep</p>
+                            <p>Address : Busan IT Training Center, Room 501</p>
+                        </div>
+                    </div>
+                </Container>
             </footer>
         </div>
     );
