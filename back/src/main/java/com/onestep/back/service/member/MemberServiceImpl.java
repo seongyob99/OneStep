@@ -1,6 +1,8 @@
 package com.onestep.back.service.member;
 
 import com.onestep.back.domain.Certifications;
+import com.onestep.back.domain.Chats;
+import com.onestep.back.domain.Goals;
 import com.onestep.back.domain.Members;
 import com.onestep.back.dto.member.MemberDTO;
 import com.onestep.back.repository.member.MemberRepository;
@@ -47,53 +49,44 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void updateMember(String memberId, MemberDTO memberDTO) {
-        Members member = memberRepository.findById(memberId)
+        Members member = memberRepository.findById(memberDTO.getMemberId())
                 .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
-
-        // 기존 데이터 유지 및 변경 데이터 적용
-        if (memberDTO.getName() != null) {
-            member.setName(memberDTO.getName());
-        }
-        if (memberDTO.getEmail() != null) {
-            member.setEmail(memberDTO.getEmail());
-        }
-        if (memberDTO.getPhone() != null) {
-            member.setPhone(memberDTO.getPhone());
-        }
-        if (memberDTO.getBirth() != null) {
-            member.setBirth(memberDTO.getBirth());
-        }
-        if (memberDTO.getPassword() != null) {
-            member.setPassword(passwordEncoder.encode(memberDTO.getPassword()));
-        }
-
+        member.updateMember(memberDTO);
         memberRepository.save(member);
     }
 
     @Override
     public void deleteMember(String memberId) {
-        // 1. 회원 조회
-        Members member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
+        try {
+            // 1. 회원 조회
+            Members member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다: " + memberId));
 
-        // 2. 회원의 모든 인증 데이터 삭제 (이미지 포함)
-        List<Certifications> certifications = certificationsRepository.findByMemberMemberId(memberId);
-        for (Certifications cert : certifications) {
-            if (cert.getFilePath() != null) {
-                String filePath = uploadPath + File.separator + cert.getFilePath();
-                File file = new File(filePath);
-                if (file.exists()) {
-                    file.delete(); // 파일 삭제
+            // 2. 인증 데이터 삭제
+            List<Certifications> certifications = certificationsRepository.findByMemberMemberId(memberId);
+            certifications.forEach(cert -> {
+                if (cert.getFilePath() != null) {
+                    String filePath = uploadPath + File.separator + cert.getFilePath();
+                    File file = new File(filePath);
+                    if (file.exists()) file.delete(); // 파일 삭제
                 }
+            });
+
+            // 3. 회원이 참여 중인 목표와의 연관 관계 삭제
+            List<Goals> participatedGoals = member.getGoals();
+            participatedGoals.forEach(goal -> {
+                goal.getMembers().remove(member); // 목표에서 회원 제거
+            });
+
+            List<Chats> chats = member.getChats();
+            for (Chats chat : chats) {
+                chat.getMembers().remove(member); // 본인만 제거
             }
+            // 4. 회원 삭제
+            memberRepository.delete(member);
+        } catch (Exception e) {
+            throw new RuntimeException("회원 삭제 중 오류 발생: " + e.getMessage(), e);
         }
-        certificationsRepository.deleteAll(certifications);
-
-        // 3. 회원이 관리하는 목표 삭제
-        member.getDelGoals().forEach(goal -> goalRepository.delete(goal));
-
-        // 4. 회원 삭제
-        memberRepository.delete(member);
     }
 
 

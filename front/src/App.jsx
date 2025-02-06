@@ -12,6 +12,7 @@ import ChatRoom from './components/chat/ChatRoom';
 import JoinForm from './components/member/JoinForm';
 import MyPage from './components/member/MyPage';
 import MemberDetail from './components/member/MemberDetail';
+import MyPage from './components/member/MyPage';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/chat" element={<ChatPage />}>
           <Route path=":chatId" element={<ChatRoom />} />
         </Route>
+        <Route path="/mypage" element={< MyPage />} />
       </Route>
     </Routes>
 
