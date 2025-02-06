@@ -17,7 +17,7 @@ const Layout = () => {
                         <div className="chat" onClick={() => navigate("/chat")}><BiSolidMessage />
                             <span>chat</span>
                         </div>
-                        <button className="login-btn">로그인</button>
+                        <button className="login-btn" onClick={() => navigate("/member/login")}>로그인</button>
                     </div>
                 </Container>
             </header>
