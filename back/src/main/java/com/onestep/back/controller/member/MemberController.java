@@ -1,5 +1,6 @@
 package com.onestep.back.controller.member;
 
+import com.onestep.back.dto.goal.GoalDTO;
 import com.onestep.back.dto.member.MemberDTO;
 import com.onestep.back.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -45,8 +46,8 @@ public class MemberController {
 
 
     @GetMapping("/{memberId}/goals")
-    public ResponseEntity<List<String>> getMemberGoals(@PathVariable String memberId) {
-        List<String> goals = memberService.getMemberGoals(memberId);
+    public ResponseEntity<List<GoalDTO>> getMemberGoals(@PathVariable String memberId) {
+        List<GoalDTO> goals = memberService.getMemberGoals(memberId);
         return ResponseEntity.ok(goals);
     }
 }
