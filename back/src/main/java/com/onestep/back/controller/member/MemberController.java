@@ -24,6 +24,7 @@ public class MemberController {
 
     @PutMapping("/update")
     public ResponseEntity<String> updateMember(@RequestBody MemberDTO memberDTO) {
+        log.info("Update member: {}", memberDTO);
         memberService.updateMember(memberDTO.getMemberId(), memberDTO);
         return ResponseEntity.ok("회원 정보가 수정되었습니다.");
     }
