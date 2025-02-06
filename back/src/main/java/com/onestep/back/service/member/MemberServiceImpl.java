@@ -99,8 +99,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberDTO join(MemberDTO memberDTO) throws MidExistException {
-        String mid = memberDTO.getMemberId();
-        boolean exist = memberRepository.existsById(mid);
+        String memberId = memberDTO.getMemberId();
+        boolean exist = memberRepository.existsById(memberId);
         if (exist) {
             throw new MidExistException();
         }
