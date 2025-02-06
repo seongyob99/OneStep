@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Button, Form, Alert } from "react-bootstrap";
-import "../../styles/member/JoinForm.scss";
+import { Container, Button, Form, Alert } from "react-bootstrap";
+import "@styles/member/JoinForm.scss";
 
 const JoinForm = () => {
   const navigate = useNavigate();
@@ -112,142 +112,144 @@ const JoinForm = () => {
   };
 
   return (
-    <div className="join-form-container">
-      <h2>회원가입</h2>
-      {responseMessage && (
-        <Alert variant={isError ? "danger" : "success"}>{responseMessage}</Alert>
-      )}
+    <Container>
+      <div className="join-form-container">
+        <h3>회원가입</h3>
+        {responseMessage && (
+          <Alert variant={isError ? "danger" : "success"}>{responseMessage}</Alert>
+        )}
 
-      <Form>
-        <div className="form-group">
-          <label className="form-label">회원 ID</label>
-          <Form.Control
-            type="text"
-            name="memberId"
-            value={formData.memberId}
-            onChange={handleInputChange}
-            isInvalid={!!errors.memberId}
-            placeholder="아이디를 입력하세요"
-            required
-          />
-          {errors.memberId && <div className="error-text">{errors.memberId}</div>}
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">이름</label>
-          <Form.Control
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            isInvalid={!!errors.name}
-            placeholder="이름을 입력하세요"
-            required
-          />
-          {errors.name && <div className="error-text">{errors.name}</div>}
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">이메일</label>
-          <Form.Control
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            isInvalid={!!errors.email}
-            placeholder="이메일을 입력하세요"
-            required
-          />
-          {errors.email && <div className="error-text">{errors.email}</div>}
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">비밀번호</label>
-          <Form.Control
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            isInvalid={!!errors.password}
-            placeholder="비밀번호를 입력하세요"
-            required
-          />
-          {errors.password && <div className="error-text">{errors.password}</div>}
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">비밀번호 확인</label>
-          <Form.Control
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
-            isInvalid={!!errors.confirmPassword}
-            placeholder="비밀번호를 다시 입력하세요"
-            required
-          />
-          {errors.confirmPassword && <div className="error-text">{errors.confirmPassword}</div>}
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">전화번호</label>
-          <Form.Control
-            type="text"
-            name="phone"
-            value={formData.phone}
-            onChange={handleInputChange}
-            isInvalid={!!errors.phone}
-            placeholder="010-1234-5678"
-            required
-          />
-          {errors.phone && <div className="error-text">{errors.phone}</div>}
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">생년월일</label>
-          <Form.Control
-            type="date"
-            name="birth"
-            value={formData.birth}
-            onChange={handleInputChange}
-            isInvalid={!!errors.birth}
-            required
-          />
-          {errors.birth && <div className="error-text">{errors.birth}</div>}
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">성별</label>
-          <div>
-            <input
-              type="radio"
-              id="male"
-              name="sex"
-              value="M"
-              checked={formData.sex === "M"}
+        <Form>
+          <div className="form-group">
+            <label className="form-label">회원 ID</label>
+            <Form.Control
+              type="text"
+              name="memberId"
+              value={formData.memberId}
               onChange={handleInputChange}
+              isInvalid={!!errors.memberId}
+              placeholder="아이디를 입력하세요"
+              required
             />
-            <label htmlFor="male" className="ml-2">남성</label>
-
-            <input
-              type="radio"
-              id="female"
-              name="sex"
-              value="F"
-              checked={formData.sex === "F"}
-              onChange={handleInputChange}
-              className="ml-4"
-            />
-            <label htmlFor="female" className="ml-2">여성</label>
+            {errors.memberId && <div className="error-text">{errors.memberId}</div>}
           </div>
-          {errors.sex && <div className="error-text">{errors.sex}</div>}
-        </div>
 
-        <Button variant="primary" className="mt-3 w-100" onClick={handleRegisterClick}>
-          회원가입
-        </Button>
-      </Form>
-    </div>
+          <div className="form-group">
+            <label className="form-label">이름</label>
+            <Form.Control
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              isInvalid={!!errors.name}
+              placeholder="이름을 입력하세요"
+              required
+            />
+            {errors.name && <div className="error-text">{errors.name}</div>}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">이메일</label>
+            <Form.Control
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              isInvalid={!!errors.email}
+              placeholder="이메일을 입력하세요"
+              required
+            />
+            {errors.email && <div className="error-text">{errors.email}</div>}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">비밀번호</label>
+            <Form.Control
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              isInvalid={!!errors.password}
+              placeholder="비밀번호를 입력하세요"
+              required
+            />
+            {errors.password && <div className="error-text">{errors.password}</div>}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">비밀번호 확인</label>
+            <Form.Control
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
+              isInvalid={!!errors.confirmPassword}
+              placeholder="비밀번호를 다시 입력하세요"
+              required
+            />
+            {errors.confirmPassword && <div className="error-text">{errors.confirmPassword}</div>}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">전화번호</label>
+            <Form.Control
+              type="text"
+              name="phone"
+              value={formData.phone}
+              onChange={handleInputChange}
+              isInvalid={!!errors.phone}
+              placeholder="010-1234-5678"
+              required
+            />
+            {errors.phone && <div className="error-text">{errors.phone}</div>}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">생년월일</label>
+            <Form.Control
+              type="date"
+              name="birth"
+              value={formData.birth}
+              onChange={handleInputChange}
+              isInvalid={!!errors.birth}
+              required
+            />
+            {errors.birth && <div className="error-text">{errors.birth}</div>}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">성별</label>
+            <div>
+              <input
+                type="radio"
+                id="male"
+                name="sex"
+                value="M"
+                checked={formData.sex === "M"}
+                onChange={handleInputChange}
+              />
+              <label htmlFor="male" className="ml-2">남성</label>
+
+              <input
+                type="radio"
+                id="female"
+                name="sex"
+                value="F"
+                checked={formData.sex === "F"}
+                onChange={handleInputChange}
+                className="ml-4"
+              />
+              <label htmlFor="female" className="ml-2">여성</label>
+            </div>
+            {errors.sex && <div className="error-text">{errors.sex}</div>}
+          </div>
+
+          <Button variant="primary" className="mt-3 w-100" onClick={handleRegisterClick}>
+            회원가입
+          </Button>
+        </Form>
+      </div>
+    </Container>
   );
 };
 
