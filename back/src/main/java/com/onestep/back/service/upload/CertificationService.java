@@ -3,6 +3,7 @@ package com.onestep.back.service.upload;
 
 import com.onestep.back.domain.Certifications;
 import com.onestep.back.dto.upload.CertificationsDTO;
+import org.springframework.beans.factory.annotation.Value;
 
 
 import java.time.LocalDate;
@@ -10,6 +11,11 @@ import java.util.List;
 
 
 public interface CertificationService {
+
+    @Value("${com.onestep.server.url}") // ✅ 서버 URL을 인터페이스에서 사용할 경우 static final로 정의
+    String serverUrl = "http://localhost:8080"; // ⚠ 환경 변수를 직접 사용할 수 없으므로 기본값 설정 필요
+
+
     // 인증사진 등록 /오늘만
     void register(CertificationsDTO dto);
 
@@ -23,8 +29,9 @@ public interface CertificationService {
     void delete(Long goalId, String targetMemberId, LocalDate certDate, String currentMemberId);
 
     // 특정 목표에 해당하는 전체 인증 목록 조회 (날짜 내림차순 정렬) /
-    List<CertificationsDTO> listByGoal(Long goalId);
+//    List<CertificationsDTO> listByGoal(Long goalId);
 
+    List<CertificationsDTO> listByGoalAndDate(Long goalId, LocalDate certDate);
     // Entity > DTO
     default CertificationsDTO entityToDto(Certifications certification) {
         return CertificationsDTO.builder()

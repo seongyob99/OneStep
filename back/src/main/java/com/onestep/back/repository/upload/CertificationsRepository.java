@@ -48,6 +48,11 @@ public interface CertificationsRepository extends JpaRepository<Certifications, 
     @Query("SELECT c FROM Certifications c WHERE c.goal.goalId = :goalId ORDER BY c.regDate DESC")
     List<Certifications> findRecentCertificationsByGoalId(@Param("goalId") Long goalId, Pageable pageable);
 
+    @Query("SELECT c FROM Certifications c WHERE c.goal.goalId = :goalId AND c.certDate = :certDate")
+    List<Certifications> findByGoalIdAndCertDate(@Param("goalId") Long goalId, @Param("certDate") LocalDate certDate);
     // 내보내기, 그만두기 시 삭제할 인증 기록 조회
     List<Certifications> findByGoalGoalIdAndMemberMemberId(Long goalId, String memberId);
+    // 회원 탈퇴시, 모든 인증 기록 조회
+    List<Certifications> findByMemberMemberId(String memberId);
+
 }

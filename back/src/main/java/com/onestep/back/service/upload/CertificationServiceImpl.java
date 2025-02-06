@@ -94,6 +94,35 @@ public class CertificationServiceImpl implements CertificationService {
                 .build();
         certificationsRepository.save(updated);
     }
+//
+//    @Override
+//    public void delete(Long goalId, String targetMemberId, LocalDate certDate, String currentMemberId) {
+//        // 목표 조회
+//        Goals goal = goalsRepository.findById(goalId)
+//                .orElseThrow(() -> new RuntimeException("목표를 찾을 수 없습니다."));
+//        // 인증사진 업로드한 멤버 조회
+//        Members targetMember = membersRepository.findById(targetMemberId)
+//                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+//
+//        CertificationId cid = new CertificationId(goal.getGoalId(), targetMember.getMemberId(), certDate);
+//        Certifications certification = certificationsRepository.findById(cid)
+//                .orElseThrow(() -> new RuntimeException("인증 정보를 찾을 수 없습니다."));
+//
+//        // 오늘날짜 인증사진만 삭제하는 조건
+//        if (!certification.getCertDate().equals(LocalDate.now())) {
+//            throw new RuntimeException("오늘의 인증만 삭제할 수 있습니다.");
+//        }
+//
+//        // 업로드한 본인과 목표 방장만 삭제 가능하도록 권한 체크
+//        if (!currentMemberId.equals(targetMember.getMemberId()) &&
+//                !currentMemberId.equals(goal.getAdminMember().getMemberId())) {
+//            throw new RuntimeException("삭제 권한이 없습니다.");
+//        }
+//
+//        certificationsRepository.delete(certification);
+//    }
+
+
 
     @Override
     public void delete(Long goalId, String targetMemberId, LocalDate certDate, String currentMemberId) {
@@ -122,10 +151,19 @@ public class CertificationServiceImpl implements CertificationService {
         certificationsRepository.delete(certification);
     }
 
-    @Override
-    public List<CertificationsDTO> listByGoal(Long goalId) {
-        List<Certifications> list = certificationsRepository.findByGoal_Id(goalId);
-        return list.stream().map(this::entityToDto).collect(Collectors.toList());
+
+//    @Override
+//    public List<CertificationsDTO> listByGoal(Long goalId) {
+//        List<Certifications> list = certificationsRepository.findByGoal_Id(goalId);
+//        return list.stream().map(this::entityToDto).collect(Collectors.toList());
+//    }
+
+    public List<CertificationsDTO> listByGoalAndDate(Long goalId, LocalDate certDate) {
+        List<Certifications> list = (certDate != null) ?
+                certificationsRepository.findByGoalIdAndCertDate(goalId, certDate) :
+                certificationsRepository.findByGoal_Id(goalId);
+
+        return list.stream().map(this::entityToDto).collect(Collectors.toList()); // ✅ 인터페이스의 default 메서드 호출
     }
 
 }

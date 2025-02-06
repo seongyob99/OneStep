@@ -1,5 +1,6 @@
 package com.onestep.back.domain;
 
+import com.onestep.back.dto.member.MemberDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +10,6 @@ import java.util.List;
 @Entity
 @Table(name = "members")
 @Getter
-@Setter
 @ToString(exclude = {"chats", "goals", "certifications"})
 @NoArgsConstructor
 @AllArgsConstructor
@@ -52,7 +52,20 @@ public class Members extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Certifications> certifications;
 
+
     public void changePassword(String password) {
         this.password = password;
     }
+
+    public void updateMember(MemberDTO memberDTO) {
+        this.name = memberDTO.getName();
+        this.email = memberDTO.getEmail();
+        this.password = memberDTO.getPassword(); // 암호화 필요
+        this.phone = memberDTO.getPhone();
+        this.birth = memberDTO.getBirth();
+    }
+
+
+
+
 }
