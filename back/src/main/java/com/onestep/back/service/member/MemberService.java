@@ -1,5 +1,6 @@
 package com.onestep.back.service.member;
 
+import com.onestep.back.dto.goal.GoalDTO;
 import com.onestep.back.dto.member.MemberDTO;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface MemberService {
 
     void deleteMember(String memberId);
 
-    List<String> getMemberGoals(String memberId);
+    List<GoalDTO> getMemberGoals(String memberId);
 
 }
 

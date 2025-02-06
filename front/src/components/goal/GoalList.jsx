@@ -106,6 +106,7 @@ const GoalList = () => {
 
                                 return (
                                     <Grid
+                                        key={`${width}-${goals.length}`}  // ✅ key 값 추가하여 리렌더링 시 데이터 유지
                                         width={width}
                                         height={rowCount * rowHeight + 20}
                                         columnWidth={columnWidth}

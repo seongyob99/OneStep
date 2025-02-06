@@ -22,4 +22,5 @@ public class MemberDTO {
     private LocalDate birth;
     private String sex;
     private boolean social;
+
 }
