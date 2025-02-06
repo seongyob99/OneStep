@@ -6,7 +6,7 @@
   background: #fff; 
   border-radius: 8px;
   // box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
-  max-width: 800px;
+  max-width: 1000px;
   margin: 20px auto; 
 
   h2 {
@@ -24,7 +24,9 @@
   }
 
   .month-calendar {
-    display: flex;
+    // display: flex;
+    // justify-content: center;
+    // align-items: center;
     flex-wrap: nowrap; // ✅ 줄 바꿈 방지
     overflow-x: auto; // ✅ 가로 스크롤 추가
     white-space: nowrap; // ✅ 줄 바꿈 방지
@@ -34,6 +36,7 @@
     margin-bottom: 10px;
   
     .day {
+      
       display: inline-block;
       min-width: 30px; // ✅ 날짜 크기 조정 (더 줄여도 가능)
       padding: 5px 8px; // ✅ 여백 줄이기
@@ -49,6 +52,7 @@
     }
   
     .selected-day {
+      
       background-color: #007bff;
       color: #fff;
       border-color: #007bff;
@@ -199,9 +203,9 @@
         }
 
         .cert-image {
-          width: 48px;
-          height: 48px;
-          border-radius: 50%;
+          width: 100px;
+          height: 100px;
+          // border-radius: 50%;
           object-fit: cover;
         }
 
