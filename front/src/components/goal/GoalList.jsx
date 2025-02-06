@@ -48,7 +48,7 @@ const GoalList = () => {
         if (index >= goals.length) return null;
 
         return (
-            <div key={key} style={{ ...style, padding: "10px" }}>
+            <div key={key} style={{ ...style }}>
                 <GoalCard goal={goals[index]} />
             </div>
         );
@@ -98,20 +98,23 @@ const GoalList = () => {
                     {goals.length > 0 ? (
                         <AutoSizer disableHeight>
                             {({ width }) => {
-                                const columnWidth = Math.floor((width - 20) / columnCount);
-                                const rowCount = Math.ceil(goals.length / columnCount);
+                                const cardMaxWidth = 200; // ✅ 카드 크기
+                                const columnCount = Math.max(1, Math.min(4, Math.floor(width / cardMaxWidth))); // ✅ 최소 1개, 최대 4개 유지
+                                const columnWidth = Math.floor(width / columnCount);
+                                const rowCount = Math.max(1, Math.ceil(goals.length / columnCount)); // ✅ 최소 1개 이상 유지
+                                const rowHeight = 400; // ✅ 카드 높이 일정하게 유지
 
                                 return (
                                     <Grid
                                         width={width}
-                                        height={rowCount * 450} // ✅ 내부 스크롤 제거 (높이 자동 설정)
+                                        height={rowCount * rowHeight + 20}
                                         columnWidth={columnWidth}
-                                        rowHeight={450}
+                                        rowHeight={rowHeight}
                                         rowCount={rowCount}
                                         columnCount={columnCount}
                                         cellRenderer={cellRenderer}
                                         overscanRowCount={3}
-                                        style={{ outline: "none" }} // ✅ 내부 스크롤 제거
+                                        style={{ outline: "none" }}
                                     />
                                 );
                             }}

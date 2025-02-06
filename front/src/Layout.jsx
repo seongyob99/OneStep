@@ -14,8 +14,10 @@ const Layout = () => {
                         <img src="../src/assets/img/ONESTEP-logo.png" alt="ONESTEP Logo" />
                     </div>
                     <div className="header-right">
-                        <div className="chat" onClick={() => navigate("/chat")}><BiSolidMessage /></div>
-                        <button className="login-btn">로그인</button>
+                        <div className="chat" onClick={() => navigate("/chat")}><BiSolidMessage />
+                            <span>chat</span>
+                        </div>
+                        <button className="login-btn" onClick={() => navigate("/member/login")}>로그인</button>
                     </div>
                 </Container>
             </header>
@@ -30,10 +32,10 @@ const Layout = () => {
                         <div className="footer-left">
                             <p><PiCopyrightBold /> 2025 ONESTEP. All Rights Reserved.</p>
                         </div>
-                        <div className="footer-right">
+                        {/* <div className="footer-right">
                             <p>GIT : https://github.com/dltkdgus3769/OneStep</p>
                             <p>Address : Busan IT Training Center, Room 501</p>
-                        </div>
+                        </div> */}
                     </div>
                 </Container>
             </footer>
