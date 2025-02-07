@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Button, Modal, Form } from "react-bootstrap";
@@ -7,7 +7,7 @@ import "@styles/upload/certUpload.scss";
 // ✅ 환경 변수에서 API 서버 URL 가져오기
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-const CertUpload = () => {
+const CertUpload = ({}) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -47,6 +47,7 @@ const CertUpload = () => {
       console.log("업로드 성공:", response.data);
       handleClose(); // ✅ 업로드 후 모달 닫기
           //  onRefresh();
+          window.location.reload();
     } catch (error) {
       alert("업로드 실패: " + error.message);
       console.error("업로드 실패:", error);
@@ -54,6 +55,7 @@ const CertUpload = () => {
       setUploading(false);
     }
   };
+
 
   return (
     <div className="upload-container">

@@ -204,44 +204,46 @@ const JoinForm = () => {
             {errors.phone && <div className="error-text">{errors.phone}</div>}
           </div>
 
-          <div className="form-group">
-            <label className="form-label">생년월일</label>
-            <Form.Control
-              type="date"
-              name="birth"
-              value={formData.birth}
-              onChange={handleInputChange}
-              isInvalid={!!errors.birth}
-              required
-            />
-            {errors.birth && <div className="error-text">{errors.birth}</div>}
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">성별</label>
-            <div>
-              <input
-                type="radio"
-                id="male"
-                name="sex"
-                value="M"
-                checked={formData.sex === "M"}
+          <div className="form-group d-flex justify-content-between">
+            <div style={{ flex: 1, marginRight: '40px' }}>
+              <label className="form-label">생년월일</label>
+              <Form.Control
+                type="date"
+                name="birth"
+                value={formData.birth}
                 onChange={handleInputChange}
+                isInvalid={!!errors.birth}
+                required
               />
-              <label htmlFor="male" className="ml-2">남성</label>
-
-              <input
-                type="radio"
-                id="female"
-                name="sex"
-                value="F"
-                checked={formData.sex === "F"}
-                onChange={handleInputChange}
-                className="ml-4"
-              />
-              <label htmlFor="female" className="ml-2">여성</label>
+              {errors.birth && <div className="error-text">{errors.birth}</div>}
             </div>
-            {errors.sex && <div className="error-text">{errors.sex}</div>}
+
+            <div style={{ flex: 1 }}>
+              <label className="form-label">성별</label>
+              <div className="mt-2">
+                <input
+                  type="radio"
+                  id="male"
+                  name="sex"
+                  value="M"
+                  checked={formData.sex === "M"}
+                  onChange={handleInputChange}
+                />
+                <label htmlFor="male">남성</label>
+
+                <input
+                  type="radio"
+                  id="female"
+                  name="sex"
+                  value="F"
+                  checked={formData.sex === "F"}
+                  onChange={handleInputChange}
+                  className="ml-4"
+                />
+                <label htmlFor="female">여성</label>
+              </div>
+              {errors.sex && <div className="error-text">{errors.sex}</div>}
+            </div>
           </div>
 
           <Button variant="primary" className="mt-3 w-100" onClick={handleRegisterClick}>
