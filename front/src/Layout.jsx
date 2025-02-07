@@ -1,9 +1,10 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { useAuth } from "./components/context/AuthContext";  // AuthContext를 import
+import { useAuth } from "./components/context/AuthContext";
 import "@styles/Layout.scss";
 import { Container } from "react-bootstrap";
 import { BiSolidMessage } from "react-icons/bi";
 import { PiCopyrightBold } from "react-icons/pi";
+import { FaUserCircle } from "react-icons/fa"; // 마이페이지 아이콘 추가
 
 const Layout = () => {
     const navigate = useNavigate();
@@ -13,18 +14,31 @@ const Layout = () => {
         <div className="layout">
             <header className="header">
                 <Container>
-                    <div className="logo" onClick={() => navigate("/")}>
-                        <img src="../src/assets/img/ONESTEP-logo.png" alt="ONESTEP Logo" />
+                    <div className="logo-container">
+                        <div className="logo" onClick={() => navigate("/")}>
+                            <img src="../src/assets/img/ONESTEP-logo.png" alt="ONESTEP Logo" />
+                        </div>
                     </div>
+
                     <div className="header-right">
-                        <div className="chat" onClick={() => navigate("/chat")}><BiSolidMessage />
+                        {authState.isAuthenticated && (
+                            <div className="welcome-message">
+                                <span>환영합니다, {authState.user?.username || "사용자"}님!</span>
+                            </div>
+                        )}
+
+                        <div className="chat" onClick={() => navigate("/chat")}>
+                            <BiSolidMessage />
                             <span>chat</span>
                         </div>
 
+                        {/* 로그인 상태에 따른 버튼 */}
                         {authState.isAuthenticated ? (
                             <>
-                                {/* 로그인 상태에서 사용자 이름을 표시하고, 로그아웃 버튼을 추가 */}
-                                <span>환영합니다, {authState.user?.username || "사용자"}님!</span>
+                                <div className="mypage" onClick={() => navigate("/mypage")}>
+                                    <FaUserCircle size={24} />
+                                    <span>마이페이지</span>
+                                </div>
                                 <button className="login-btn" onClick={logout}>로그아웃</button>
                             </>
                         ) : (
@@ -44,10 +58,6 @@ const Layout = () => {
                         <div className="footer-left">
                             <p><PiCopyrightBold /> 2025 ONESTEP. All Rights Reserved.</p>
                         </div>
-                        {/* <div className="footer-right">
-                            <p>GIT : https://github.com/dltkdgus3769/OneStep</p>
-                            <p>Address : Busan IT Training Center, Room 501</p>
-                        </div> */}
                     </div>
                 </Container>
             </footer>
