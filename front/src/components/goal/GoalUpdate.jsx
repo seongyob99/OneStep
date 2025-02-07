@@ -15,7 +15,8 @@ const GoalUpdate = () => {
     const { authState } = useAuth();
     // username 가져오기
     const username = authState.user?.username;
-
+    const [isAuthLoaded, setIsAuthLoaded] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const [cateList, setCateList] = useState([]);
     const [noEndDate, setNoEndDate] = useState(false);
@@ -34,6 +35,20 @@ const GoalUpdate = () => {
         thumbnail: '',
         file: null
     });
+
+    useEffect(() => {
+        if (authState === undefined || authState === null) {
+            return;
+        }
+        setIsAuthLoaded(true);
+        setLoading(false);
+    }, [authState]);
+
+    useEffect(() => {
+        if (isAuthLoaded && !authState.isAuthenticated) {
+            navigate("/member/login", { replace: true });
+        }
+    }, [isAuthLoaded, authState.isAuthenticated, navigate]);
 
     // 카테고리 조회
     const getCate = useCallback(async () => {

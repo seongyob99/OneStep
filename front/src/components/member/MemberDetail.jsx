@@ -9,6 +9,7 @@ const MemberDetail = () => {
   const { authState } = useAuth();
   // username 가져오기
   const memberId = authState.user?.username;
+  const [isAuthLoaded, setIsAuthLoaded] = useState(false);
 
   const [member, setMember] = useState({
     memberId: "",
@@ -31,6 +32,20 @@ const MemberDetail = () => {
 
   // 오늘 날짜 계산
   const today = new Date().toISOString().split("T")[0];
+
+  useEffect(() => {
+    if (authState === undefined || authState === null) {
+      return;
+    }
+    setIsAuthLoaded(true);
+    setLoading(false);
+  }, [authState]);
+
+  useEffect(() => {
+    if (isAuthLoaded && !authState.isAuthenticated) {
+      navigate("/member/login", { replace: true });
+    }
+  }, [isAuthLoaded, authState.isAuthenticated, navigate]);
 
   // 사용자 정보 가져오기
   const fetchMember = async () => {

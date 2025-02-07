@@ -13,6 +13,8 @@ const GoalRegister = () => {
     const { authState } = useAuth();
     // username 가져오기
     const username = authState.user?.username;
+    const [isAuthLoaded, setIsAuthLoaded] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const [form, setForm] = useState({
         title: "",
@@ -30,6 +32,22 @@ const GoalRegister = () => {
     const navigate = useNavigate();
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     const fileInputRef = useRef(null);
+
+
+    useEffect(() => {
+        if (authState === undefined || authState === null) {
+            return;
+        }
+        setIsAuthLoaded(true);
+        setLoading(false);
+    }, [authState]);
+
+    useEffect(() => {
+        if (isAuthLoaded && !authState.isAuthenticated) {
+            navigate("/member/login", { replace: true });
+        }
+    }, [isAuthLoaded, authState.isAuthenticated, navigate]);
+
 
     useEffect(() => {
         axios.get(`${SERVER_URL}/categories`)
