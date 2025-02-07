@@ -45,7 +45,10 @@ const GoalUpdate = () => {
     }, [authState]);
 
     useEffect(() => {
-        if (isAuthLoaded && !authState.isAuthenticated) {
+        if (isAuthLoaded && authState.isAuthenticated) {
+            getCate();
+            getGoalInfo();
+        } else if (isAuthLoaded && !authState.isAuthenticated) {
             navigate("/member/login", { replace: true });
         }
     }, [isAuthLoaded, authState.isAuthenticated, navigate]);
@@ -77,11 +80,6 @@ const GoalUpdate = () => {
         } catch (err) {
             alert("상세정보를 가져오지 못했습니다.");
         }
-    }, []);
-
-    useEffect(() => {
-        getCate();
-        getGoalInfo();
     }, []);
 
     // onChange
