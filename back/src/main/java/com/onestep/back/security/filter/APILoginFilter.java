@@ -37,9 +37,7 @@ public class APILoginFilter extends UsernamePasswordAuthenticationFilter {
         try {
             Map<String, String> credentials = new ObjectMapper().readValue(request.getInputStream(), Map.class);
             String username = credentials.get("memberId");
-            log.info("username: " + username);
             String password = credentials.get("password");
-            log.info("password: " + password);
 
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(username, password);
@@ -63,8 +61,6 @@ public class APILoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String accessToken = jwtUtil.generateToken(claims, username, false);
         String refreshToken = jwtUtil.generateToken(claims, username, true);
-        log.info("refreshToken: " + refreshToken);
-
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);
