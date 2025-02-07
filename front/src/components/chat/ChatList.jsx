@@ -2,12 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import '@styles/chat/ChatList.scss';
+import { useAuth } from '../context/AuthContext';
 
 const ChatList = ({ setSelectedChat }) => {
     const [chatList, setChatList] = useState([]);
     const [selectedChatId, setSelectedChatIdState] = useState(null);
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-    const memberId = 'user01'; // 실제 사용자 ID로 변경 필요
+    // AuthContext에서 authState 가져오기
+    const { authState } = useAuth();
+    // username 가져오기
+    const memberId = authState.user?.username;
+
 
     useEffect(() => {
         axios.get(`${SERVER_URL}/chat/list/${memberId}`)

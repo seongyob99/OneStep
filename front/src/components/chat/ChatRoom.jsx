@@ -4,6 +4,7 @@ import axios from 'axios';
 import { List, AutoSizer, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
 import '@styles/chat/ChatRoom.scss';
 import { IoPersonSharp } from "react-icons/io5";
+import { useAuth } from '../context/AuthContext';
 
 const ChatRoom = () => {
     const { chatId } = useParams();
@@ -20,7 +21,10 @@ const ChatRoom = () => {
 
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     const listRef = useRef(null);
-    const memberId = 'user01'; // 실제 사용자 ID로 변경 필요
+    // AuthContext에서 authState 가져오기
+    const { authState } = useAuth();
+    // username 가져오기
+    const memberId = authState.user?.username;
 
     const cacheRef = useRef(
         new CellMeasurerCache({
@@ -70,7 +74,6 @@ const ChatRoom = () => {
     useEffect(() => {
         const intervalId = setInterval(() => {
             loadMessages();
-            console.log("호출")
         }, 2500);
         return () => clearInterval(intervalId);
     }, [chatId]);

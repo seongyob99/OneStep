@@ -4,12 +4,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import { produce } from 'immer';
 import { Container } from 'react-bootstrap';
 import '@styles/goal/goalUpdate.scss';
+import { useAuth } from '../context/AuthContext';
 
 const GoalUpdate = () => {
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     const navigate = useNavigate();
     const goalid = useParams().goalid;
     const fileInputRef = useRef(null);
+    // AuthContext에서 authState 가져오기
+    const { authState } = useAuth();
+    // username 가져오기
+    const username = authState.user?.username;
+
 
     const [cateList, setCateList] = useState([]);
     const [noEndDate, setNoEndDate] = useState(false);
@@ -211,7 +217,7 @@ const GoalUpdate = () => {
         formData.append("certCycle", form.certCycle);
         formData.append("rule", form.rule);
         formData.append("thumbnail", currentImg);
-        formData.append("memberId", "user05");  // 로그인 유저
+        formData.append("memberId", username);  // 로그인 유저
 
         if (form.file) {
             formData.append("file", form.file);
