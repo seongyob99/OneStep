@@ -24,7 +24,7 @@ const GoalDtl = () => {
     const navigate = useNavigate();
     const goalid = useParams().goalid;
     const isStarted = goalData && new Date(goalData?.startDate).getTime() <= Date.now();
-    const isEnded = goalData && new Date(goalData?.endDate).getTime() <= Date.now();
+    const isEnded = goalData && goalData?.endDate && new Date(goalData?.endDate).getTime() <= Date.now();
 
     // 정보 조회
     const getGoalInfo = useCallback(async () => {
