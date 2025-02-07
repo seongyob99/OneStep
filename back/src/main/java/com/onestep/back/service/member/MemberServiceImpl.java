@@ -36,16 +36,16 @@ public class MemberServiceImpl implements MemberService {
     public MemberDTO getMemberById(String memberId) {
         Members member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
-        return new MemberDTO(
-                member.getMemberId(),
-                member.getName(),
-                member.getEmail(),
-                member.getPassword(),
-                member.getPhone(),
-                member.getBirth(),
-                member.getSex(),
-                member.isSocial()
-        );
+        return MemberDTO.builder()
+                .memberId(member.getMemberId())
+                .name(member.getName())
+                .email(member.getEmail())
+                .password(member.getPassword())
+                .phone(member.getPhone())
+                .birth(member.getBirth())
+                .sex(member.getSex())
+                .social(member.isSocial())
+                .build();
     }
 
 

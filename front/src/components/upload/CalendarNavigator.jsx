@@ -10,7 +10,6 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 const CalendarNavigator = ({ onDateClick }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [certificationData, setCertificationData] = useState([]);
-
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [showMonthSelect, setShowMonthSelect] = useState(false);
 
@@ -22,6 +21,7 @@ const CalendarNavigator = ({ onDateClick }) => {
 
   const goalid = useParams().goalid;
   const selectedDayRef = useRef(null);
+
 
 
   // 날짜 포맷 (yy-mm-dd)
@@ -82,7 +82,7 @@ const CalendarNavigator = ({ onDateClick }) => {
 
     try {
       const formattedDate = formatDate(selectedDate);
-      const apiUrl = `${SERVER_URL}/cert?goalId=${goalid}&date=${formattedDate}`;
+      const apiUrl = `${SERVER_URL}/cert/${goalid}`;
 
       console.log("📢 API 요청 URL:", apiUrl);
 
@@ -118,6 +118,52 @@ const CalendarNavigator = ({ onDateClick }) => {
       selectedDayRef.current.scrollIntoView({ behavior: "smooth", inline: "center" });
     }
   }, [fetchCertifications, selectedDate]); 
+
+
+const dateNavRef = useRef(null);
+
+// 스크롤 이벤트 핸들러 추가:
+const handleDateNavigationScroll = (e) => {
+  const { scrollLeft, clientWidth, scrollWidth } = e.target;
+  if (scrollLeft + clientWidth >= scrollWidth - 10) {
+    // 스크롤이 오른쪽 끝에 도달하면 다음 달로 전환
+    const newDate = new Date(selectedDate);
+    newDate.setMonth(selectedDate.getMonth() + 1);
+    newDate.setDate(1); // 다음 달의 첫날로 변경
+    setSelectedDate(newDate);
+    setSelectedMonth(newDate.getMonth() + 1);
+    if (onDateClick) onDateClick(formatDate(newDate));
+  }
+};
+
+//
+
+const groupedCertifications = certificationData.reduce((acc, member) => {
+  // 각 멤버의 인증 정보 배열 순회
+  member.certdto.forEach((cert) => {
+    // 인증 날짜가 존재하는 경우만 처리 (null 체크)
+    if (cert.certDate) {
+      // cert.certDate가 이미 문자열이면 그대로 사용 (예: "2025-02-06")
+      // 그렇지 않으면 toISOString() 등으로 포맷팅
+      const dateKey = cert.certDate;
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
+      }
+      acc[dateKey].push({
+        memberName: member.name,
+        filePath: cert.filePath,
+        // 필요시 추가 필드 추가
+      });
+    }
+  });
+  return acc;
+}, {});
+
+const sortedDates = Object.keys(groupedCertifications).sort();
+  // 선택된 날짜에 해당하는 인증 정보만 추출
+  const selectedDateKey = formatDate(selectedDate);
+  const certificationsForSelectedDate = groupedCertifications[selectedDateKey] || [];
+  
 
   return (
     <div className="calendar-navigator">
@@ -176,23 +222,29 @@ const CalendarNavigator = ({ onDateClick }) => {
       {/* ----------------------------------------------- */}
       {/* 인증된 멤버 리스트 */}
       <div className="certification-list">
-        <h3>{formatDate(selectedDate)} 인증 리스트</h3>
-        {certificationData.length > 0 ? (
-          <ul>
-            {certificationData.map((cert, index) => (
-              <li key={index}>
-                <img
-                  src={`${SERVER_URL}/uploads/${cert.filePath}`}
-                  alt="인증 이미지"
-                  className="cert-image"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => showImageModal(`${SERVER_URL}/uploads/${cert.filePath}`, cert.user, cert.filePath)}
-                />
-                <p>참여자: {cert.user}</p>
-              </li>
-            ))}
-          </ul>
-        ) : (
+  <h3>{formatday(selectedDate)} 인증 리스트</h3>
+  {certificationsForSelectedDate.length > 0 ? (
+    <ul>
+      {certificationsForSelectedDate.map((cert, index) => (
+        <li key={index}>
+          <p>{cert.memberName}</p>
+          <img
+            src={`${SERVER_URL}/uploads/${cert.filePath}`}
+            alt="인증 이미지"
+            className="cert-image"
+            style={{ cursor: "pointer" }}
+            onClick={() =>
+              showImageModal(
+                `${SERVER_URL}/uploads/${cert.filePath}`,
+                cert.memberName,
+                cert.filePath
+              )
+            }
+          />
+        </li>
+      ))}
+    </ul>
+  ) : (
           <p>아직 인증한 멤버가 없습니다.</p>
         )}
       </div>
