@@ -22,7 +22,7 @@ const ChatList = ({ setSelectedChat }) => {
             .catch(error => {
                 console.error("채팅방 목록을 불러오는 데 실패했습니다:", error);
             });
-    }, []);
+    }, [memberId]);
 
     const handleChatSelect = (chat) => {
         setSelectedChatIdState(chat.chatId);
