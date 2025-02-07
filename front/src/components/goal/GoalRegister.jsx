@@ -66,28 +66,36 @@ const GoalRegister = () => {
     };
 
     const handleRegister = async () => {
-        // 필수 필드 검증
+        // ✅ JWT 토큰 가져오기
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            navigate("/login");
+            return;
+        }
+
+        // ✅ 필수 필드 검증
         if (!form.categoryId || !form.title.trim() || !form.description.trim()
             || !form.startDate || !form.certCycle || !form.rule.trim()) {
             alert("모든 필드를 입력해주세요.");
             return;
         }
 
-        // 정원 검증
+        // ✅ 정원 검증
         const participants = Number(form.participants);
         if (isNaN(participants) || participants < 1) {
             alert("정원은 1 이상의 숫자를 입력해주세요.");
             return;
         }
 
-        // 인증 주기 검증
+        // ✅ 인증 주기 검증
         const certCycle = Number(form.certCycle);
         if (isNaN(certCycle) || certCycle < 1) {
             alert("인증 주기는 1 이상의 숫자를 입력해주세요.");
             return;
         }
 
-        // 시작일 검증
+        // ✅ 시작일 검증
         const startDate = new Date(form.startDate);
         if (isNaN(startDate.getTime())) {
             alert("유효한 시작일을 입력해주세요.");
@@ -102,7 +110,7 @@ const GoalRegister = () => {
             return;
         }
 
-        // 종료일 검증
+        // ✅ 종료일 검증
         if (!noEndDate) {
             if (!form.endDate) {
                 alert("종료일을 입력해주세요.");
@@ -129,13 +137,17 @@ const GoalRegister = () => {
             }
         }
 
-        // 파일 검증
+        // ✅ 파일 검증
         if (!form.file) {
             alert("썸네일은 필수입니다.");
             return;
         }
 
-        // 폼 데이터 생성
+        // ✅ JWT에서 사용자 ID 추출 (디코딩)
+        const decodedToken = JSON.parse(atob(token.split(".")[1]));
+        const memberId = decodedToken.sub;  // ✅ JWT의 `sub` 필드에서 ID 가져오기
+
+        // ✅ 폼 데이터 생성
         const formData = new FormData();
         formData.append("title", form.title);
         formData.append("description", form.description);
@@ -145,16 +157,20 @@ const GoalRegister = () => {
         formData.append("certCycle", certCycle);
         formData.append("rule", form.rule);
         formData.append("categoryId", Number(form.categoryId));
-        formData.append("memberId", "user01");
+        formData.append("memberId", memberId);
         formData.append("file", form.file);
 
         try {
             await axios.post(`${SERVER_URL}/goals/register`, formData, {
-                headers: { "Content-Type": "multipart/form-data" },
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`,  // ✅ JWT 토큰 추가
+                },
             });
             alert("목표 등록 완료!");
             navigate("/");
         } catch (error) {
+            console.error("목표 등록 오류:", error);
             alert("목표 등록에 실패했습니다.");
         }
     };
