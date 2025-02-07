@@ -10,10 +10,11 @@ import com.onestep.back.repository.category.CategoriesRepository;
 import com.onestep.back.repository.chat.ChatsRepository;
 import com.onestep.back.repository.goal.GoalRepository;
 import com.onestep.back.repository.member.MemberRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,15 +29,19 @@ public class GoalServiceImpl implements GoalService {
     private static final String uploadPath = "c:\\upload\\onestep";
 
     private final GoalRepository goalRepository;
+    private final ModelMapper modelMapper;
     private final MemberRepository memberRepository;
     private final CategoriesRepository categoriesRepository;
     private final ChatsRepository chatsRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Override
     public List<GoalDTO> getList(Long categoryId, String title) {
         List<Goals> goals = (categoryId != null) ?
-                goalRepository.findByCategoryCategoryIdAndTitleContaining(categoryId, title == null ? "" : title, Sort.by(Sort.Order.desc("goalId"))) :
-                goalRepository.findByTitleContaining(title == null ? "" : title, Sort.by(Sort.Order.desc("goalId")));
+                goalRepository.findByCategoryCategoryIdAndTitleContaining(categoryId, title == null ? "" : title) :
+                goalRepository.findByTitleContaining(title == null ? "" : title);
 
         return goals.stream().map(goal -> GoalDTO.builder()
                 .goalId(goal.getGoalId())
@@ -64,6 +69,11 @@ public class GoalServiceImpl implements GoalService {
     @Transactional
     @Override
     public Long register(GoalDTO goalDTO) {
+
+        // ✅ memberId 하드코딩 유지
+        if (goalDTO.getMemberId() == null || goalDTO.getMemberId().trim().isEmpty()) {
+            goalDTO.setMemberId("user01");
+        }
 
         Categories category = categoriesRepository.findById(goalDTO.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("❌ Invalid category ID: " + goalDTO.getCategoryId()));
