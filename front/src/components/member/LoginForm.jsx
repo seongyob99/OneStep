@@ -43,13 +43,11 @@ const LoginForm = () => {
         if (!validateForm()) return;
 
         try {
-            console.log("📤 로그인 요청 데이터:", JSON.stringify(formData));
             const response = await axios.post(`${SERVER_URL}/member/login`, formData, {
                 headers: { "Content-Type": "application/json" }
             });
 
             const { accessToken, refreshToken, user } = response.data;
-            console.log("✅ 응답 데이터:", response.data);
 
             login(accessToken, refreshToken, user);
 
@@ -57,15 +55,8 @@ const LoginForm = () => {
         } catch (error) {
             console.error("❌ 로그인 실패:", error.response?.data || error.message);
             setIsError(true);
-            setResponseMessage(error.response?.data?.message || "로그인 실패");
+            setResponseMessage("ID 또는 비밀번호를 다시 확인해주세요.");
         }
-    };
-
-    // 로그인 성공 후 처리
-    const onLoginSuccess = (accessToken) => {
-        // 예: 로그인 성공 후 액세스 토큰을 저장하고, 리다이렉트
-        console.log("로그인 성공! 액세스 토큰:", accessToken);
-        navigate("/");  // 예시: 로그인 후 대시보드로 리다이렉트
     };
 
     // 입력값 변경 핸들러

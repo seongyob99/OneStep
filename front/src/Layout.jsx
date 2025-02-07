@@ -4,7 +4,7 @@ import "@styles/Layout.scss";
 import { Container } from "react-bootstrap";
 import { BiSolidMessage } from "react-icons/bi";
 import { PiCopyrightBold } from "react-icons/pi";
-import { FaUserCircle } from "react-icons/fa"; // 마이페이지 아이콘 추가
+import { FaUserCircle } from "react-icons/fa";
 
 const Layout = () => {
     const navigate = useNavigate();
@@ -23,20 +23,19 @@ const Layout = () => {
                     <div className="header-right">
                         {authState.isAuthenticated && (
                             <div className="welcome-message">
-                                <span>환영합니다, {authState.user?.username || "사용자"}님!</span>
+                                <span style={{ color: 'gray' }}>환영합니다, <span style={{ fontWeight: 600 }}>{authState.user?.username || "사용자"}</span>님!</span>
                             </div>
                         )}
-
-                        <div className="chat" onClick={() => navigate("/chat")}>
-                            <BiSolidMessage />
-                            <span>chat</span>
-                        </div>
 
                         {/* 로그인 상태에 따른 버튼 */}
                         {authState.isAuthenticated ? (
                             <>
+                                <div className="chat" onClick={() => navigate("/chat")}>
+                                    <BiSolidMessage />
+                                    <span>chat</span>
+                                </div>
                                 <div className="mypage" onClick={() => navigate("/mypage")}>
-                                    <FaUserCircle size={24} />
+                                    <FaUserCircle size={20} />
                                     <span>마이페이지</span>
                                 </div>
                                 <button className="login-btn" onClick={logout}>로그아웃</button>

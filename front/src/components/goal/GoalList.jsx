@@ -5,8 +5,12 @@ import { AutoSizer, Grid } from "react-virtualized";
 import GoalCard from "./GoalCard";
 import "@styles/goal/goalList.scss";
 import { Container } from "react-bootstrap";
+import { useAuth } from "../context/AuthContext";
 
 const GoalList = () => {
+    // AuthContext에서 authState 가져오기
+    const { authState } = useAuth();
+
     const [searchTerm, setSearchTerm] = useState("");
     const [searchKeyword, setSearchKeyword] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
@@ -69,9 +73,11 @@ const GoalList = () => {
                 {/* 제목 + 목표 등록 버튼 */}
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h3 className="mb-3">목표 목록</h3>
-                    <button className="btn btn-primary" onClick={() => navigate("/goals/register")}>
-                        목표 등록
-                    </button>
+                    {authState.isAuthenticated &&
+                        <button className="btn btn-primary" onClick={() => navigate("/goals/register")}>
+                            목표 등록
+                        </button>
+                    }
                 </div>
 
                 {/* ✅ 검색 & 카테고리 필터 */}

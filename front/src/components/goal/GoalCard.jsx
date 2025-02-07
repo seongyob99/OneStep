@@ -9,7 +9,7 @@ const GoalCard = ({ goal }) => {
     // ✅ 제목이 길면 앞부분 유지하고 뒤쪽만 ... 처리
     const truncateTitle = (title, maxLength = 10) => {
         if (title.length > maxLength) {
-            return title.slice(0, 7) + "..."; // ✅ 앞 7글자는 유지, 나머지는 '...' 처리
+            return title.slice(0, 18) + "...";
         }
         return title;
     };
@@ -22,7 +22,7 @@ const GoalCard = ({ goal }) => {
     return (
         <div className="goal-card card shadow-sm p-3 d-flex flex-column justify-content-between" onClick={handleNavigate}>
             {/* ✅ 이미지 및 구분선 */}
-            <div className="text-center">
+            <div>
                 <img
                     src={goal.thumbnail ? `${SERVER_URL}/uploads/${goal.thumbnail}` : `${SERVER_URL}/uploads/default.jpg`}
                     className="goal-card-img card-img-top"
@@ -33,11 +33,11 @@ const GoalCard = ({ goal }) => {
 
             {/* ✅ 카드 본문 */}
             <div className="goal-card-body card-body">
+                <p className="goal-card-category">{goal.categoryName}</p>
                 <div className="d-flex align-items-center">
                     <h5 className="goal-card-title flex-grow-1 card-title" title={goal.title}>
                         {truncateTitle(goal.title, 15)} {/* ✅ 제목 길이 제한 적용 */}
                     </h5>
-                    <p className="goal-card-category mb-0 ms-2">| {goal.categoryName}</p>
                 </div>
                 <p className="goal-card-text">{goal.startDate} ~ {goal.endDate || "종료 시"}</p>
                 <p className="goal-card-text">
