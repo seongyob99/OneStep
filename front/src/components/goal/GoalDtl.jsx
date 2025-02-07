@@ -6,6 +6,7 @@ import { Container, Row, Col, Button, ListGroup, Image, Spinner, Modal } from 'r
 import { FaMedal, FaCalendarAlt, FaUser, FaUserCog } from 'react-icons/fa';
 import { BsCalendarWeekFill } from "react-icons/bs";
 import { RiTodoFill, RiArrowDownSLine } from "react-icons/ri";
+import { useAuth } from '../context/AuthContext';
 
 const GoalDtl = () => {
     const [goalData, setGoalData] = useState(null);
@@ -14,6 +15,10 @@ const GoalDtl = () => {
     const [selectedMember, setSelectedMember] = useState(null);
     const [isMembersVisible, setIsMembersVisible] = useState(false);
     const [dataChanged, setDataChanged] = useState(false);
+    // AuthContext에서 authState 가져오기
+    const { authState } = useAuth();
+    // username 가져오기
+    const memberId = authState.user?.username;
 
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     const navigate = useNavigate();
@@ -64,6 +69,10 @@ const GoalDtl = () => {
 
     // 참가하기
     const onJoin = useCallback(async () => {
+        if (!memberId) {
+            return;
+        }
+
         if (goalData?.members.length === goalData?.participants) {
             alert("모집 완료된 목표입니다.");
             return;
@@ -73,7 +82,7 @@ const GoalDtl = () => {
             try {
                 await axios.post(
                     `${SERVER_URL}/goals/dtl/joinGoal`,
-                    { goalId: goalid, memberId: 'user03' }, // 로그인 유저
+                    { goalId: goalid, memberId: memberId },
                     { headers: { 'Content-Type': 'application/json' } }
                 );
                 setDataChanged(prev => !prev);
@@ -81,7 +90,7 @@ const GoalDtl = () => {
                 alert("작업에 실패했습니다. 다시 시도해주세요.");
             }
         }
-    }, [goalData]);
+    }, [goalData, memberId]);
 
     // 내보내기 및 그만두기
     const removeMember = useCallback(async (memberId) => {
@@ -101,7 +110,7 @@ const GoalDtl = () => {
     const onCancel = useCallback(() => {
         const confirmCancel = confirm("정말 그만두시겠습니까?");
         if (confirmCancel) {
-            removeMember('user03'); // 로그인 유저
+            removeMember(memberId);
         }
     }, []);
 
@@ -174,19 +183,36 @@ const GoalDtl = () => {
                             <p className="my-2">{goalData.description}</p>
                         </Col>
                         <Col xs="auto">
-                            {!isEnded &&
+                            {authState.isAuthenticated && (
                                 <>
-                                    <Button variant="danger" className="ms-2" onClick={onExport}>내보내기</Button>
-                                    <Button variant="danger" className="ms-2" onClick={onCancel}>그만두기</Button>
+                                    {!isEnded &&
+                                        <>
+                                            {memberId === goalData.adminMemberId &&
+                                                <Button variant="danger" className="ms-2" onClick={onExport}>내보내기</Button>
+                                            }
+                                            {filteredMembers.filter(member => memberId === member.memberId).length > 0 &&
+                                                <Button variant="danger" className="ms-2" onClick={onCancel}>그만두기</Button>
+                                            }
+                                        </>
+                                    }
+                                    {!isStarted &&
+                                        <>
+                                            {memberId === goalData.adminMemberId ? (
+                                                <>
+                                                    <Button variant="danger" className="ms-2" onClick={onUpdate}>수정하기</Button>
+                                                    <Button variant="danger" className="ms-2" onClick={onDelete}>삭제하기</Button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {filteredMembers.filter(member => memberId === member.memberId).length === 0 &&
+                                                        <Button variant="primary" className="ms-2" onClick={onJoin}>참가하기</Button>
+                                                    }
+                                                </>
+                                            )}
+                                        </>
+                                    }
                                 </>
-                            }
-                            {!isStarted &&
-                                <>
-                                    <Button variant="danger" className="ms-2" onClick={onUpdate}>수정하기</Button>
-                                    <Button variant="danger" className="ms-2" onClick={onDelete}>삭제하기</Button>
-                                    <Button variant="primary" className="ms-2" onClick={onJoin}>참가하기</Button>
-                                </>
-                            }
+                            )}
                         </Col>
                     </Row>
                 </Col>
@@ -278,7 +304,7 @@ const GoalDtl = () => {
                         </Col>
                         <Col xs="auto">
                             <Button variant="primary" onClick={onCertification}>
-                                인증하기
+                                인증 목록
                             </Button>
                         </Col>
                     </Row>

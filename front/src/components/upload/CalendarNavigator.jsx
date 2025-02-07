@@ -64,13 +64,14 @@ const CalendarNavigator = ({ onDateClick }) => {
   };
   // 날짜 변경 함수
   const getDates = () => {
-    const yesterday = new Date(selectedDate);
-    yesterday.setDate(selectedDate.getDate() - 1);
 
-    const tomorrow = new Date(selectedDate);
-    tomorrow.setDate(selectedDate.getDate() + 1);
-
-    return [yesterday, selectedDate, tomorrow];
+    const dates = [];
+    for (let offset = -2; offset <= 2; offset++) {
+      const newDate = new Date(selectedDate);
+      newDate.setDate(selectedDate.getDate() + offset);
+      dates.push(newDate);
+    }
+    return dates;
   };
   // 선택된 날짜의 인증 리스트 가져오기 (API 호출)
   const fetchCertifications = useCallback(async () => {
@@ -140,23 +141,10 @@ const CalendarNavigator = ({ onDateClick }) => {
         )}
       </div>
       {/* ----------------------------------------------- */}
-      {/* 해당 월의 달력 */}
-      {/* <div className="month-calendar" >
-        {getDaysInMonth(selectedDate.getFullYear(), selectedMonth).map((day) => (
-          <span
-            key={day}
-            className={selectedDate.getDate() === day ? "day selected-day" : "day"}
-            onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedMonth - 1, day))}
-            
-          >
-            {day}
-          </span>
-        ))}
-      </div> */}
 
 <div className="month-calendar">
       {getDaysInMonth(selectedDate.getFullYear(), selectedMonth).map((day) => (
-        <span
+        <span 
           key={day}
           ref={selectedDate.getDate() === day ? selectedDayRef : null} // ✅ 선택된 날짜에만 ref 적용
           className={selectedDate.getDate() === day ? "day selected-day" : "day"}
@@ -173,11 +161,7 @@ const CalendarNavigator = ({ onDateClick }) => {
         {getDates().map((date, index) => (
           <span
             key={index}
-            className={date.toDateString() === selectedDate.toDateString() ? "selected-date" : ""}
-            // onClick={() => {
-            //   setSelectedDate(date);
-            //   if (onDateClick) onDateClick(formatDate(date));
-            // }}
+            className={date.toDateString() === selectedDate.toDateString() ? "selected-date" : "navday"}
             onClick={() => {
               setSelectedDate(date);
               setSelectedMonth(date.getMonth() + 1); // ✅ 월도 같이 변경
