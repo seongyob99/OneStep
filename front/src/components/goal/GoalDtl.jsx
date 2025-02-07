@@ -6,6 +6,7 @@ import { Container, Row, Col, Button, ListGroup, Image, Spinner, Modal } from 'r
 import { FaMedal, FaCalendarAlt, FaUser, FaUserCog } from 'react-icons/fa';
 import { BsCalendarWeekFill } from "react-icons/bs";
 import { RiTodoFill, RiArrowDownSLine } from "react-icons/ri";
+import { useAuth } from '../context/AuthContext';
 
 const GoalDtl = () => {
     const [goalData, setGoalData] = useState(null);
@@ -14,6 +15,10 @@ const GoalDtl = () => {
     const [selectedMember, setSelectedMember] = useState(null);
     const [isMembersVisible, setIsMembersVisible] = useState(false);
     const [dataChanged, setDataChanged] = useState(false);
+    // AuthContext에서 authState 가져오기
+    const { authState } = useAuth();
+    // username 가져오기
+    const username = authState.user?.username;
 
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     const navigate = useNavigate();
@@ -73,7 +78,7 @@ const GoalDtl = () => {
             try {
                 await axios.post(
                     `${SERVER_URL}/goals/dtl/joinGoal`,
-                    { goalId: goalid, memberId: 'user03' }, // 로그인 유저
+                    { goalId: goalid, memberId: username }, // 로그인 유저
                     { headers: { 'Content-Type': 'application/json' } }
                 );
                 setDataChanged(prev => !prev);
@@ -101,7 +106,7 @@ const GoalDtl = () => {
     const onCancel = useCallback(() => {
         const confirmCancel = confirm("정말 그만두시겠습니까?");
         if (confirmCancel) {
-            removeMember('user03'); // 로그인 유저
+            removeMember(username); // 로그인 유저
         }
     }, []);
 

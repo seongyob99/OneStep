@@ -4,8 +4,16 @@ import { useNavigate } from "react-router-dom";
 import { produce } from 'immer';
 import { Container } from 'react-bootstrap';
 import '@styles/goal/goalUpdate.scss';
+import { useAuth } from '../context/AuthContext';
+
+
 
 const GoalRegister = () => {
+    // AuthContext에서 authState 가져오기
+    const { authState } = useAuth();
+    // username 가져오기
+    const username = authState.user?.username;
+
     const [form, setForm] = useState({
         title: "",
         description: "",
@@ -145,7 +153,7 @@ const GoalRegister = () => {
         formData.append("certCycle", certCycle);
         formData.append("rule", form.rule);
         formData.append("categoryId", Number(form.categoryId));
-        formData.append("memberId", "user01");
+        formData.append("memberId", username);
         formData.append("file", form.file);
 
         try {
