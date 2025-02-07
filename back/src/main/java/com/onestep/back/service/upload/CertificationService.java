@@ -2,6 +2,7 @@ package com.onestep.back.service.upload;
 
 
 import com.onestep.back.domain.Certifications;
+import com.onestep.back.dto.member.MemberDTO;
 import com.onestep.back.dto.upload.CertificationsDTO;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -31,12 +32,16 @@ public interface CertificationService {
     // 특정 목표에 해당하는 전체 인증 목록 조회 (날짜 내림차순 정렬) /
 //    List<CertificationsDTO> listByGoal(Long goalId);
 
-    List<CertificationsDTO> listByGoalAndDate(Long goalId, LocalDate certDate);
+    List<MemberDTO> Alllist(Long goalId);
+
+    List<CertificationsDTO> listByAll(Long goalId, String memberid, LocalDate certDate);
     // Entity > DTO
     default CertificationsDTO entityToDto(Certifications certification) {
+        String memberName = (certification.getMember() != null) ? certification.getMember().getName() : "Unknown";
         return CertificationsDTO.builder()
                 .goalId(certification.getGoal().getGoalId())
                 .memberId(certification.getMember().getMemberId())
+                .name(memberName)
                 .certDate(certification.getCertDate())
                 .filePath(certification.getFilePath())
                 .build();
