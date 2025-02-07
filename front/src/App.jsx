@@ -14,31 +14,35 @@ import MyPage from './components/member/MyPage';
 import MemberDetail from './components/member/MemberDetail';
 import CertBoard from './components/upload/CertBoard';
 import LoginForm from './components/member/LoginForm';
+import { AuthProvider } from './components/context/AuthContext';
 
 function App() {
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/test" element={<Test />} />
-        <Route path="/" element={<GoalList />} />
-        <Route path="/goals/register" element={<GoalRegister />} />
-        <Route path="/:goalid" element={<GoalDtl />} />
-        <Route path="/:goalid/update" element={<GoalUpdate />} />
+    <AuthProvider>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/test" element={<Test />} />
+          <Route path="/" element={<GoalList />} />
+          <Route path="/goals/register" element={<GoalRegister />} />
+          <Route path="/:goalid" element={<GoalDtl />} />
+          <Route path="/:goalid/update" element={<GoalUpdate />} />
 
-        <Route path="/member/join" element={<JoinForm />} />
-        <Route path="/member/login" element={<LoginForm />} />
-        <Route path="/mypage" element={< MyPage />} />
-        <Route path="/member/detail" element={< MemberDetail />} />
+          <Route path="/member/join" element={<JoinForm />} />
+          <Route path="/member/login" element={<LoginForm />} />
+          <Route path="/mypage" element={< MyPage />} />
+          <Route path="/member/detail" element={< MemberDetail />} />
 
-        <Route path="/chat" element={<ChatPage />}>
-          <Route path=":chatId" element={<ChatRoom />} />
+          <Route path="/chat" element={<ChatPage />}>
+            <Route path=":chatId" element={<ChatRoom />} />
+          </Route>
+
+          <Route path="/cert/:goalid" element={<CertBoard />} />
         </Route>
-
-        <Route path="/cert/:goalid" element={<CertBoard />} />
-      </Route>
-    </Routes>
+      </Routes>
+    </AuthProvider>
 
   );
 }
+
 
 export default App;

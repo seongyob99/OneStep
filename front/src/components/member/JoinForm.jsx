@@ -148,6 +148,7 @@ const JoinForm = () => {
             {errors.name && <div className="error-text">{errors.name}</div>}
           </div>
 
+
           <div className="form-group">
             <label className="form-label">이메일</label>
             <Form.Control

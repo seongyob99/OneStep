@@ -23,4 +23,5 @@ public class MemberDTO {
     private String sex;
     private boolean social;
 
+
 }

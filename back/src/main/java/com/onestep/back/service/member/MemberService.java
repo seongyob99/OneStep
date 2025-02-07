@@ -17,6 +17,5 @@ public interface MemberService {
     void deleteMember(String memberId);
 
     List<GoalDTO> getMemberGoals(String memberId);
-
 }
 
