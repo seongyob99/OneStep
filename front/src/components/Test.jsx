@@ -2,12 +2,18 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { produce } from 'immer';
+import { useAuth } from './context/AuthContext';
 
 const Test = () => {
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     const navigate = useNavigate();
 
     const [list, setList] = useState([]);
+    // AuthContext에서 authState 가져오기
+    const { authState } = useAuth();
+    // username 가져오기
+    const username = authState.user?.username;
+
     const [form, setForm] = useState({
         name: '',
         chkType: false,
