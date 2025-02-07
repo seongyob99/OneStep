@@ -35,10 +35,13 @@ const Layout = () => {
                                     <span>chat</span>
                                 </div>
                                 <div className="mypage" onClick={() => navigate("/mypage")}>
-                                    <FaUserCircle size={20} />
+                                    <FaUserCircle size={18} />
                                     <span>마이페이지</span>
                                 </div>
-                                <button className="login-btn" onClick={logout}>로그아웃</button>
+                                <button className="login-btn" onClick={() => {
+                                    logout();
+                                    navigate("/");
+                                }}>로그아웃</button>
                             </>
                         ) : (
                             <button className="login-btn" onClick={() => navigate("/member/login")}>로그인</button>
