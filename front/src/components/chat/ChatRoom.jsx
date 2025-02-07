@@ -74,7 +74,7 @@ const ChatRoom = () => {
     useEffect(() => {
         const intervalId = setInterval(() => {
             loadMessages();
-        }, 2500);
+        }, 1500);
         return () => clearInterval(intervalId);
     }, [chatId]);
 
