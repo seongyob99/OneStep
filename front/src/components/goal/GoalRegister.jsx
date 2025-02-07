@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { produce } from 'immer';
@@ -15,71 +15,42 @@ const GoalRegister = () => {
         certCycle: 1,
         rule: "",
         categoryId: "",
-        file: null
+        file: null,
     });
     const [cateList, setCateList] = useState([]);
     const [noEndDate, setNoEndDate] = useState(false);
     const navigate = useNavigate();
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+    const fileInputRef = useRef(null);
 
-    // 카테고리 목록 불러오기
     useEffect(() => {
         axios.get(`${SERVER_URL}/categories`)
             .then(response => setCateList(response.data))
             .catch(() => alert("카테고리를 불러오는 데 실패했습니다."));
     }, []);
 
-    // 입력값 변경 핸들러
     const onChange = useCallback((e) => {
         const { name, value, type, checked } = e.target;
 
-        if (type === 'checkbox') {
+        if (type === "checkbox") {
             setNoEndDate(checked);
             if (checked) {
-                setForm(
-                    produce((draft) => {
-                        draft.endDate = "";
-                    })
-                );
+                setForm(produce((draft) => { draft.endDate = ""; }));
             }
         } else {
             if (name === "participants" || name === "certCycle") {
                 if (!/^\d*$/.test(value)) {
-                    alert("🚨 유효한 숫자를 입력해주세요.");
-                    e.target.value = "";
+                    alert("유효한 숫자를 입력해주세요.");
                     return;
                 }
-
-                const numericValue = Number(value);
-
-                if (numericValue <= 0) {
-                    alert("🚨 1 이상의 숫자를 입력해주세요.");
-                    e.target.value = "";
-                    return;
-                }
-
-                if (value.includes(".")) {
-                    alert("🚨 소수점은 입력할 수 없습니다.");
-                    e.target.value = "";
-                    return;
-                }
-
-                setForm(
-                    produce((draft) => {
-                        draft[name] = numericValue;
-                    })
-                );
-            } else {
-                setForm(
-                    produce((draft) => {
-                        draft[name] = value;
-                    })
-                );
+                setForm(produce((draft) => { draft[name] = value; }));
+                return;
             }
-        }
-    }, []);
 
-    // 파일 업로드 핸들러
+            setForm(produce((draft) => { draft[name] = value; }));
+        }
+    }, [noEndDate]);
+
     const onFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -87,45 +58,104 @@ const GoalRegister = () => {
         }
     };
 
-    // 목표 등록 요청
+    const handleFileCancel = () => {
+        setForm(prev => ({ ...prev, file: null }));
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
     const handleRegister = async () => {
+        // 필수 필드 검증
         if (!form.categoryId || !form.title.trim() || !form.description.trim()
             || !form.startDate || !form.certCycle || !form.rule.trim()) {
-            alert("🚨 모든 필드를 입력해주세요.");
-            return;
-        }
-        if (!noEndDate && !form.endDate) {
-            alert("🚨 종료일을 입력해주세요.");
-            return;
-        }
-        if (!form.file) {
-            alert("🚨 썸네일은 필수입니다.");
+            alert("모든 필드를 입력해주세요.");
             return;
         }
 
+        // 정원 검증
+        const participants = Number(form.participants);
+        if (isNaN(participants) || participants < 1) {
+            alert("정원은 1 이상의 숫자를 입력해주세요.");
+            return;
+        }
+
+        // 인증 주기 검증
+        const certCycle = Number(form.certCycle);
+        if (isNaN(certCycle) || certCycle < 1) {
+            alert("인증 주기는 1 이상의 숫자를 입력해주세요.");
+            return;
+        }
+
+        // 시작일 검증
+        const startDate = new Date(form.startDate);
+        if (isNaN(startDate.getTime())) {
+            alert("유효한 시작일을 입력해주세요.");
+            return;
+        }
+        startDate.setHours(0, 0, 0, 0);
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        if (startDate < tomorrow) {
+            alert("시작일은 내일 이후여야 합니다.");
+            return;
+        }
+
+        // 종료일 검증
+        if (!noEndDate) {
+            if (!form.endDate) {
+                alert("종료일을 입력해주세요.");
+                return;
+            }
+
+            const endDate = new Date(form.endDate);
+            if (isNaN(endDate.getTime())) {
+                alert("유효한 종료일을 입력해주세요.");
+                return;
+            }
+            endDate.setHours(0, 0, 0, 0);
+
+            if (endDate <= startDate) {
+                alert("종료일은 시작일 이후여야 합니다.");
+                return;
+            }
+
+            // 인증 주기 일수 검증
+            const dateDiff = Math.floor((endDate - startDate) / (1000 * 3600 * 24));
+            if (certCycle > dateDiff) {
+                alert(`인증 주기는 시작일과 종료일 사이 최대 일수(${dateDiff}일)를 초과할 수 없습니다.`);
+                return;
+            }
+        }
+
+        // 파일 검증
+        if (!form.file) {
+            alert("썸네일은 필수입니다.");
+            return;
+        }
+
+        // 폼 데이터 생성
         const formData = new FormData();
         formData.append("title", form.title);
         formData.append("description", form.description);
-        formData.append("participants", form.participants);
+        formData.append("participants", participants);
         formData.append("startDate", form.startDate);
         formData.append("endDate", noEndDate ? "" : form.endDate);
-        formData.append("certCycle", form.certCycle);
+        formData.append("certCycle", certCycle);
         formData.append("rule", form.rule);
         formData.append("categoryId", Number(form.categoryId));
-        formData.append("memberId", "user01"); // 로그인 유저
-
-        if (form.file) {
-            formData.append("file", form.file);
-        }
+        formData.append("memberId", "user01");
+        formData.append("file", form.file);
 
         try {
             await axios.post(`${SERVER_URL}/goals/register`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-            alert("✅ 목표 등록 완료!");
+            alert("목표 등록 완료!");
             navigate("/");
         } catch (error) {
-            alert("❌ 목표 등록에 실패했습니다.");
+            alert("목표 등록에 실패했습니다.");
         }
     };
 
@@ -175,19 +205,6 @@ const GoalRegister = () => {
                 </div>
                 <div className="mb-4 flex">
                     <div className="flex-1">
-                        <label className="form-label">인증 주기</label>
-                        <div className="flex">
-                            <input
-                                type="text"
-                                name="certCycle"
-                                className="form-control no-spin"
-                                value={form.certCycle}
-                                onChange={onChange}
-                            />
-                            <span>일</span>
-                        </div>
-                    </div>
-                    <div className="flex-1 ml-4">
                         <label className="form-label">정원</label>
                         <div className="flex">
                             <input
@@ -200,7 +217,7 @@ const GoalRegister = () => {
                             <span>명</span>
                         </div>
                     </div>
-                    <div className="flex-2 ml-4">
+                    <div className="flex-1 ml-8">
                         <label className="form-label">시작일</label>
                         <input
                             type="date"
@@ -210,7 +227,7 @@ const GoalRegister = () => {
                             onChange={onChange}
                         />
                     </div>
-                    <div className="flex-2 ml-4">
+                    <div className="flex-1 ml-4">
                         <label className="form-label">종료일</label>
                         <input
                             type="date"
@@ -230,6 +247,19 @@ const GoalRegister = () => {
                         />
                         <label>종료일 없음</label>
                     </div>
+                    <div className="flex-1 ml-8">
+                        <label className="form-label">인증 주기</label>
+                        <div className="flex">
+                            <input
+                                type="text"
+                                name="certCycle"
+                                className="form-control no-spin"
+                                value={form.certCycle}
+                                onChange={onChange}
+                            />
+                            <span>일</span>
+                        </div>
+                    </div>
                 </div>
                 <div className="mb-4">
                     <label className="form-label">인증 규칙</label>
@@ -243,15 +273,24 @@ const GoalRegister = () => {
                 <div className="thumbnail-input mb-4">
                     <label className="form-label">썸네일</label>
                     <span className="small-font ml-2" style={{ color: "#fc4c24" }}>* 이미지는 1:1 비율로 넣어주세요 (권장)</span>
+
                     <input
                         type="file"
                         name="file"
                         className="form-control"
+                        ref={fileInputRef}
                         onChange={onFileChange}
                     />
-                </div>
-                <div className="text-right">
-                    <button type="button" onClick={handleRegister} className="btn btn-primary mb-3">등록하기</button>
+                    {form.file && (
+                        <div className="mt-2 d-flex">
+                            <p>
+                                {form.file.name}
+                                <button type="button" className="btn btn-danger ml-2" onClick={handleFileCancel}>
+                                    취소
+                                </button>
+                            </p>
+                        </div>
+                    )}
                 </div>
             </form>
         </Container>

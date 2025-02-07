@@ -1,45 +1,105 @@
 .goal-card {
     width: 100%;
-    cursor: pointer;
+    max-width: 265px;
+    height: 350px;
+    /* ✅ 카드 높이 통일 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     border-radius: 10px;
+    /* ✅ 카드 자체에도 radius 적용 */
+    overflow: hidden;
+    /* ✅ 내부 이미지도 radius 적용되도록 */
+    cursor: pointer;
 }
 
 .goal-card-img {
+    width: 100%;
+    height: 180px;
     object-fit: cover;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    aspect-ratio: 1 / 1;
+    /* ✅ 크롭해서 꽉 채우기 */
+    border-radius: 10px !important;
+    /* ✅ 아래쪽도 radius 적용 */
 }
 
+/* ✅ 이미지 크기 고정 (1:1 유지) */
+.goal-card-img-wrapper {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border-radius: 10px !important;
+    /* ✅ 모든 모서리 둥글게 */
+}
+
+/* ✅ 카드 내부 컨텐츠 영역 */
 .goal-card-body {
-    padding: 0.5rem;
+    flex-grow: 1;
+    padding: 10px;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    /* ✅ 원래 정렬대로 위쪽 정렬 */
 }
 
+
+/* ✅ 제목 길이 제한 (`...` 유지) */
 .goal-card-title {
-    max-width: 180px;
+    max-width: 100%;
+    height: 24px;
+    /* ✅ 제목 높이를 카테고리와 맞추기 */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: inline-block;
+    font-size: 22px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    /* ✅ 텍스트를 세로 중앙 정렬 */
+    line-height: 1.2;
+    /* ✅ 높이를 일정하게 유지 */
 }
 
 .goal-card-title:hover {
     text-decoration: underline;
 }
 
+/* ✅ 카테고리 스타일 */
 .goal-card-category {
     margin-left: 0.5rem;
     color: gray;
+    white-space: nowrap;
+    /* ✅ 한 줄 유지 */
+    flex-shrink: 0;
+    font-size: 15px;
+    height: 24px;
+    /* ✅ 제목과 같은 높이로 맞춤 */
+    display: flex;
+    align-items: center;
+    /* ✅ 텍스트를 세로 중앙 정렬 */
 }
 
+
+/* ✅ 설명 텍스트 최대 3줄 유지 */
 .goal-card-text {
-    margin: 0.25rem 0;
+    font-size: 14px;
+    color: #666;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    /* ✅ 설명 텍스트 높이 고정 */
 }
 
 .goal-card-hr {
     margin: 1rem 0;
+}
+
+/* ✅ 기타 정보도 정렬 유지 */
+.goal-card-footer {
+    font-size: 12px;
+    color: gray;
 }

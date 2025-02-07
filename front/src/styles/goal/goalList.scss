@@ -90,3 +90,37 @@
         }
     }
 }
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    /* 🔥 전체 페이지에서 스크롤 허용 */
+}
+
+#root {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.goal-list-container {
+    width: 100vw;
+    max-width: 106%;
+    height: auto;
+    /* ✅ 높이 자동 조정 */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    /* ✅ 페이지 전체에서 스크롤 적용 */
+    padding-bottom: 20px;
+    /* ✅ 하단 패딩 추가 */
+}
+
+.auto-sizer-wrapper {
+    flex-grow: 1;
+    height: auto;
+    /* ✅ 높이 자동 조정 */
+}

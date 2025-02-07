@@ -4,6 +4,7 @@ import com.onestep.back.domain.Certifications;
 import com.onestep.back.domain.Chats;
 import com.onestep.back.domain.Goals;
 import com.onestep.back.domain.Members;
+import com.onestep.back.dto.goal.GoalDTO;
 import com.onestep.back.dto.member.MemberDTO;
 import com.onestep.back.repository.member.MemberRepository;
 import com.onestep.back.repository.upload.CertificationsRepository;
@@ -47,11 +48,13 @@ public class MemberServiceImpl implements MemberService {
         );
     }
 
+
     @Override
     public void updateMember(String memberId, MemberDTO memberDTO) {
         Members member = memberRepository.findById(memberDTO.getMemberId())
                 .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
         member.updateMember(memberDTO);
+        member.changePassword(passwordEncoder.encode(memberDTO.getPassword()));
         memberRepository.save(member);
     }
 
@@ -91,10 +94,10 @@ public class MemberServiceImpl implements MemberService {
 
 
     @Override
-    public List<String> getMemberGoals(String memberId) {
+    public List<GoalDTO> getMemberGoals(String memberId) {
         Members member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
-        return member.getGoals().stream().map(goal -> goal.getTitle()).collect(Collectors.toList());
+        return member.getGoals().stream().map(goal -> modelMapper.map(goal, GoalDTO.class)).collect(Collectors.toList());
     }
 
     @Override

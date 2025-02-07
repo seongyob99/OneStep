@@ -26,5 +26,4 @@ public class APIUserDetailsService implements UserDetailsService {
                 .password(member.getPassword())
                 .build();
     }
-
 }

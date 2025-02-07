@@ -1,0 +1,220 @@
+
+
+.calendar-navigator {
+  text-align: center;
+  padding: 20px;
+  background: #fff; 
+  border-radius: 8px;
+  // box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+  max-width: 1000px;
+  margin: 20px auto; 
+
+  h2 {
+    font-size: 22px;
+    color: #333;
+    cursor: pointer;
+    text-decoration: none !important; 
+    display: inline-block;
+    font-weight: 600;
+    transition: color 0.2s ease-in-out;
+
+    &:hover {
+      color: #0056b3; 
+    }
+  }
+
+  .month-calendar {
+    // display: flex;
+    // justify-content: center;
+    // align-items: center;
+    flex-wrap: nowrap; // ✅ 줄 바꿈 방지
+    overflow-x: auto; // ✅ 가로 스크롤 추가
+    white-space: nowrap; // ✅ 줄 바꿈 방지
+    justify-content: flex-start; // ✅ 좌측 정렬 (중앙 정렬을 원하면 center)
+    gap: 4px; // ✅ 간격 조정
+    padding: 10px 0;
+    margin-bottom: 10px;
+  
+    .day {
+      
+      display: inline-block;
+      min-width: 30px; // ✅ 날짜 크기 조정 (더 줄여도 가능)
+      padding: 5px 8px; // ✅ 여백 줄이기
+      font-size: 12px; // ✅ 글씨 크기 줄이기
+      text-align: center;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+  
+      &:hover {
+        background-color: #f0f0f0;
+      }
+    }
+  
+    .selected-day {
+      
+      background-color: #007bff;
+      color: #fff;
+      border-color: #007bff;
+    }
+  }
+  
+  .month-selector {
+    position: relative;
+    display: inline-block;
+  }
+  
+  // .month-dropdown {
+  //   position: absolute;
+  //   background: white;
+  //   border: 1px solid #ccc;
+  //   padding: 5px;
+  //   z-index: 1000;
+  //   width: 80px;
+  // }
+  
+  // .month-option {
+  //   padding: 5px;
+  //   cursor: pointer;
+  // }
+  
+  // .month-option:hover {
+  //   background: #f0f0f0;
+  // }
+  
+  .month-dropdown {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 1000;
+    width: 200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); // ✅ 3개씩 배치
+    gap: 10px; // ✅ 간격 추가
+  }
+  
+  .month-option {
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    // background: #f8f9fa;
+    border-radius: 5px;
+  }
+  
+  .month-option:hover {
+    background: #e9ecef;
+  }
+  
+
+  .date-navigation {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    margin-top: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd; 
+
+    button {
+      background-color: #f5f5f5;
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 4px;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        background-color: #e0e0e0;
+      }
+
+      &:active {
+        background-color: #d6d6d6;
+      }
+    }
+
+    span {
+      padding: 8px 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.2s ease-in-out;
+      color: #555;
+
+      &:hover {
+        background-color: #f0f0f0;
+      }
+    }
+
+    .selected-date {
+      font-weight: bold;
+      color: white;
+      background-color: #007bff;
+      padding: 8px 12px;
+      border-radius: 5px;
+      transition: background-color 0.2s ease-in-out;
+
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+  }
+
+  .certification-list {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fafafa;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05); 
+
+    h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        transition: background-color 0.2s ease-in-out;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &:hover {
+          background-color: #f9f9f9;
+        }
+
+        .cert-image {
+          width: 100px;
+          height: 100px;
+          // border-radius: 50%;
+          object-fit: cover;
+        }
+
+        p {
+          flex: 1;
+          font-size: 14px;
+          color: #555;
+        }
+      }
+    }
+  }
+}

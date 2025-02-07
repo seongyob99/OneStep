@@ -47,7 +47,6 @@ public class TokenCheckFilter extends OncePerRequestFilter {
             }
         }
 
-
         chain.doFilter(request, response);
     }
 }

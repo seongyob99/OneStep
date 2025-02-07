@@ -37,7 +37,6 @@ public class GoalRestController {
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String title) {
 
-        log.info("📌 목표 목록 조회 요청: categoryId={}, title={}", categoryId, title);
         List<GoalDTO> goals = goalService.getList(categoryId, title);
         return ResponseEntity.ok(goals);
     }
@@ -55,31 +54,24 @@ public class GoalRestController {
             memberId = "user01";  // ✅ 여기에 하드코딩
         }
 
-        log.info("✅ 현재 로그인된 사용자 ID: {}", memberId);
-
-        log.info("✅ 목표 등록 요청: {}", goalDTO);
         goalDTO.setMemberId(memberId);
         goalDTO.setCategoryId(categoryId);
 
         try {
             // 파일 업로드 처리
             if (file != null && !file.isEmpty()) {
-                log.info("📂 파일 업로드 시작: {}", file.getOriginalFilename());
 
                 String uuid = UUID.randomUUID().toString();
                 String fileName = uuid + "_" + file.getOriginalFilename();
                 Path savePath = Paths.get(uploadPath, fileName);
 
-                log.info("📂 파일 저장 경로: {}", savePath);
 
                 Path uploadDir = Paths.get(uploadPath);
                 if (Files.notExists(uploadDir)) {
                     Files.createDirectories(uploadDir);
-                    log.info("📂 업로드 경로 생성 완료: {}", uploadDir);
                 }
 
                 file.transferTo(savePath);
-                log.info("✅ 파일 저장 완료: {}", savePath);
 
                 goalDTO.setThumbnail(fileName);
             } else {
@@ -88,7 +80,6 @@ public class GoalRestController {
 
             // 목표 데이터베이스 저장 (goals, goals_members, chats, chats_members 자동 추가)
             Long goalId = goalService.register(goalDTO);
-            log.info("✅ 목표 등록 완료: ID={}", goalId);
 
             // 응답 데이터 생성
             Map<String, Object> response = new HashMap<>();
@@ -97,11 +88,9 @@ public class GoalRestController {
             return ResponseEntity.ok(response);
 
         } catch (IOException e) {
-            log.error("❌ 파일 업로드 실패", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "파일 업로드 중 오류가 발생했습니다."));
         } catch (Exception e) {
-            log.error("❌ 목표 등록 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "목표 등록 중 오류가 발생했습니다."));
         }
