@@ -12,7 +12,6 @@ import com.onestep.back.repository.goal.GoalRepository;
 import com.onestep.back.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +50,7 @@ public class GoalServiceImpl implements GoalService {
                 .categoryName(goal.getCategory().getCateName())
                 .memberId(goal.getAdminMember().getMemberId())
                 .thumbnail(goal.getThumbnail())
-                .members(goal.getMembers().stream() // null 체크 제거
+                .members(goal.getMembers().stream()
                         .map(m -> MemberDTO.builder()
                                 .memberId(m.getMemberId())
                                 .name(m.getName())
@@ -86,7 +85,6 @@ public class GoalServiceImpl implements GoalService {
                 .build();
 
         Goals savedGoal = goalRepository.save(goal);
-
 
         Chats chatRoom = Chats.builder()
                 .goal(savedGoal)

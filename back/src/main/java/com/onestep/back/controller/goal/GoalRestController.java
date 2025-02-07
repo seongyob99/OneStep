@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -31,7 +30,7 @@ public class GoalRestController {
 
     private final GoalService goalService;
 
-    // 목표 목록 조회
+    // ✅ 목표 목록 조회
     @GetMapping("/list")
     public ResponseEntity<List<GoalDTO>> getGoalList(
             @RequestParam(required = false) Long categoryId,
@@ -41,30 +40,18 @@ public class GoalRestController {
         return ResponseEntity.ok(goals);
     }
 
-    // 목표 등록
+    // ✅ 목표 등록
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> registerGoal(
             @ModelAttribute GoalDTO goalDTO,
-            @RequestParam("memberId") String memberId,
-            @RequestParam("categoryId") Long categoryId,
             @RequestPart(value = "file", required = false) MultipartFile file) {
 
-        // ✅ 로그인 구현 전까지 기본 `memberId` 하드코딩
-        if (memberId == null || memberId.trim().isEmpty()) {
-            memberId = "user01";  // ✅ 여기에 하드코딩
-        }
-
-        goalDTO.setMemberId(memberId);
-        goalDTO.setCategoryId(categoryId);
-
         try {
-            // 파일 업로드 처리
+            // ✅ 파일 업로드 처리
             if (file != null && !file.isEmpty()) {
-
                 String uuid = UUID.randomUUID().toString();
                 String fileName = uuid + "_" + file.getOriginalFilename();
                 Path savePath = Paths.get(uploadPath, fileName);
-
 
                 Path uploadDir = Paths.get(uploadPath);
                 if (Files.notExists(uploadDir)) {
@@ -72,25 +59,23 @@ public class GoalRestController {
                 }
 
                 file.transferTo(savePath);
-
                 goalDTO.setThumbnail(fileName);
             } else {
                 log.info("📂 파일이 제공되지 않음. 기본값 유지");
             }
 
-            // 목표 데이터베이스 저장 (goals, goals_members, chats, chats_members 자동 추가)
+            // ✅ 목표 데이터베이스 저장
             Long goalId = goalService.register(goalDTO);
 
-            // 응답 데이터 생성
-            Map<String, Object> response = new HashMap<>();
-            response.put("goalId", goalId);
-
-            return ResponseEntity.ok(response);
+            // ✅ 응답 데이터 반환
+            return ResponseEntity.ok(Map.of("goalId", goalId));
 
         } catch (IOException e) {
+            log.error("파일 업로드 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "파일 업로드 중 오류가 발생했습니다."));
         } catch (Exception e) {
+            log.error("목표 등록 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "목표 등록 중 오류가 발생했습니다."));
         }
