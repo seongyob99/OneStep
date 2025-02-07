@@ -15,6 +15,8 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +58,7 @@ public class GoalServiceImpl implements GoalService {
                 .categoryName(goal.getCategory().getCateName())
                 .memberId(goal.getAdminMember().getMemberId())
                 .thumbnail(goal.getThumbnail())
-                .members(goal.getMembers().stream() // null 체크 제거
+                .members(goal.getMembers().stream()
                         .map(m -> MemberDTO.builder()
                                 .memberId(m.getMemberId())
                                 .name(m.getName())
@@ -69,17 +71,14 @@ public class GoalServiceImpl implements GoalService {
     @Transactional
     @Override
     public Long register(GoalDTO goalDTO) {
-
-        // ✅ memberId 하드코딩 유지
-        if (goalDTO.getMemberId() == null || goalDTO.getMemberId().trim().isEmpty()) {
-            goalDTO.setMemberId("user01");
-        }
+        String memberId = (goalDTO.getMemberId() == null || goalDTO.getMemberId().trim().isEmpty())
+                ? getCurrentUserId() : goalDTO.getMemberId();
 
         Categories category = categoriesRepository.findById(goalDTO.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("❌ Invalid category ID: " + goalDTO.getCategoryId()));
 
-        Members member = memberRepository.findById(goalDTO.getMemberId())
-                .orElseThrow(() -> new IllegalArgumentException("❌ Invalid member ID: " + goalDTO.getMemberId()));
+        Members member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ Invalid member ID: " + memberId));
 
         Goals goal = Goals.builder()
                 .title(goalDTO.getTitle())
@@ -97,7 +96,6 @@ public class GoalServiceImpl implements GoalService {
 
         Goals savedGoal = goalRepository.save(goal);
 
-
         Chats chatRoom = Chats.builder()
                 .goal(savedGoal)
                 .chatName(savedGoal.getTitle())
@@ -107,5 +105,13 @@ public class GoalServiceImpl implements GoalService {
         chatsRepository.save(chatRoom);
 
         return savedGoal.getGoalId();
+    }
+
+    private String getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return authentication.getName();
+        }
+        throw new IllegalStateException("❌ 로그인되지 않은 사용자입니다.");
     }
 }
