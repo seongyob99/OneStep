@@ -171,7 +171,7 @@ const JoinForm = () => {
               value={formData.password}
               onChange={handleInputChange}
               isInvalid={!!errors.password}
-              placeholder="비밀번호를 입력하세요"
+              placeholder="비밀번호는 6자 이상, 영문자와 숫자를 포함해주세요"
               required
             />
             {errors.password && <div className="error-text">{errors.password}</div>}
