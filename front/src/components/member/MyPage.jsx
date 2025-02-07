@@ -10,6 +10,7 @@ const MyPage = () => {
   const { authState, logout } = useAuth();
   // username 가져오기
   const memberId = authState.user?.username;
+  const [isAuthLoaded, setIsAuthLoaded] = useState(false);
 
   const [member, setMember] = useState({});
   const [goals, setGoals] = useState([]);
@@ -25,7 +26,23 @@ const MyPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!memberId) {
+    if (authState === undefined || authState === null) {
+      return;
+    }
+    setIsAuthLoaded(true);
+    setLoading(false);
+  }, [authState]);
+
+  useEffect(() => {
+    if (isAuthLoaded && !authState.isAuthenticated) {
+      navigate("/member/login", { replace: true });
+    }
+  }, [isAuthLoaded, authState.isAuthenticated, navigate]);
+
+
+
+  useEffect(() => {
+    if (!isAuthLoaded || !memberId) {
       return;
     }
 
@@ -47,7 +64,16 @@ const MyPage = () => {
     };
 
     fetchData();
-  }, [memberId]);
+  }, [isAuthLoaded, memberId]);
+
+  if (!isAuthLoaded) {
+    return (
+      <Container className="text-center my-5">
+        <Spinner animation="border" variant="primary" />
+        <p>인증 정보를 불러오는 중...</p>
+      </Container>
+    );
+  }
 
   if (loading) {
     return (
