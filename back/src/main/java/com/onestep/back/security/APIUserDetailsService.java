@@ -17,10 +17,8 @@ public class APIUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 사용자 정보를 데이터베이스에서 가져오기
         Members member = memberRepository.findByMemberId(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
         return User.builder()
                 .username(member.getMemberId())
                 .password(member.getPassword())
