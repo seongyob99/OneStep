@@ -21,81 +21,85 @@
         height: 100%;
     }
 
-    .header-content {
-        flex-grow: 1;
+    .logo-container {
         display: flex;
-        justify-content: center;
-        font-size: 1.5rem;
-        font-weight: bold;
-    }
+        align-items: center;
+        flex-grow: 1;
 
+        .welcome-message {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+
+            img {
+                width: 100%;
+                max-width: 250px;
+                height: auto;
+                transition: transform 0.2s ease-in-out;
+            }
+
+            img:hover {
+                transform: scale(1.05);
+            }
+        }
+    }
 
     .header-right {
         display: flex;
         align-items: center;
-    }
+        gap: 10px;
 
-    // .chat {
-    //     position: fixed;
-    //     bottom: 50px;
-    //     right: 50px;
-    //     background: #000;
-    //     display: flex;
-    //     flex-direction: column;
-    //     align-items: center;
-    //     justify-content: center;
-    //     width: 70px;
-    //     height: 70px;
-    //     border-radius: 50%;
-    //     font-size: 1.5rem;
-    //     color: #fff;
-    //     // font-weight: bold;
-    //     // color: rgb(80, 78, 78);
-    //     // cursor: pointer;
-    //     // margin: 0 1rem 0 0;
+        .chat {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #000;
+            cursor: pointer;
+            // margin-right: 20px;
 
-    //     span {
-    //         font-size: 12px;
-    //     }
+            span {
+                font-size: 14px;
+                text-transform: uppercase;
+                font-weight: bold;
+                margin-left: 5px;
+            }
 
-    // }
-    .chat {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        color: #000;
-        // font-weight: bold;
-        // color: rgb(80, 78, 78);
-        // cursor: pointer;
-        margin: 0 1rem 0 0;
-        cursor: pointer;
-
-        span {
-            font-size: 14px;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin: 0 0 0 2px;
+            &:hover {
+                transform: scale(1.05);
+            }
         }
 
-    }
+        .mypage {
+            display: flex;
+            align-items: center;
+            // margin-right: 20px;
+            cursor: pointer;
+            font-size: 14px;
 
-    .chat:hover {
-        transform: scale(1.05);
-    }
+            span {
+                margin-left: 5px;
+            }
+        }
 
-    .login-btn {
-        padding: 5px 10px;
-        font-size: 1rem;
-        border: none;
-        background-color: orange;
-        color: white;
-        cursor: pointer;
-        border-radius: 5px;
-    }
+        .login-btn {
+            padding: 5px 10px;
+            font-size: 1rem;
+            border: none;
+            background-color: orange;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
 
-    .login-btn:hover {
-        background-color: darkorange;
+        .login-btn:hover {
+            background-color: darkorange;
+        }
     }
 }
 
@@ -103,23 +107,6 @@
     flex-grow: 1;
     padding-top: 100px;
     overflow-y: auto;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.logo img {
-    width: 100%;
-    max-width: 250px;
-    height: auto;
-    transition: transform 0.2s ease-in-out;
-}
-
-.logo img:hover {
-    transform: scale(1.05);
 }
 
 .footer {
