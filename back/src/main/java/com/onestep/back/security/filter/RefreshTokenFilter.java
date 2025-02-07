@@ -42,7 +42,6 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
             if (jwtUtil.isTokenValid(token)) {
                 Claims claims = jwtUtil.parseToken(token);
                 String username = claims.getSubject();
-
                 String newAccessToken = jwtUtil.generateToken(claims, username, false);
 
                 Map<String, String> tokens = new HashMap<>();
