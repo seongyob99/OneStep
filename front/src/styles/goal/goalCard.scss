@@ -54,7 +54,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
     display: flex;
     align-items: center;
@@ -75,11 +75,8 @@
     /* ✅ 한 줄 유지 */
     flex-shrink: 0;
     font-size: 15px;
-    height: 24px;
     /* ✅ 제목과 같은 높이로 맞춤 */
-    display: flex;
-    align-items: center;
-    /* ✅ 텍스트를 세로 중앙 정렬 */
+    margin: 3px 0;
 }
 
 
@@ -92,10 +89,11 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     /* ✅ 설명 텍스트 높이 고정 */
+    margin: 3px 0;
 }
 
 .goal-card-hr {
-    margin: 1rem 0;
+    margin: 1rem 0 0 0;
 }
 
 /* ✅ 기타 정보도 정렬 유지 */

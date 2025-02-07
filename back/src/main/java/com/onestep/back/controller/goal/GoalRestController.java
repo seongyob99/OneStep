@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +15,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -43,23 +40,11 @@ public class GoalRestController {
         return ResponseEntity.ok(goals);
     }
 
-    // ✅ 목표 등록 (로그인 사용자 기반)
+    // ✅ 목표 등록
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> registerGoal(
             @ModelAttribute GoalDTO goalDTO,
-            @RequestParam("categoryId") Long categoryId,
-            @RequestPart(value = "file", required = false) MultipartFile file,
-            @AuthenticationPrincipal UserDetails userDetails) {  // ✅ 로그인된 사용자 정보 가져오기
-
-        // ✅ 로그인한 사용자만 등록 가능
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "로그인이 필요합니다."));
-        }
-
-        String memberId = userDetails.getUsername(); // 로그인된 사용자 ID
-        goalDTO.setMemberId(memberId);
-        goalDTO.setCategoryId(categoryId);
+            @RequestPart(value = "file", required = false) MultipartFile file) {
 
         try {
             // ✅ 파일 업로드 처리

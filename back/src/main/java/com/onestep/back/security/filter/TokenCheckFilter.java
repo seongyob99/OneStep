@@ -32,7 +32,7 @@ public class TokenCheckFilter extends OncePerRequestFilter {
 
 
         if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7); // "Bearer " 제거
+            token = token.substring(7);
 
             if (jwtUtil.isTokenValid(token)) {
                 Claims claims = jwtUtil.parseToken(token);
@@ -46,7 +46,6 @@ public class TokenCheckFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
-
 
         chain.doFilter(request, response);
     }

@@ -26,13 +26,8 @@ public class JWTUtil {
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
-
     public String generateToken(Map<String, Object> claims, String subject, boolean isRefresh) {
         long expirationTime = isRefresh ? REFRESH_TOKEN_EXPIRY : ACCESS_TOKEN_EXPIRY;
-
-        log.info("🔹 토큰 생성 시작 | Subject: {}, Expiry: {}, IsRefresh: {}", subject, expirationTime, isRefresh);
-        log.info("🔹 Claims: {}", claims);
-
         if (isRefresh) {
             claims.put("type", "refresh");
         }
@@ -45,7 +40,6 @@ public class JWTUtil {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-
 
 
     public Claims parseToken(String token) {

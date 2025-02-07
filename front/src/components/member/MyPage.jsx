@@ -3,8 +3,15 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Container, Row, Col, Card, ListGroup, Tabs, Tab, Spinner, Button } from "react-bootstrap";
 import '@styles/member/MyPage.scss';
+import { useAuth } from "../context/AuthContext";
 
 const MyPage = () => {
+  // AuthContext에서 authState 가져오기
+  const { authState, logout } = useAuth();
+  // username 가져오기
+  const memberId = authState.user?.username;
+  const [isAuthLoaded, setIsAuthLoaded] = useState(false);
+
   const [member, setMember] = useState({});
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,10 +26,29 @@ const MyPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (authState === undefined || authState === null) {
+      return;
+    }
+    setIsAuthLoaded(true);
+    setLoading(false);
+  }, [authState]);
+
+  useEffect(() => {
+    if (isAuthLoaded && !authState.isAuthenticated) {
+      navigate("/member/login", { replace: true });
+    }
+  }, [isAuthLoaded, authState.isAuthenticated, navigate]);
+
+
+
+  useEffect(() => {
+    if (!isAuthLoaded || !memberId) {
+      return;
+    }
+
     const fetchData = async () => {
       try {
         setLoading(true);
-        const memberId = "user03";
         const [memberResponse, goalsResponse] = await Promise.all([
           axios.get(`${SERVER_URL}/api/member/${memberId}`),
           axios.get(`${SERVER_URL}/api/member/${memberId}/goals`),
@@ -38,7 +64,16 @@ const MyPage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [isAuthLoaded, memberId]);
+
+  if (!isAuthLoaded) {
+    return (
+      <Container className="text-center my-5">
+        <Spinner animation="border" variant="primary" />
+        <p>인증 정보를 불러오는 중...</p>
+      </Container>
+    );
+  }
 
   if (loading) {
     return (
@@ -70,8 +105,8 @@ const MyPage = () => {
     return goals.slice(startIndex, endIndex);
   };
 
-  const totalOngoingPages = Math.ceil(ongoingGoals.length / PAGE_SIZE);
-  const totalCompletedPages = Math.ceil(completedGoals.length / PAGE_SIZE);
+  const totalOngoingPages = Math.ceil(ongoingGoals.length / PAGE_SIZE || 1);
+  const totalCompletedPages = Math.ceil(completedGoals.length / PAGE_SIZE || 1);
 
   const handleEditInfo = () => {
     navigate("/member/detail");
@@ -82,8 +117,8 @@ const MyPage = () => {
     if (!confirmDelete) return;
 
     try {
-      const memberId = "user03"; // 로그인된 사용자 ID
       await axios.delete(`${SERVER_URL}/api/member/${memberId}`);
+      logout();
       alert("회원 탈퇴가 완료되었습니다.");
       navigate("/");
     } catch (error) {
@@ -170,7 +205,7 @@ const MyPage = () => {
                 </Tab>
               </Tabs>
             </Card.Body>
-            <Card.Footer className="d-flex justify-content-center">
+            <Card.Footer className="d-flex justify-content-center align-items-center">
               {selectedTab === "ongoing" ? (
                 <>
                   <Button

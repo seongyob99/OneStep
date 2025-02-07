@@ -2,8 +2,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Row, Col, Container, Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const MemberDetail = () => {
+  // AuthContext에서 authState 가져오기
+  const { authState } = useAuth();
+  // username 가져오기
+  const memberId = authState.user?.username;
+  const [isAuthLoaded, setIsAuthLoaded] = useState(false);
+
   const [member, setMember] = useState({
     memberId: "",
     name: "",
@@ -26,10 +33,23 @@ const MemberDetail = () => {
   // 오늘 날짜 계산
   const today = new Date().toISOString().split("T")[0];
 
+  useEffect(() => {
+    if (authState === undefined || authState === null) {
+      return;
+    }
+    setIsAuthLoaded(true);
+    setLoading(false);
+  }, [authState]);
+
+  useEffect(() => {
+    if (isAuthLoaded && !authState.isAuthenticated) {
+      navigate("/member/login", { replace: true });
+    }
+  }, [isAuthLoaded, authState.isAuthenticated, navigate]);
+
   // 사용자 정보 가져오기
   const fetchMember = async () => {
     try {
-      const memberId = "user03"; // 로그인된 사용자 ID
       const response = await axios.get(`${SERVER_URL}/api/member/${memberId}`);
       setMember(response.data);
     } catch (error) {
@@ -41,8 +61,12 @@ const MemberDetail = () => {
   };
 
   useEffect(() => {
+    if (!memberId) {
+      return;
+    }
+
     fetchMember();
-  }, []);
+  }, [memberId]);
 
   // 유효성 검사 함수
   const validateForm = () => {
@@ -117,7 +141,7 @@ const MemberDetail = () => {
   return (
     <Container>
       <h3 className="my-4">
-        {validationError && <Alert variant="danger">{validationError}</Alert>}
+        {validationError && <Alert variant="danger" className="fs-5">{validationError}</Alert>}
         <Form>
           <Form.Group className="mb-3">
             <h5>회원 ID</h5>
@@ -171,8 +195,15 @@ const MemberDetail = () => {
             <Form.Check
               type="switch" // 스위치 스타일 적용
               id="passwordChangeSwitch"
+              placeholder="비밀번호는 6자 이상, 영문자와 숫자를 포함해주세요"
               checked={isPasswordChangeEnabled}
-              onChange={(e) => setIsPasswordChangeEnabled(e.target.checked)}
+              onChange={(e) => {
+                setValidationError(null);
+                setNewPassword("");
+                setConfirmPassword("");
+                setIsPasswordChangeEnabled(e.target.checked)
+              }
+              }
               style={{ marginBottom: "10px" }}
             />
           </Form.Group>
@@ -184,7 +215,11 @@ const MemberDetail = () => {
                 <Form.Control
                   type="password"
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  onChange={(e) => {
+                    setValidationError(null);
+                    setNewPassword(e.target.value)
+                  }
+                  }
                   disabled={!isPasswordChangeEnabled}
                 />
               </Col>

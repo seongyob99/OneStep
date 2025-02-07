@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CertificationsRepository extends JpaRepository<Certifications, CertificationId> {
+public interface CertificationsRepository extends JpaRepository<Certifications, CertificationId>, CertCustomRepo {
     // 특정 목표에 속한 인증들을 날짜 내림차순으로 조회
     @EntityGraph(attributePaths = {"goal", "member"})
     @Query("select c from Certifications c " +
@@ -29,21 +29,13 @@ public interface CertificationsRepository extends JpaRepository<Certifications, 
             "where c.goal.goalId = :goalId " +
             "and c.member.memberId = :memberId " +
             "and c.certDate = :certDate")
-    Optional<Certifications> findByGoal_IdAndMember_IdAndCertDate(@Param("goalId") Long goalId,
+    Optional<Certifications> findByAll(@Param("goalId") Long goalId,
                                                                   @Param("memberId") Long memberId,
                                                                   @Param("certDate") LocalDate certDate);
-//    // 최신 인증 목록 조회
-//    @Query("SELECT c FROM Certifications c WHERE c.goal.goalId = :goalId ORDER BY c.certDate DESC")
-//    List<Certifications> findLatestCertifications(Long goalId);
-//
-//    // 오늘 날짜의 인증 조회
-//    @Query("SELECT c FROM Certifications c WHERE c.goal.goalId = :goalId AND c.certDate = :today")
-//    List<Certifications> findTodayCertifications(Long goalId, LocalDate today);
-//
-//    // 특정 사용자의 특정 목표에 대한 인증 목록 조회
-//    List<Certifications> findByGoal_GoalIdAndMember_MemberId(Long goalId, Long memberId);
 
 
+    @Query("SELECT c.member.name FROM Certifications c WHERE c.member.memberId = :memberId")
+    String findMemberName(@Param("memberId") String memberId);
     // 최근 인증 기록 탑4 조회
     @Query("SELECT c FROM Certifications c WHERE c.goal.goalId = :goalId ORDER BY c.regDate DESC")
     List<Certifications> findRecentCertificationsByGoalId(@Param("goalId") Long goalId, Pageable pageable);

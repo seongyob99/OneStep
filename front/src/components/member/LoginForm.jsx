@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Button, Form, Alert } from "react-bootstrap";
+import { Container, Button, Form, Alert } from "react-bootstrap";
 import "@styles/member/LoginForm.scss";
+import { useAuth } from "../context/AuthContext";
 
 const LoginForm = () => {
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const [formData, setFormData] = useState({
         memberId: "",
@@ -41,31 +43,20 @@ const LoginForm = () => {
         if (!validateForm()) return;
 
         try {
-            console.log("📤 로그인 요청 데이터:", JSON.stringify(formData));  // JSON 확인
             const response = await axios.post(`${SERVER_URL}/member/login`, formData, {
                 headers: { "Content-Type": "application/json" }
             });
 
-            console.log("✅ 응답 데이터:", response.data);
+            const { accessToken, refreshToken, user } = response.data;
 
-            // 로그인 성공 후 액세스 토큰을 로컬 스토리지에 저장
-            localStorage.setItem("accessToken", response.data.accessToken);
+            login(accessToken, refreshToken, user);
 
-            // 로그인 성공 후 추가 작업
-            onLoginSuccess(response.data.accessToken);
-
+            navigate("/");
         } catch (error) {
             console.error("❌ 로그인 실패:", error.response?.data || error.message);
             setIsError(true);
-            setResponseMessage(error.response?.data?.message || "로그인 실패");
+            setResponseMessage("ID 또는 비밀번호를 다시 확인해주세요.");
         }
-    };
-
-    // 로그인 성공 후 처리
-    const onLoginSuccess = (accessToken) => {
-        // 예: 로그인 성공 후 액세스 토큰을 저장하고, 리다이렉트
-        console.log("로그인 성공! 액세스 토큰:", accessToken);
-        navigate("/");  // 예시: 로그인 후 대시보드로 리다이렉트
     };
 
     // 입력값 변경 핸들러
@@ -83,55 +74,57 @@ const LoginForm = () => {
     };
 
     return (
-        <div className="login-form-container">
-            <h2>로그인</h2>
+        <Container className="h-100 d-flex align-items-center">
+            <div className="login-form-container">
+                <h3>로그인</h3>
 
-            {responseMessage && (
-                <Alert variant={isError ? "danger" : "success"}>{responseMessage}</Alert>
-            )}
+                {responseMessage && (
+                    <Alert variant={isError ? "danger" : "success"}>{responseMessage}</Alert>
+                )}
 
-            <Form>
-                <div className="form-group">
-                    <label className="form-label">회원 ID</label>
-                    <Form.Control
-                        type="text"
-                        name="memberId"
-                        value={formData.memberId}
-                        onChange={handleInputChange}
-                        isInvalid={!!errors.memberId}
-                        placeholder="아이디를 입력하세요"
-                        required
-                    />
-                    {errors.memberId && <div className="error-text">{errors.memberId}</div>}
-                </div>
+                <Form>
+                    <div className="form-group">
+                        <label className="form-label">회원 ID</label>
+                        <Form.Control
+                            type="text"
+                            name="memberId"
+                            value={formData.memberId}
+                            onChange={handleInputChange}
+                            isInvalid={!!errors.memberId}
+                            placeholder="아이디를 입력하세요"
+                            required
+                        />
+                        {errors.memberId && <div className="error-text">{errors.memberId}</div>}
+                    </div>
 
-                <div className="form-group">
-                    <label className="form-label">비밀번호</label>
-                    <Form.Control
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        isInvalid={!!errors.password}
-                        placeholder="비밀번호를 입력하세요"
-                        required
-                    />
-                    {errors.password && <div className="error-text">{errors.password}</div>}
-                </div>
+                    <div className="form-group">
+                        <label className="form-label">비밀번호</label>
+                        <Form.Control
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            isInvalid={!!errors.password}
+                            placeholder="비밀번호를 입력하세요"
+                            required
+                        />
+                        {errors.password && <div className="error-text">{errors.password}</div>}
+                    </div>
 
-                <Button variant="primary" className="mt-3 w-100" onClick={handleLoginClick}>
-                    로그인
-                </Button>
+                    <Button variant="primary" className="mt-3 w-100" onClick={handleLoginClick}>
+                        로그인
+                    </Button>
 
-                <Button
-                    variant="secondary"
-                    className="mt-2 w-100"
-                    onClick={handleRegisterClick}
-                >
-                    회원가입
-                </Button>
-            </Form>
-        </div>
+                    <Button
+                        variant="secondary"
+                        className="mt-2 w-100"
+                        onClick={handleRegisterClick}
+                    >
+                        회원가입
+                    </Button>
+                </Form>
+            </div>
+        </Container>
     );
 };
 
