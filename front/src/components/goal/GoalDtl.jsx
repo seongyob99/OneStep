@@ -260,7 +260,7 @@ const GoalDtl = () => {
                             </>
                         ) : (
                             <ListGroup>
-                                {goalData.members.map((member, index) => {
+                                {goalData.members.slice(0, 7).map((member, index) => {
                                     if (index === 0) {
                                         return (
                                             <ListGroup.Item key={member.memberId} title={`${member.name} (${member.memberId})`}>
