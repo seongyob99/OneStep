@@ -1,0 +1,22 @@
+.not-found {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.not-found h1 {
+    font-size: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.not-found p {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.not-found svg {
+    margin-bottom: 1rem;
+}

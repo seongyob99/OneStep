@@ -111,6 +111,11 @@ const JoinForm = () => {
     }));
   };
 
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  yesterday.setMinutes(yesterday.getMinutes() - yesterday.getTimezoneOffset());
+  const formattedDate = yesterday.toISOString().split("T")[0];
+
   return (
     <Container>
       <div className="join-form-container">
@@ -214,6 +219,7 @@ const JoinForm = () => {
                 value={formData.birth}
                 onChange={handleInputChange}
                 isInvalid={!!errors.birth}
+                max={formattedDate}
                 required
               />
               {errors.birth && <div className="error-text">{errors.birth}</div>}
