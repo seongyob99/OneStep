@@ -7,10 +7,7 @@ import { Container } from "react-bootstrap";
 
 
 const CertBoard = () => {
-  const { goalId } = useParams(); // ✅ URL에서 goalId 가져오기
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [showDetail, setShowDetail] = useState(false);
-
+  const { goalId } = useParams(); 
   
   const handleDateClick = (date) => {
     setSelectedDate(date);
@@ -22,7 +19,6 @@ const CertBoard = () => {
     <Container>
       <CertUpload goalId={goalId} />
       <CalendarNavigator goalId={goalId} onDateClick={handleDateClick} />
-
     </Container>
   );
 };

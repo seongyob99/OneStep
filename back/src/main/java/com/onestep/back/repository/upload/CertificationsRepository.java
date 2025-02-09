@@ -23,19 +23,6 @@ public interface CertificationsRepository extends JpaRepository<Certifications, 
             "order by c.certDate desc")
     List<Certifications> findByGoal_Id(@Param("goalId") Long goalId);
 
-    // 특정 목표, 특정 회원, 특정 날짜의 인증 조회 (복합키 구성 요소)
-    @EntityGraph(attributePaths = {"goal", "member"})
-    @Query("select c from Certifications c " +
-            "where c.goal.goalId = :goalId " +
-            "and c.member.memberId = :memberId " +
-            "and c.certDate = :certDate")
-    Optional<Certifications> findByAll(@Param("goalId") Long goalId,
-                                                                  @Param("memberId") Long memberId,
-                                                                  @Param("certDate") LocalDate certDate);
-
-
-    @Query("SELECT c.member.name FROM Certifications c WHERE c.member.memberId = :memberId")
-    String findMemberName(@Param("memberId") String memberId);
     // 최근 인증 기록 탑4 조회
     @Query("SELECT c FROM Certifications c WHERE c.goal.goalId = :goalId ORDER BY c.regDate DESC")
     List<Certifications> findRecentCertificationsByGoalId(@Param("goalId") Long goalId, Pageable pageable);
