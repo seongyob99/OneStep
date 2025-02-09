@@ -31,17 +31,14 @@ public class CertificationServiceImpl implements CertificationService {
     private final GoalRepository goalsRepository;
     private final MemberRepository membersRepository;
 
+    // 파일 업로드
     @Override
     public void register(CertificationsDTO dto) {
-
-
         // 인증 등록은 오늘 날짜만 허용
         if (!dto.getCertDate().equals(LocalDate.now())) {
             throw new RuntimeException("인증 등록은 오늘 날짜에만 가능합니다.");
         }
 
-        log.info("service goalId확인 : "+ dto.getGoalId());
-        // 중복 등록 체크: 동일 목표, 동일 회원, 동일 날짜의 인증이 존재하는지 확인하기 // 아님 수정기능 ?
         Goals goal = goalsRepository.findById(dto.getGoalId())
                 .orElseThrow(() -> new RuntimeException("목표를 찾을 수 없습니다."));
         Members member = membersRepository.findById(dto.getMemberId())
@@ -62,7 +59,7 @@ public class CertificationServiceImpl implements CertificationService {
 
         // 종료일이 설정되어 있고 인증일이 종료일 이후이면 업로드 안됨
         if (goal.getEndDate() != null && certDate.isAfter(goal.getEndDate())) {
-            throw new RuntimeException("인증일은 목표 종료일 이전이어야 합니다.");
+            throw new RuntimeException("목료가 종료되었습니다.");
         }
 
         // 인증 주기 체크: 목표 시작일과 인증일 사이의 일수 차이가 목표의 인증 주기로 나누어 떨어져야 함
@@ -82,43 +79,7 @@ public class CertificationServiceImpl implements CertificationService {
         certificationsRepository.save(certification);
     }
 
-    @Override
-    public CertificationsDTO read(Long goalId, String memberId, LocalDate certDate) {
-        Goals goal = goalsRepository.findById(goalId)
-                .orElseThrow(() -> new RuntimeException("목표를 찾을 수 없습니다."));
-        Members member = membersRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
-        CertificationId cid = new CertificationId(goal.getGoalId(), member.getMemberId(), certDate);
-        Certifications certification = certificationsRepository.findById(cid)
-                .orElseThrow(() -> new RuntimeException("인증 정보를 찾을 수 없습니다."));
-        return entityToDto(certification);
-    }
-
-    @Override
-    public void update(CertificationsDTO dto) {
-        // 수정은 오늘 날짜의 인증만 가능 / 로그인한 본인만
-        Goals goal = goalsRepository.findById(dto.getGoalId())
-                .orElseThrow(() -> new RuntimeException("목표를 찾을 수 없습니다."));
-        Members member = membersRepository.findById(dto.getMemberId())
-                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
-        CertificationId cid = new CertificationId(goal.getGoalId(), member.getMemberId(), dto.getCertDate());
-        Certifications certification = certificationsRepository.findById(cid)
-                .orElseThrow(() -> new RuntimeException("인증 정보를 찾을 수 없습니다."));
-
-        if (!certification.getCertDate().equals(LocalDate.now())) {
-            throw new RuntimeException("오늘의 인증만 수정할 수 있습니다.");
-        }
-
-        // 불변성을 유지, 새 인스턴ㅅ,생성 해서 업데이트
-        Certifications updated = Certifications.builder()
-                .goal(certification.getGoal())
-                .member(certification.getMember())
-                .certDate(certification.getCertDate())
-                .filePath(dto.getFilePath()) // 변경할 파일 경로
-                .build();
-        certificationsRepository.save(updated);
-    }
-
+    // 파일 삭제
     @Override
     public void delete(Long goalId, String targetMemberId, LocalDate certDate, String currentMemberId) {
         // 목표 조회
@@ -146,24 +107,9 @@ public class CertificationServiceImpl implements CertificationService {
         certificationsRepository.delete(certification);
     }
 
+    // 파일 불러오기
     public List<MemberDTO> Alllist(Long goalId) {
 
-        return  certificationsRepository.getCertInfo(goalId);// ✅ 인터페이스의 default 메서드 호출
-    }
-
-
-        public List<CertificationsDTO> listByAll(Long goalId, String memberId, LocalDate certDate) {
-        // 인증 데이터 확인후 가져오기
-        List<Certifications> list = (certDate != null) ?
-                certificationsRepository.findByGoalIdAndCertDate(goalId, certDate) :
-                certificationsRepository.findByGoal_Id(goalId);
-
-        return list.stream()
-                .map(cert -> {
-                    CertificationsDTO dto = entityToDto(cert);
-                    dto.setName(cert.getMember().getName());  // DTO의 name 필드에 회원 이름 저장
-                    return dto;
-                })
-                .collect(Collectors.toList());
+        return  certificationsRepository.getCertInfo(goalId);// 인터페이스의 default 메서드 호출
     }
 }

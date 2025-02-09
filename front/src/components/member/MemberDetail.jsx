@@ -30,8 +30,10 @@ const MemberDetail = () => {
   const navigate = useNavigate();
   const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-  // 오늘 날짜 계산
-  const today = new Date().toISOString().split("T")[0];
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  yesterday.setMinutes(yesterday.getMinutes() - yesterday.getTimezoneOffset());
+  const formattedDate = yesterday.toISOString().split("T")[0];
 
   useEffect(() => {
     if (authState === undefined || authState === null) {
@@ -185,7 +187,7 @@ const MemberDetail = () => {
               name="birth"
               value={member.birth || ""}
               onChange={(e) => setMember({ ...member, birth: e.target.value })}
-              max={today} // 오늘 날짜를 초과하지 못하도록 설정
+              max={formattedDate}
             />
           </Form.Group>
 

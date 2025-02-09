@@ -7,6 +7,7 @@ import com.onestep.back.domain.QGoals;
 import com.onestep.back.domain.QMembers;
 import com.onestep.back.dto.member.MemberDTO;
 import com.onestep.back.dto.upload.CertificationsDTO;
+
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.time.LocalDate;
@@ -28,18 +29,21 @@ public class CertCustomRepoImpl extends QuerydslRepositorySupport implements Cer
         QMembers members = QMembers.members;
         QCertifications certifications = QCertifications.certifications;
 
-        // 1. 인증 정보를 튜플 리스트로 fetch (GroupBy transform 대신 일반 fetch 사용)
+        // 1. 인증 정보를 튜플 리스트로 fetch (goalId를 필터링)
         List<Tuple> memberResult = from(members)
                 .leftJoin(members.certifications, certifications)
                 .leftJoin(members.goals, goals)
-                .where(goals.goalId.eq(goalId))
+                .where(goals.goalId.eq(goalId) // goalId가 일치하는 멤버만 가져옴
+                        .and(certifications.goal.goalId.eq(goalId))) // goalId가 일치하는 인증 데이터만 포함
                 .select(
                         goals.goalId,
+                        goals.adminMember.memberId,
                         members.memberId,
                         members.name,
                         certifications.filePath,
                         certifications.certDate,
                         goals.startDate,
+                        goals.endDate,
                         goals.certCycle
                 )
                 .orderBy(members.memberId.asc(), certifications.certDate.desc())
@@ -53,16 +57,21 @@ public class CertCustomRepoImpl extends QuerydslRepositorySupport implements Cer
         List<MemberDTO> memberDTOList = groupedResults.entrySet().stream()
                 .map(entry -> {
                     List<Tuple> tuples = entry.getValue();
-                    // 첫 번째 튜플에서 회원 정보를 추출 (모든 튜플은 같은 회원 정보임)
                     Tuple first = tuples.get(0);
                     String memberId = first.get(members.memberId);
                     String memberName = first.get(members.name);
                     LocalDate startDate = first.get(goals.startDate);
+                    LocalDate endDate = first.get(goals.endDate);
                     Long certCycle = first.get(goals.certCycle);
+                    String adminMemberId = first.get(goals.adminMember.memberId);
 
-                    // 각 튜플을 CertificationsDTO로 매핑
+                    // 🔹 goalId가 일치하는 인증 정보만 필터링하여 certDTOList 생성
                     List<CertificationsDTO> certDTOList = tuples.stream()
+                            .filter(tuple -> goalId.equals(tuple.get(goals.goalId))) // goalId 일치하는 데이터만 필터링
                             .map(tuple -> CertificationsDTO.builder()
+                                    .goalId(tuple.get(goals.goalId))
+                                    .memberId(tuple.get(members.memberId))
+                                    .name(tuple.get(members.name))
                                     .filePath(tuple.get(certifications.filePath))
                                     .certDate(tuple.get(certifications.certDate))
                                     .build())
@@ -73,6 +82,8 @@ public class CertCustomRepoImpl extends QuerydslRepositorySupport implements Cer
                             .name(memberName)
                             .certdto(certDTOList)
                             .startDate(startDate)
+                            .endDate(endDate)
+                            .adminMemberId(adminMemberId)
                             .certCycle(certCycle)
                             .build();
                 })
