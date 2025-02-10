@@ -169,6 +169,15 @@ const GoalDtl = () => {
         );
     }
 
+    const renderTextWithLineBreaks = (text) => {
+        return text.split("\n").map((line, index) => (
+            <span key={index}>
+                {line}
+                <br />
+            </span>
+        ));
+    };
+
     return (
         <Container>
             <Col className="d-flex align-items-center">
