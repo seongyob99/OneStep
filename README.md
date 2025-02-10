@@ -26,7 +26,7 @@
 
 ## 프로젝트 화면
 ![Image](https://github.com/user-attachments/assets/723e6110-4baf-4af7-8910-f19560fbc1f4)
-![Image](https://github.com/user-attachments/assets/4608cc6e-96f1-4918-ab8e-6b415d3381fa)
+![Image](https://github.com/user-attachments/assets/8a6a14bd-bc3b-42dc-8f78-0a8b83c1ac07)
 ![Image](https://github.com/user-attachments/assets/03582838-4948-4a2f-87fc-b610bfeae213)
 ![Image](https://github.com/user-attachments/assets/ca734c2d-7567-42c3-a8b6-63fc5bc75e3f)
 ![Image](https://github.com/user-attachments/assets/22b4445c-dedf-4502-9043-d55eced70d2d)
