@@ -130,7 +130,7 @@ const GoalUpdate = () => {
                         const endDate = new Date(form.endDate);
                         endDate.setHours(0, 0, 0, 0);
 
-                        if (endDate <= startDate) {
+                        if (form.endDate && endDate <= startDate) {
                             alert("시작일은 종료일 이전이여야 합니다.");
                             return;
                         }

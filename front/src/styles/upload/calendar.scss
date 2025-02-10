@@ -12,8 +12,8 @@
   border: none;
   background: none;
   font-size: 20px;
-  cursor: pointer; 
-  padding: 3px 10px; 
+  cursor: pointer;
+  padding: 3px 10px;
   transition: color 0.3s ease;
 }
 
@@ -39,67 +39,67 @@
 }
 
 .year-selector button:hover {
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
 }
 
 .calendar-navigator {
   text-align: center;
-  padding: 20px;
-  background: #fff; 
+  background: #fff;
   border-radius: 8px;
   max-width: 1000px;
-  margin: 20px auto; 
+  margin: 20px auto;
 
   h2 {
     font-size: 22px;
     border-radius: 4px;
-    padding: 7px 10px; 
+    padding: 7px 10px;
     color: #333;
     cursor: pointer;
-    text-decoration: none !important; 
+    text-decoration: none !important;
     display: inline-block;
     font-weight: 600;
+
     &:hover {
       background-color: #f0f0f0;
     }
   }
 
   .month-calendar {
-    flex-wrap: nowrap; 
-    overflow-x: auto; 
-    white-space: nowrap; 
-    justify-content: flex-start; 
-    gap: 4px; 
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    white-space: nowrap;
+    justify-content: flex-start;
+    gap: 4px;
     padding: 10px 0;
     margin-bottom: 10px;
-  
+
     .day {
       display: inline-block;
-      min-width: 30px; 
-      padding: 5px 8px; 
-      font-size: 12px; 
+      min-width: 30px;
+      padding: 5px 8px;
+      font-size: 12px;
       text-align: center;
       border-radius: 4px;
       cursor: pointer;
       transition: background-color 0.2s;
-  
+
       &:hover {
         background-color: #f0f0f0;
       }
     }
-  
+
     .selected-day {
       background-color: #007bff;
       color: #fff;
       border-color: #007bff;
     }
   }
-  
+
   .month-selector {
     position: relative;
     display: inline-block;
   }
-  
+
   .month-dropdown {
     position: absolute;
     background: white;
@@ -109,32 +109,32 @@
     width: 200px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
-  
+
   .month-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px; 
+    gap: 10px;
   }
-  
+
   .month-option {
     padding: 8px;
     text-align: center;
     cursor: pointer;
     border-radius: 5px;
   }
-  
+
   .month-option:hover {
     background: #e9ecef;
   }
 
   .date-navigation {
     display: flex;
-    justify-content: space-between; 
+    justify-content: space-between;
     align-items: center;
     margin-top: 15px;
     padding: 10px 0;
-    border-bottom: 1px solid #ddd; 
-    
+    border-bottom: 1px solid #ddd;
+
     button {
       background-color: white;
       border: none;
@@ -180,8 +180,8 @@
     }
 
     .navday {
-      padding: 4px 3px; 
-      font-size: 14px;  
+      padding: 4px 3px;
+      font-size: 14px;
     }
   }
 
@@ -202,12 +202,12 @@
     ul {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px; 
+      gap: 20px;
       list-style: none;
       padding: 0;
       margin: 0;
     }
-  
+
     li {
       width: 100%;
       max-width: 200px;
@@ -219,27 +219,98 @@
       text-align: center;
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-  
+
       &:hover {
         transform: translateY(-4px);
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
       }
-  
+
       .cert-image {
-        width: 150px; 
-        height: 150px; 
-        aspect-ratio: 1 / 1; 
-        object-fit: cover; 
+        width: 150px;
+        height: 150px;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
         border-radius: 4px;
         margin-bottom: 10px;
       }
-  
+
       p {
         font-size: 14px;
         color: #555;
         margin: 0;
-        text-align: left; 
+        text-align: left;
       }
     }
+
+
+
+    
+  }
+// 모달 내부에서 인증 이미지 크기 조절
+.cert-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    position: relative;
+    max-width: 500px; // 최대 크기 설정
+    width: 90%;
+  }
+
+  .cert-image {
+    width: 100%; // 모달에서는 가득 차게 설정
+    max-width: 400px; // 원하는 최대 크기
+    height: auto; // 비율 유지
+    object-fit: contain; // 원본 비율 유지
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: red;
+    }
+  }
+
+  
+}
+
+
+
+
+}
+
+
+.text-center.modal-body {
+  img {
+    width: 100% !important;  /* 부모 요소에 맞게 */
+    max-width: 400px !important; /* 최대 크기 제한 */
+    height: auto !important;  /* 비율 유지 */
+    object-fit: contain !important; /* 이미지 왜곡 방지 */
+    border-radius: 8px; /* 모서리를 둥글게 */
+    display: block;
+    margin: 10px auto; /* 중앙 정렬 */
   }
 }
