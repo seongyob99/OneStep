@@ -19,20 +19,19 @@
 2025.1.31 ~ 2025.02.11
 
 ## ERD
-![Image](https://github.com/user-attachments/assets/9741697b-d805-4659-9192-d2982e517146)
+![Image](https://github.com/user-attachments/assets/99aa8cb6-8f2a-4910-8c7f-7c41a3d4adbf)
 
 ## API 명세서
-- ### [The Ticket API 설계](https://docs.google.com/document/d/135iGo6gqKv1fQDkRXCIWcC7O1V1Dlf88QwlKvyZ9zF8/edit?usp=sharing)
+- ### [OneStep API 설계](https://docs.google.com/document/d/135iGo6gqKv1fQDkRXCIWcC7O1V1Dlf88QwlKvyZ9zF8/edit?usp=sharing)
 
 ## 프로젝트 화면
-![image](https://github.com/user-attachments/assets/0da0cea1-a1fd-4a63-95d5-11731d5d54c9)
-![image](https://github.com/user-attachments/assets/4cdf2c7c-8074-4889-818d-f8a2f5aa8995)
-![image](https://github.com/user-attachments/assets/a90db53c-ba65-4796-b6e2-4eda321639c2)
-![image](https://github.com/user-attachments/assets/500b1294-4dc2-454b-bc21-e590f4fd6f24)
-![image](https://github.com/user-attachments/assets/358f5eff-1aa7-4a02-8ec0-fd3849b42dce)
-![image](https://github.com/user-attachments/assets/c97818f6-5e70-4d17-a940-8bd8e8d9b8a0)
-![image](https://github.com/user-attachments/assets/fa0b9013-1f25-4ea1-9160-cb7d55e85e5a)
-![image](https://github.com/user-attachments/assets/0a2be9d8-b204-4070-ac56-629449967acf)
-![Image](https://github.com/user-attachments/assets/4c488b75-a20a-4856-8f70-69663fd79adf)
-![image](https://github.com/user-attachments/assets/bb770383-6cd5-47c6-b1e2-5e24c32577f8)
-![image](https://github.com/user-attachments/assets/d7dd0659-9037-4363-8c98-7c938f93af42)
+![Image](https://github.com/user-attachments/assets/049e1081-f962-45af-899e-23d0b2218a49)
+![Image](https://github.com/user-attachments/assets/4608cc6e-96f1-4918-ab8e-6b415d3381fa)
+![Image](https://github.com/user-attachments/assets/03582838-4948-4a2f-87fc-b610bfeae213)
+![Image](https://github.com/user-attachments/assets/ca734c2d-7567-42c3-a8b6-63fc5bc75e3f)
+![Image](https://github.com/user-attachments/assets/22b4445c-dedf-4502-9043-d55eced70d2d)
+![Image](https://github.com/user-attachments/assets/2bc4e6d5-7a8e-4fb9-80b6-a2715665dfeb)
+![Image](https://github.com/user-attachments/assets/18ed16ca-f4d3-4510-a5f8-e65b56516a08)
+![Image](https://github.com/user-attachments/assets/992e668a-04c1-4a27-942b-61ccf0c13c45)
+![Image](https://github.com/user-attachments/assets/a3977ecf-c377-4f0e-bd14-89fa8da30e77)
+![Image](https://github.com/user-attachments/assets/d8238260-054f-41ac-bc3c-a0ab7e2ae449)
