@@ -1,6 +1,6 @@
 package com.onestep.back.dto.chat;
+
 import com.onestep.back.domain.ChatMessages;
-import com.onestep.back.domain.Chats;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +17,7 @@ public class ChatMessagesDTO {
     private String memberId;  // 메시지를 보낸 멤버의 ID
     private String content;   // 메시지 내용
     private LocalDateTime timestamp; // 메시지 작성 시각
+    private String chatName;
 
     // ChatMessages 엔티티를 DTO로 변환하는 생성자
     public ChatMessagesDTO(ChatMessages chatMessages) {
@@ -24,5 +25,6 @@ public class ChatMessagesDTO {
         this.memberId = chatMessages.getMemberId();
         this.content = chatMessages.getContent();
         this.timestamp = chatMessages.getRegDate();  // createdDate 필드를 timestamp로 사용
+        this.chatName = chatMessages.getChat().getChatName();
     }
 }

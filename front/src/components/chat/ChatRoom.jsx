@@ -10,7 +10,7 @@ const ChatRoom = () => {
     const { chatId } = useParams();
     const [memberCount, setMemberCount] = useState(null);
     const { selectedChat } = useOutletContext();
-    const chatRoomName = selectedChat ? selectedChat.chatName : chatId;
+
     const [messages, setMessages] = useState([]);
     const [error, setError] = useState(null);
     const [newMessage, setNewMessage] = useState('');
@@ -18,7 +18,9 @@ const ChatRoom = () => {
     const [isAtBottom, setIsAtBottom] = useState(true);
     const [showNewMessageIndicator, setShowNewMessageIndicator] = useState(false);
     const [lastConfirmedMessageId, setLastConfirmedMessageId] = useState(null);
-
+    const [chatRoomName, setChatRoomName] = useState(
+        selectedChat ? selectedChat.chatName : chatId
+    );
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     const listRef = useRef(null);
     // AuthContext에서 authState 가져오기
@@ -35,13 +37,16 @@ const ChatRoom = () => {
 
     // 메시지 로드 함수
     const loadMessages = (loadMore = false) => {
-        const lastMessageId =
-            loadMore && messages.length > 0 ? messages[0].messageId : null;
+        const lastMessageId = loadMore && messages.length > 0 ? messages[0].messageId : null;
         axios.get(`${SERVER_URL}/chat/${chatId}/messages`, {
             params: { loadMore, lastMessageId },
         })
             .then((response) => {
                 const newMessages = response.data;
+                // 응답 데이터의 첫번째 메시지에서 chatName을 가져와 상태 업데이트
+                if (newMessages && newMessages.length > 0) {
+                    setChatRoomName(newMessages[0].chatName);
+                }
                 setMessages((prev) =>
                     loadMore ? [...newMessages, ...prev] : newMessages
                 );
