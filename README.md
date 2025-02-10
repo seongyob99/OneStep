@@ -13,7 +13,7 @@
 - 언어 : Java(17)
 ### Tools
 - IDE : IntelliJ, VSCode
-- Version Controll : Git, Github
+- Version Control : Git, Github
 
 ## 제작 기간
 2025.1.31 ~ 2025.02.11
