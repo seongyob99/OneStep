@@ -74,7 +74,7 @@ public class GoalCustomRepoImpl extends QuerydslRepositorySupport implements Goa
 
         // 참여자 정보 조회
         List<Tuple> memberResult = from(members)
-                .leftJoin(members.certifications, certifications)
+                .leftJoin(members.certifications, certifications).on(certifications.goal.goalId.eq(goalId))
                 .leftJoin(members.goals, goals)
                 .where(goals.goalId.eq(goalId))
                 .groupBy(members.memberId, members.name)

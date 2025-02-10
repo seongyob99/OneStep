@@ -31,10 +31,9 @@ public class CertCustomRepoImpl extends QuerydslRepositorySupport implements Cer
 
         // 1. 인증 정보를 튜플 리스트로 fetch (goalId를 필터링)
         List<Tuple> memberResult = from(members)
-                .leftJoin(members.certifications, certifications)
+                .leftJoin(members.certifications, certifications).on(certifications.goal.goalId.eq(goalId))
                 .leftJoin(members.goals, goals)
-                .where(goals.goalId.eq(goalId) // goalId가 일치하는 멤버만 가져옴
-                        .and(certifications.goal.goalId.eq(goalId))) // goalId가 일치하는 인증 데이터만 포함
+                .where(goals.goalId.eq(goalId)) // goalId가 일치하는 멤버만 가져옴
                 .select(
                         goals.goalId,
                         goals.adminMember.memberId,

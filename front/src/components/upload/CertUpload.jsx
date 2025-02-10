@@ -19,14 +19,12 @@ const CertUpload = () => {
   const { authState } = useAuth();
   const memberId = authState.user?.username;
   const goalid = useParams().goalid;
-  const fileInputRef = useRef(null);
 
   // 목표 정보 불러오기: 목표 데이터는 배열 형식으로 받아온다고 가정
   useEffect(() => {
     axios
       .get(`${SERVER_URL}/cert/${goalid}`)
       .then((response) => {
-        console.log("📢 goalData API 응답:", response.data);
         // 응답이 배열이면 그대로 사용, 아니면 배열로 변환
         const data = Array.isArray(response.data)
           ? response.data
@@ -70,7 +68,6 @@ const CertUpload = () => {
     // 시작일로부터 오늘까지의 차이(일수) 계산
     const diffDays = Math.floor((today - startDate) / (1000 * 3600 * 24));
     const certCycle = Number(goalData[0]?.certCycle || 1);
-    console.log("🚀 diffDays:", diffDays, "certCycle:", certCycle, "오늘:", today);
     return diffDays % certCycle === 0;
   };
 
@@ -101,7 +98,7 @@ const CertUpload = () => {
       .toISOString()
       .split("T")[0];
 
-  
+
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("goalId", goalid);
@@ -113,7 +110,6 @@ const CertUpload = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       alert("인증 완료!");
-      console.log("📢 업로드 성공:", response.data);
       handleClose();
       window.location.reload();
       setUploading(false);
@@ -165,7 +161,7 @@ const CertUpload = () => {
         </Modal.Header>
         <Modal.Body>
           <Form.Group controlId="formFile" className="mb-3">
-          <Form.Label>{`오늘(${formatday(new Date)}) 인증 사진만 업로드 가능합니다.`}</Form.Label>
+            <Form.Label>{`오늘(${formatday(new Date)}) 인증 사진만 업로드 가능합니다.`}</Form.Label>
             <Form.Control type="file" onChange={handleFileChange} />
           </Form.Group>
         </Modal.Body>
