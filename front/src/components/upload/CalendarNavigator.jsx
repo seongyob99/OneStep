@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import CertModal from "./CertModal";
 import "@styles/upload/calendar.scss";
-import { useAuth } from '../context/AuthContext';
 
 //환경 변수에서 API 서버 URL 가져오기
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
@@ -21,16 +20,10 @@ const CalendarNavigator = ({ onDateClick }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
-  const [selectedFilePath, setSelectedFilePath] = useState(""); 
+  const [selectedFilePath, setSelectedFilePath] = useState("");
 
   const goalid = useParams().goalid;
   const selectedDayRef = useRef(null);
-
-
-  // AuthContext에서 authState 가져오기
-  const { authState } = useAuth();
-  // username 가져오기
-  const memberId = authState.user?.username;
 
 
   // 날짜 포맷 (yy-mm-dd)
@@ -110,7 +103,6 @@ const CalendarNavigator = ({ onDateClick }) => {
     }
 
     try {
-      const formattedDate = formatDate(selectedDate);
       const apiUrl = `${SERVER_URL}/cert/${goalid}`;
       const response = await axios.get(apiUrl, {
         headers: { "Content-Type": "application/json" },
@@ -131,7 +123,7 @@ const CalendarNavigator = ({ onDateClick }) => {
             acc[dateKey] = [];
           }
           acc[dateKey].push({
-            memberName: member.name,  
+            memberName: member.name,
             memberId: member.memberId,
             filePath: cert.filePath,
           });
@@ -162,10 +154,6 @@ const CalendarNavigator = ({ onDateClick }) => {
     }
   }, [fetchCertifications, selectedDate]);
 
-
-  const dateNavRef = useRef(null);
-
-  const sortedDates = Object.keys(groupedCertifications).sort();
   // 선택된 날짜에 해당하는 인증 정보만 추출
   const selectedDateKey = formatDate(selectedDate);
   const certificationsForSelectedDate = groupedCertifications[selectedDateKey] || [];
@@ -192,7 +180,7 @@ const CalendarNavigator = ({ onDateClick }) => {
                   className="year-input"
                   value={inputYear}
                   onChange={(e) => setInputYear(e.target.value)}
-                  onBlur={handleYearChange} 
+                  onBlur={handleYearChange}
                   onKeyDown={(e) => e.key === "Enter" && handleYearChange()}
                   autoFocus
                 />
