@@ -8,7 +8,7 @@
 - 프레임워크 및 라이브러리 : React, Axios
 - 언어 : SCSS, JavaScript
 ### Back-end
-- 프레임워크 및 라이브러리 : SpringBoot
+- 프레임워크: SpringBoot
 - DBMS : MariaDB
 - 언어 : Java(17)
 ### Tools
