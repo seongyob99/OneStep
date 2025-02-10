@@ -47,13 +47,13 @@ const CertDelete = ({
 
     try {
       const response = await axios.delete(
-        `${SERVER_URL}/cert/delete/${filePath}?goalId=${goalid}&memberId=${memberId}&certDate=${selectedDate}&currentMemberId=${memberId}`,
+        `${SERVER_URL}/cert/delete/${filePath}?goalId=${goalid}&memberId=${certOwnerId}&certDate=${selectedDate}&currentMemberId=${memberId}`,
         {
           data: {
             goalId: goalid,
             filePath: filePath,
             certDate: selectedDate,
-            currentMemberId:memberId
+            currentMemberId: memberId
           },
           headers: {
             "Content-Type": "application/json",
