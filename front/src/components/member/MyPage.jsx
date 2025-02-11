@@ -50,8 +50,8 @@ const MyPage = () => {
       try {
         setLoading(true);
         const [memberResponse, goalsResponse] = await Promise.all([
-          axios.get(`${SERVER_URL}/api/member/${memberId}`),
-          axios.get(`${SERVER_URL}/api/member/${memberId}/goals`),
+          axios.get(`${SERVER_URL}/member/${memberId}`),
+          axios.get(`${SERVER_URL}/member/${memberId}/goals`),
         ]);
         setMember(memberResponse.data);
         setGoals(goalsResponse.data || []);
@@ -117,7 +117,7 @@ const MyPage = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`${SERVER_URL}/api/member/${memberId}`);
+      await axios.delete(`${SERVER_URL}/member/${memberId}`);
       logout();
       alert("회원 탈퇴가 완료되었습니다.");
       navigate("/");

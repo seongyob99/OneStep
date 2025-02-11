@@ -52,7 +52,7 @@ const MemberDetail = () => {
   // 사용자 정보 가져오기
   const fetchMember = async () => {
     try {
-      const response = await axios.get(`${SERVER_URL}/api/member/${memberId}`);
+      const response = await axios.get(`${SERVER_URL}/member/${memberId}`);
       setMember(response.data);
     } catch (error) {
       console.error("사용자 정보를 가져오는 데 실패했습니다.", error);
@@ -115,7 +115,7 @@ const MemberDetail = () => {
 
     setValidationError(null); // 이전 에러 초기화
     try {
-      await axios.put(`${SERVER_URL}/api/member/update`, updatedMemberData);
+      await axios.put(`${SERVER_URL}/member/update`, updatedMemberData);
       alert("회원 정보가 성공적으로 수정되었습니다.");
       navigate("/mypage"); // 수정 성공 시 마이페이지로 이동
     } catch (error) {
